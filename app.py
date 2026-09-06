@@ -2,6 +2,7 @@ import os
 import re
 import json
 import math
+import glob
 import networkx as nx
 import pandas as pd
 import streamlit as st
@@ -139,7 +140,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Đã bỏ nút chỉ đường từ GPS tới vị trí đứt trong hàm này
 def apply_map_custom_css(folium_map):
     font_awesome_link = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">'
     folium_map.get_root().html.add_child(folium.Element(font_awesome_link))
@@ -180,7 +180,7 @@ def apply_map_custom_css(folium_map):
     """
     folium_map.get_root().html.add_child(folium.Element(custom_css))
 
-# 3. Tải dữ liệu Excel & JSON
+# 3. Tải dữ liệu Excel & Nhiều file JSON TQGP*.json
 @st.cache_data
 def load_data():
     file_path = "Data.xlsx"
@@ -190,54 +190,54 @@ def load_data():
     return df_uplink, df_cable, df_hdn
 
 @st.cache_data
-def load_json_cable_shapes(json_file_path="TQGP001.json"):
+def load_all_json_cable_shapes(search_pattern="TQGP*.json"):
     cable_shapes = {}
-    if not os.path.exists(json_file_path):
-        return cable_shapes
-        
-    try:
-        with open(json_file_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
+    json_files = glob.glob(search_pattern)
+    
+    for json_file_path in json_files:
+        try:
+            with open(json_file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
 
-        if isinstance(data, dict) and data.get("type") == "FeatureCollection":
-            for feature in data.get("features", []):
-                props = feature.get("properties", {})
-                cable_name = props.get("name") or props.get("TEN_DOAN_CAP") or props.get("code") or props.get("id")
-                geom = feature.get("geometry", {})
-                
-                if geom.get("type") == "LineString":
-                    coords = [[p[1], p[0]] for p in geom.get("coordinates", [])]
-                    if cable_name:
-                        cable_shapes[str(cable_name).strip()] = coords
-                elif geom.get("type") == "MultiLineString":
-                    coords = []
-                    for line in geom.get("coordinates", []):
-                        coords.extend([[p[1], p[0]] for p in line])
-                    if cable_name:
-                        cable_shapes[str(cable_name).strip()] = coords
+            if isinstance(data, dict) and data.get("type") == "FeatureCollection":
+                for feature in data.get("features", []):
+                    props = feature.get("properties", {})
+                    cable_name = props.get("name") or props.get("TEN_DOAN_CAP") or props.get("code") or props.get("id")
+                    geom = feature.get("geometry", {})
+                    
+                    if geom.get("type") == "LineString":
+                        coords = [[p[1], p[0]] for p in geom.get("coordinates", [])]
+                        if cable_name:
+                            cable_shapes[str(cable_name).strip()] = coords
+                    elif geom.get("type") == "MultiLineString":
+                        coords = []
+                        for line in geom.get("coordinates", []):
+                            coords.extend([[p[1], p[0]] for p in line])
+                        if cable_name:
+                            cable_shapes[str(cable_name).strip()] = coords
 
-        elif isinstance(data, list):
-            for item in data:
-                cable_name = item.get("cable_name") or item.get("name") or item.get("code")
-                coords = item.get("coordinates") or item.get("points") or item.get("path")
-                if cable_name and coords:
-                    formatted_coords = []
-                    for pt in coords:
-                        if isinstance(pt, (list, tuple)) and len(pt) >= 2:
-                            if pt[0] > pt[1]:
-                                formatted_coords.append([pt[1], pt[0]])
-                            else:
-                                formatted_coords.append([pt[0], pt[1]])
-                    if formatted_coords:
-                        cable_shapes[str(cable_name).strip()] = formatted_coords
-    except Exception as e:
-        st.error(f"Lỗi khi đọc file TQGP001.json: {e}")
+            elif isinstance(data, list):
+                for item in data:
+                    cable_name = item.get("cable_name") or item.get("name") or item.get("code")
+                    coords = item.get("coordinates") or item.get("points") or item.get("path")
+                    if cable_name and coords:
+                        formatted_coords = []
+                        for pt in coords:
+                            if isinstance(pt, (list, tuple)) and len(pt) >= 2:
+                                if pt[0] > pt[1]:
+                                    formatted_coords.append([pt[1], pt[0]])
+                                else:
+                                    formatted_coords.append([pt[0], pt[1]])
+                        if formatted_coords:
+                            cable_shapes[str(cable_name).strip()] = formatted_coords
+        except Exception as e:
+            st.warning(f"Lỗi khi đọc file {json_file_path}: {e}")
 
     return cable_shapes
 
 try:
     df_uplink, df_cable, df_hdn = load_data()
-    json_cable_shapes = load_json_cable_shapes("TQGP001.json")
+    json_cable_shapes = load_all_json_cable_shapes("TQGP*.json")
 except Exception as e:
     st.error(f"Lỗi khi tải dữ liệu: {e}")
     st.stop()
@@ -411,10 +411,19 @@ with st.sidebar:
                 offset = target_dist - target_segment['start_dist']
                 fault_lat, fault_lng = None, None
 
+                # Đảo chiều tuyến cáp trong JSON nếu hướng vẽ trong JSON ngược với hướng di chuyển TĐ A -> TĐ B
                 if cable_name in json_cable_shapes:
                     raw_coords = json_cable_shapes[cable_name]
+                    u_coord = hdn_coords.get(target_segment['u'])
+                    if u_coord and len(raw_coords) > 1:
+                        d_start = haversine(u_coord[0], u_coord[1], raw_coords[0][0], raw_coords[0][1])
+                        d_end = haversine(u_coord[0], u_coord[1], raw_coords[-1][0], raw_coords[-1][1])
+                        if d_end < d_start:
+                            raw_coords = list(reversed(raw_coords))
+
                     fault_lat, fault_lng = interpolate_on_polyline(raw_coords, offset)
 
+                # Fallback: Nội suy tuyến thẳng nếu thiếu tọa độ chi tiết
                 if fault_lat is None or fault_lng is None:
                     u_coord = hdn_coords.get(target_segment['u'])
                     v_coord = hdn_coords.get(target_segment['v'])
@@ -475,12 +484,19 @@ if map_data:
     
     folium.LayerControl().add_to(m)
 
-    # Hiển thị lộ trình bằng AntPath (Hiệu ứng dòng chảy di chuyển đến điểm đứt)
+    # Hiển thị lộ trình bằng AntPath dựa theo đường cáp thực tế trong JSON
     full_route_coords = []
     for seg in map_data['cable_segments']:
         c_name = seg['cable']
         if c_name in json_cable_shapes:
-            full_route_coords.extend(json_cable_shapes[c_name])
+            seg_coords = json_cable_shapes[c_name]
+            u_coord = hdn_coords.get(seg['u'])
+            if u_coord and len(seg_coords) > 1:
+                d_start = haversine(u_coord[0], u_coord[1], seg_coords[0][0], seg_coords[0][1])
+                d_end = haversine(u_coord[0], u_coord[1], seg_coords[-1][0], seg_coords[-1][1])
+                if d_end < d_start:
+                    seg_coords = list(reversed(seg_coords))
+            full_route_coords.extend(seg_coords)
         else:
             u_coord = hdn_coords.get(seg['u'])
             v_coord = hdn_coords.get(seg['v'])
@@ -497,7 +513,7 @@ if map_data:
             weight=6,
             opacity=0.9,
             delay=1000,
-            tooltip="Lộ trình cáp mạng"
+            tooltip="Lộ trình cáp mạng thực tế"
         ).add_to(m)
 
     # Hiển thị Marker và Nhãn tên TĐ
