@@ -365,18 +365,15 @@ with st.sidebar:
 
                 if fault_lat and fault_lng:
                     st.success(
-                        f"""<div style="color: #1D4ED8; font-weight: 600;">
-                        ⚠️ <b>Vị trí đứt nằm trong đoạn cáp:</b><br><br>
-                        <b>{cable_name}</b><br><br>
-                        📍 <b>Lộ trình đoạn:</b> {target_segment['u']} ➔ {target_segment['v']}<br><br>
-                        📏 <b>Chiều dài đoạn cáp lỗi:</b> {target_segment['length']:.1f} m<br><br>
-                        🔌 <b>Dung lượng đoạn cáp:</b> {target_segment['capacity']}<br><br>
-                        <hr style="border-top: 1px solid #1D4ED8;">
-                        🎯 <b>Chi tiết vị trí điểm đứt:</b><br>
-                        - Cách <b>{target_segment['u']}</b> (Đầu đoạn): <b>{offset_from_u:.1f} m</b><br>
-                        - Cách <b>{target_segment['v']}</b> (Cuối đoạn): <b>{offset_from_v:.1f} m</b>
-                        </div>""",
-                        unsafe_allow_html=True
+                        f"⚠️ **Vị trí đứt nằm trong đoạn cáp:**\n\n"
+                        f"**{cable_name}**\n\n"
+                        f"📍 **Lộ trình đoạn:** {target_segment['u']} ➔ {target_segment['v']}\n\n"
+                        f"📏 **Chiều dài đoạn cáp lỗi:** {target_segment['length']:.1f} m\n\n"
+                        f"🔌 **Dung lượng đoạn cáp:** {target_segment['capacity']}\n\n"
+                        f"---\n"
+                        f"🎯 **Chi tiết vị trí điểm đứt:**\n"
+                        f"- Cách **{target_segment['u']}** (Đầu đoạn): **{offset_from_u:.1f} m**\n"
+                        f"- Cách **{target_segment['v']}** (Cuối đoạn): **{offset_from_v:.1f} m**"
                     )
                     gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
                     st.link_button("📍 Mở chỉ đường Google Maps", gmaps_url, type="primary", use_container_width=True)
