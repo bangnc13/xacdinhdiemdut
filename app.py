@@ -14,61 +14,43 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS Streamlit
+# 2. Inject CSS Streamlit (Chuyển viền nút toggle menu sang màu Cam Neon + Bo tròn)
 st.markdown("""
     <style>
-    /* 1. HIỆN HEADER TRONG SUỐT CHO NÚT TOGGLE SIDEBAR */
+    /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
     header[data-testid="stHeader"] {
         background-color: transparent !important;
         z-index: 999999 !important;
     }
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
 
-    /* 2. ẨN HOÀN TOÀN TẤT CẢ BIỂU TƯỢNG BÊN PHẢI (GITHUB/CON MÈO, FORK, STAR, MENU 3 CHẤM, DEPLOY) */
-    #MainMenu {visibility: hidden !important;}
-    footer {visibility: hidden !important;}
-    [data-testid="stToolbar"] {display: none !important;}
-    [data-testid="stDecoration"] {display: none !important;}
-    [data-testid="stStatusWidget"] {display: none !important;}
-    .stAppDeployButton {display: none !important;}
-    a[href*="github.com"] {display: none !important;}
-
-    /* 3. ĐỊNH DẠNG NÚT BẤM HIỆN/ẨN MENU TRÊN BẢN ĐỒ (XANH NEON & BO TRÒN) */
+    /* 2. ĐỊNH DẠNG NÚT BẤM ẨN/HIỆN SIDEBAR: BO TRÒN VÀ VIỀN CAM NEON */
     button[data-testid="stHeaderIconButton"],
-    [data-testid="stSidebarCollapseButton"] button,
-    [data-testid="stSidebarCollapsedControl"] button {
-        background-color: #0F172A !important;                /* Nền tối nổi bật */
-        color: #00FF66 !important;                           /* Icon màu xanh neon */
-        border-radius: 50% !important;                       /* Bo tròn hoàn toàn */
-        width: 42px !important;
-        height: 42px !important;
+    [data-testid="stSidebarCollapseButton"] button {
+        background-color: #2563EB !important;
+        color: white !important;
+        border-radius: 50% !important;                       /* Bo tròn hoàn toàn dạng hình tròn */
+        width: 40px !important;
+        height: 40px !important;
         padding: 0px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        border: 2px solid #00FF66 !important;                /* Đường viền màu Xanh Neon */
-        box-shadow: 0 0 12px rgba(0, 255, 102, 0.8), 0 4px 12px rgba(0, 0, 0, 0.5) !important; /* Hiệu ứng phát sáng Xanh Neon */
+        border: 2px solid #FF5F1F !important;                /* Đường viền màu Cam Neon */
+        box-shadow: 0 0 10px rgba(255, 95, 31, 0.8), 0 4px 12px rgba(0, 0, 0, 0.5) !important; /* Hiệu ứng phát sáng neon */
         transition: all 0.2s ease-in-out !important;
     }
 
     button[data-testid="stHeaderIconButton"]:hover,
-    [data-testid="stSidebarCollapseButton"] button:hover,
-    [data-testid="stSidebarCollapsedControl"] button:hover {
-        background-color: #1E293B !important;
-        border-color: #66FF99 !important;                     /* Viền sáng hơn khi hover */
-        color: #FFFFFF !important;
-        box-shadow: 0 0 18px rgba(0, 255, 102, 1), 0 4px 15px rgba(0, 0, 0, 0.6) !important;
+    [data-testid="stSidebarCollapseButton"] button:hover {
+        background-color: #1D4ED8 !important;
+        border-color: #FF7F3E !important;                     /* Viền sáng hơn khi hover */
+        box-shadow: 0 0 15px rgba(255, 127, 62, 1), 0 4px 15px rgba(0, 0, 0, 0.6) !important;
         transform: scale(1.08);
     }
 
-    /* Đảm bảo nút bấm khi menu bị đóng vẫn hiển thị đè lên bản đồ */
-    [data-testid="stSidebarCollapsedControl"] {
-        position: fixed !important;
-        top: 12px !important;
-        left: 12px !important;
-        z-index: 999999 !important;
-    }
-
-    /* 4. BẢN ĐỒ TRÀN SÁT CÁC CẠNH MÀN HÌNH */
+    /* 3. BẢN ĐỒ TRÀN SÁT CÁC CẠNH MÀN HÌNH */
     .block-container {
         padding-top: 0rem !important;
         padding-bottom: 0rem !important;
@@ -77,7 +59,7 @@ st.markdown("""
         max-width: 100% !important;
     }
 
-    /* 5. MENU BÊN TRÁI (SIDEBAR) TRONG SUỐT VỚI HIỆU ỨNG BLUR KÍNH MỜ */
+    /* 4. MENU BÊN TRÁI (SIDEBAR) TRONG SUỐT VỚI HIỆU ỨNG BLUR KÍNH MỜ */
     [data-testid="stSidebar"] {
         background: rgba(15, 23, 42, 0.75) !important;
         backdrop-filter: blur(16px) saturate(180%) !important;
@@ -86,7 +68,7 @@ st.markdown("""
         z-index: 999998 !important;
     }
 
-    /* 6. ĐỔI MÀU CHỮ TRÊN MENU */
+    /* 5. ĐỔI MÀU CHỮ TRÊN MENU */
     [data-testid="stSidebar"] h1, 
     [data-testid="stSidebar"] h2, 
     [data-testid="stSidebar"] h3, 
@@ -103,7 +85,7 @@ st.markdown("""
         color: #3B82F6 !important;
     }
 
-    /* 7. Ô NHẬP & SELECTBOX */
+    /* 6. Ô NHẬP & SELECTBOX */
     [data-testid="stSidebar"] input, [data-testid="stSidebar"] div[data-baseweb="select"] {
         background-color: rgba(0, 0, 0, 0.4) !important;
         color: #93C5FD !important;
