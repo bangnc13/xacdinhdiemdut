@@ -262,9 +262,38 @@ def load_all_json_cables(directory="."):
 
     return cable_shapes
 
+# Hàm căn chỉnh hướng tọa độ cáp từ u đến v
+def get_oriented_cable_coords(cable_name, u_node, v_node, json_cable_shapes, hdn_coords):
+    if cable_name not in json_cable_shapes:
+        u_pt = hdn_coords.get(u_node)
+        v_pt = hdn_coords.get(v_node)
+        if u_pt and v_pt:
+            return [u_pt, v_pt]
+        return []
+    
+    coords = list(json_cable_shapes[cable_name])
+    if len(coords) < 2:
+        return coords
+
+    u_pt = hdn_coords.get(u_node)
+    v_pt = hdn_coords.get(v_node)
+
+    if u_pt:
+        # Kiểm tra điểm đầu hay điểm cuối gần u_node hơn
+        dist_start = haversine(u_pt[0], u_pt[1], coords[0][0], coords[0][1])
+        dist_end = haversine(u_pt[0], u_pt[1], coords[-1][0], coords[-1][1])
+        if dist_end < dist_start:
+            coords.reverse()
+            
+    return coords
+
+# Nội suy tọa độ chính xác từng điểm uốn uốn lượn trên sợi cáp
 def interpolate_on_polyline(coords, target_offset):
-    if not coords or len(coords) < 2:
+    if not coords:
         return None
+    if len(coords) == 1:
+        return coords[0][0], coords[0][1]
+
     accumulated = 0.0
     for i in range(len(coords) - 1):
         p1, p2 = coords[i], coords[i+1]
@@ -297,11 +326,10 @@ for _, row in df_hdn.iterrows():
     if pd.notnull(lat) and pd.notnull(lng):
         hdn_coords[name] = (float(lat), float(lng))
 
-# Bổ sung tọa độ từ JSON vào hdn_coords cho các điểm chưa có trong Excel
+# Bổ sung tọa độ gốc từ JSON nếu Excel thiếu
 for cable_name, coords in json_cable_shapes.items():
     if coords:
         start_pt, end_pt = coords[0], coords[-1]
-        # Lấy tọa độ đầu cuối làm điểm tham chiếu dự phòng
         for _, row in df_cable[df_cable['Tên đoạn cáp'].astype(str).str.strip() == cable_name].iterrows():
             u = normalize_node(row['Điểm KN1'])
             v = normalize_node(row['Điểm KN2'])
@@ -310,22 +338,22 @@ for cable_name, coords in json_cable_shapes.items():
             if v and v not in hdn_coords:
                 hdn_coords[v] = (end_pt[0], end_pt[1])
 
-# 5. Xây dựng đồ thị mạng cáp (Kết hợp chiều dài tính từ JSON nếu Excel thiếu)
+# 5. Xây dựng đồ thị mạng cáp & TÍNH CHIỀU DÀI THỰC TẾ THEO CÁC ĐIỂM TỌA ĐỘ
 G = nx.Graph()
 for _, row in df_cable.iterrows():
     u = normalize_node(row['Điểm KN1'])
     v = normalize_node(row['Điểm KN2'])
     cable_name = str(row['Tên đoạn cáp']).strip()
     
-    try:
-        length = float(row['Chiều dài thực (m)'])
-    except (ValueError, TypeError):
-        length = 0.0
-        
-    # Nâng cấp: Tính chiều dài chính xác bằng tọa độ polyline JSON nếu Excel để trống hoặc = 0
-    if length <= 0 and cable_name in json_cable_shapes:
+    # Tính chiều dài thực dựa trên chuỗi tọa độ chi tiết của JSON
+    if cable_name in json_cable_shapes:
         length = calculate_polyline_length(json_cable_shapes[cable_name])
-        
+    else:
+        try:
+            length = float(row['Chiều dài thực (m)'])
+        except (ValueError, TypeError):
+            length = 0.0
+
     if u and v:
         G.add_edge(u, v, cable=cable_name, length=length)
 
@@ -413,13 +441,17 @@ with st.sidebar:
                 start_d = accumulated_dist
                 accumulated_dist += seg_len
                 
+                # Căn chỉnh thứ tự tọa độ từ u sang v
+                oriented_coords = get_oriented_cable_coords(edge_data['cable'], u, v, json_cable_shapes, hdn_coords)
+
                 seg_info = {
                     'u': u,
                     'v': v,
                     'cable': edge_data['cable'],
                     'length': seg_len,
                     'start_dist': start_d,
-                    'end_dist': accumulated_dist
+                    'end_dist': accumulated_dist,
+                    'coords': oriented_coords
                 }
                 cable_segments.append(seg_info)
 
@@ -433,20 +465,9 @@ with st.sidebar:
             elif target_segment:
                 cable_name = target_segment['cable']
                 offset = target_dist - target_segment['start_dist']
-                fault_lat, fault_lng = None, None
-
-                # Định vị điểm đứt chính xác từ các điểm tọa độ tuyến cáp
-                if cable_name in json_cable_shapes:
-                    raw_coords = json_cable_shapes[cable_name]
-                    fault_lat, fault_lng = interpolate_on_polyline(raw_coords, offset)
-
-                if fault_lat is None or fault_lng is None:
-                    u_coord = hdn_coords.get(target_segment['u'])
-                    v_coord = hdn_coords.get(target_segment['v'])
-                    if u_coord and v_coord:
-                        ratio = offset / target_segment['length'] if target_segment['length'] > 0 else 0
-                        fault_lat = u_coord[0] + ratio * (v_coord[0] - u_coord[0])
-                        fault_lng = u_coord[1] + ratio * (v_coord[1] - u_coord[1])
+                
+                # Định vị vị trí đứt theo đúng khúc cua thực tế trên bản đồ
+                fault_lat, fault_lng = interpolate_on_polyline(target_segment['coords'], offset)
 
                 if fault_lat and fault_lng:
                     st.success(f"⚠️ **Vị trí đứt nằm trong đoạn cáp:**\n\n**{cable_name}**\n\n({target_segment['u']} ➔ {target_segment['v']})")
@@ -466,7 +487,7 @@ with st.sidebar:
                 else:
                     st.warning("Thiếu dữ liệu tọa độ Lat/Lng cho đoạn cáp chứa vị trí đứt.")
 
-# 7. BẢN ĐỒ BÊN PHẢI
+# 7. BẢN ĐỒ BÊN PHẢI HIỂN THỊ CHÍNH XÁC KHÚC CUA
 if map_data:
     m = folium.Map(
         location=[map_data['fault_lat'], map_data['fault_lng']], 
@@ -500,18 +521,10 @@ if map_data:
     
     folium.LayerControl().add_to(m)
 
+    # Nối toàn bộ chuỗi tọa độ đa điểm của tuyến cáp
     full_route_coords = []
     for seg in map_data['cable_segments']:
-        c_name = seg['cable']
-        if c_name in json_cable_shapes:
-            full_route_coords.extend(json_cable_shapes[c_name])
-        else:
-            u_coord = hdn_coords.get(seg['u'])
-            v_coord = hdn_coords.get(seg['v'])
-            if u_coord:
-                full_route_coords.append(u_coord)
-            if v_coord:
-                full_route_coords.append(v_coord)
+        full_route_coords.extend(seg['coords'])
 
     if full_route_coords:
         AntPath(
@@ -521,7 +534,7 @@ if map_data:
             weight=6,
             opacity=0.9,
             delay=1000,
-            tooltip="Lộ trình cáp mạng"
+            tooltip="Lộ trình cáp mạng thực tế"
         ).add_to(m)
 
     for node in map_data['node_path']:
@@ -603,6 +616,7 @@ else:
         iconLoading="fa fa-spinner fa-spin"
     ).add_to(default_map)
 
+    # Hiển thị tất cả các tuyến cáp thực tế có trong JSON khi chưa tra cứu
     for c_name, coords in json_cable_shapes.items():
         folium.PolyLine(
             coords,
