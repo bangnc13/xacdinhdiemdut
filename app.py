@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS Streamlit (Giao diện SÁNG - Lịch sự, Dễ đọc + Giảm độ mờ Sidebar)
+# 2. Inject CSS Streamlit (Sidebar Trong Suốt 70% + Hiệu ứng Blur Kính Mờ)
 st.markdown("""
     <style>
     /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
@@ -67,17 +67,17 @@ st.markdown("""
         max-width: 100% !important;
     }
 
-    /* 4. MENU BÊN TRÁI (SIDEBAR) GIAO DIỆN SÁNG VỚI HIỆU ỨNG BLUR KÍNH MỜ SÁNG */
+    /* 4. MENU BÊN TRÁI (SIDEBAR) TRONG SUỐT 70% + KHỬ MỜ BLUR */
     [data-testid="stSidebar"] {
-        background: rgba(255, 255, 255, 0.88) !important;    /* Nền trắng mờ sáng tinh tế */
-        backdrop-filter: blur(16px) saturate(180%) !important;
-        -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-        border-right: 1px solid rgba(203, 213, 225, 0.8) !important;
+        background: rgba(255, 255, 255, 0.30) !important;    /* Nền trắng trong suốt 70% (độ phủ 30%) */
+        backdrop-filter: blur(20px) saturate(180%) !important;/* Giữ hiệu ứng kính mờ mịn đẹp */
+        -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.4) !important;
         z-index: 999998 !important;
-        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05) !important;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08) !important;
     }
 
-    /* 5. ĐỔI MÀU CHỮ SANG TÔNG ĐẬM (DỄ ĐỌC TRÊN NỀN SÁNG) */
+    /* 5. MÀU CHỮ ĐẬM BẮT MẮT (GIÚP DỄ ĐỌC TRÊN NỀN BẢN ĐỒ BÊN DƯỚI) */
     [data-testid="stSidebar"] h1, 
     [data-testid="stSidebar"] h2, 
     [data-testid="stSidebar"] h3, 
@@ -85,32 +85,32 @@ st.markdown("""
     [data-testid="stSidebar"] .stMarkdown,
     [data-testid="stSidebar"] p,
     [data-testid="stSidebar"] span {
-        color: #1E293B !important;                          /* Màu xanh đen đậm */
+        color: #0F172A !important;                          /* Chữ đen đậm rõ ràng */
         font-weight: 600 !important;
-        text-shadow: none !important;
+        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);    /* Đổ bóng nhẹ chân chữ giúp nổi bật */
     }
 
     [data-testid="stSidebar"] h1 {
-        color: #2563EB !important;                          /* Tiêu đề xanh FPT */
+        color: #1D4ED8 !important;                          /* Tiêu đề xanh đậm */
     }
 
-    /* 6. Ô NHẬP & SELECTBOX TÔNG SÁNG */
+    /* 6. Ô NHẬP & SELECTBOX TRONG SUỐT BÁN PHẦN */
     [data-testid="stSidebar"] input, 
     [data-testid="stSidebar"] div[data-baseweb="select"] {
-        background-color: #F1F5F9 !important;               /* Nền xám nhạt */
-        color: #0F172A !important;                          /* Chữ đen đậm */
-        border: 1px solid #CBD5E1 !important;
+        background-color: rgba(255, 255, 255, 0.6) !important; /* Ô nhập liệu mờ nhẹ */
+        color: #0F172A !important;
+        border: 1px solid rgba(148, 163, 184, 0.5) !important;
         border-radius: 8px !important;
     }
 
-    /* Định dạng menu xổ xuống của Selectbox */
+    /* Menu xổ xuống của Selectbox */
     div[data-baseweb="popover"] {
-        background-color: #FFFFFF !important;
+        background-color: rgba(255, 255, 255, 0.95) !important;
         color: #0F172A !important;
     }
 
     [data-testid="stSidebar"] hr {
-        border-color: #E2E8F0 !important;
+        border-color: rgba(148, 163, 184, 0.4) !important;
     }
 
     .stButton > button, .stLinkButton > a {
@@ -119,12 +119,12 @@ st.markdown("""
         border-radius: 8px !important;
         font-weight: bold !important;
         border: none !important;
-        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3) !important;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4) !important;
     }
 
     .stButton > button:hover, .stLinkButton > a:hover {
         background-color: #1D4ED8 !important;
-        box-shadow: 0 4px 10px rgba(29, 78, 216, 0.4) !important;
+        box-shadow: 0 4px 12px rgba(29, 78, 216, 0.5) !important;
     }
 
     iframe {
