@@ -10,7 +10,6 @@ import folium
 from folium import DivIcon
 from folium.plugins import LocateControl, AntPath
 from streamlit_folium import st_folium
-import streamlit.components.v1 as components
 from PIL import Image
 
 # 1. Cấu hình trang
@@ -207,15 +206,14 @@ def normalize_node(node_str):
         return f"{prefix}.{int(num):04d}/{suffix}"
     return s
 
-# 3. Tải dữ liệu Excel & Đọc toàn bộ các file JSON trong hệ thống
+# 3. Đọc dữ liệu cáp kết nối từ Excel
 @st.cache_data
-def load_data():
+def load_excel_cable():
     file_path = "Data.xlsx"
-    df_uplink = pd.read_excel(file_path, sheet_name="uplink")
     df_cable = pd.read_excel(file_path, sheet_name="Đoạn cáp")
-    df_hdn = pd.read_excel(file_path, sheet_name="HĐN")
-    return df_uplink, df_cable, df_hdn
+    return df_cable
 
+# 4. Trích xuất TOÀN BỘ tọa độ từ các file JSON
 @st.cache_data
 def load_all_json_cables(directory="."):
     cable_shapes = {}
@@ -262,11 +260,29 @@ def load_all_json_cables(directory="."):
 
     return cable_shapes
 
-# Hàm căn chỉnh hướng tọa độ cáp từ u đến v
-def get_oriented_cable_coords(cable_name, u_node, v_node, json_cable_shapes, hdn_coords):
+# Tự động gán tọa độ các tập điểm u, v từ 2 đầu của sợi cáp trong JSON
+def build_node_coords_from_json(df_cable, json_cable_shapes):
+    node_coords = {}
+    for _, row in df_cable.iterrows():
+        u = normalize_node(row['Điểm KN1'])
+        v = normalize_node(row['Điểm KN2'])
+        cable_name = str(row['Tên đoạn cáp']).strip()
+
+        if cable_name in json_cable_shapes:
+            coords = json_cable_shapes[cable_name]
+            if coords:
+                start_pt, end_pt = coords[0], coords[-1]
+                if u and u not in node_coords:
+                    node_coords[u] = (start_pt[0], start_pt[1])
+                if v and v not in node_coords:
+                    node_coords[v] = (end_pt[0], end_pt[1])
+    return node_coords
+
+# Định hướng hướng tọa độ đi từ u sang v
+def get_oriented_cable_coords(cable_name, u_node, v_node, json_cable_shapes, node_coords):
     if cable_name not in json_cable_shapes:
-        u_pt = hdn_coords.get(u_node)
-        v_pt = hdn_coords.get(v_node)
+        u_pt = node_coords.get(u_node)
+        v_pt = node_coords.get(v_node)
         if u_pt and v_pt:
             return [u_pt, v_pt]
         return []
@@ -275,11 +291,8 @@ def get_oriented_cable_coords(cable_name, u_node, v_node, json_cable_shapes, hdn
     if len(coords) < 2:
         return coords
 
-    u_pt = hdn_coords.get(u_node)
-    v_pt = hdn_coords.get(v_node)
-
+    u_pt = node_coords.get(u_node)
     if u_pt:
-        # Kiểm tra điểm đầu hay điểm cuối gần u_node hơn
         dist_start = haversine(u_pt[0], u_pt[1], coords[0][0], coords[0][1])
         dist_end = haversine(u_pt[0], u_pt[1], coords[-1][0], coords[-1][1])
         if dist_end < dist_start:
@@ -287,7 +300,7 @@ def get_oriented_cable_coords(cable_name, u_node, v_node, json_cable_shapes, hdn
             
     return coords
 
-# Nội suy tọa độ chính xác từng điểm uốn uốn lượn trên sợi cáp
+# Nội suy vị trí chính xác trên đường cáp JSON
 def interpolate_on_polyline(coords, target_offset):
     if not coords:
         return None
@@ -308,44 +321,22 @@ def interpolate_on_polyline(coords, target_offset):
     return coords[-1][0], coords[-1][1]
 
 try:
-    df_uplink, df_cable, df_hdn = load_data()
+    df_cable = load_excel_cable()
     json_cable_shapes = load_all_json_cables(".")
+    # CHỈ LẤY TỌA ĐỘ TỪ CÁC FILE JSON
+    json_node_coords = build_node_coords_from_json(df_cable, json_cable_shapes)
 except Exception as e:
     st.error(f"Lỗi khi tải dữ liệu: {e}")
     st.stop()
 
-# 4. Trích xuất tọa độ HĐN từ Excel
-df_hdn['Lat_clean'] = pd.to_numeric(df_hdn['Lat'].astype(str).str.replace(',', '.'), errors='coerce')
-df_hdn['Lng_clean'] = pd.to_numeric(df_hdn['Lng'].astype(str).str.replace(',', '.'), errors='coerce')
-
-hdn_coords = {}
-for _, row in df_hdn.iterrows():
-    name = normalize_node(row['Tên đối tượng'])
-    lat = row['Lat_clean']
-    lng = row['Lng_clean']
-    if pd.notnull(lat) and pd.notnull(lng):
-        hdn_coords[name] = (float(lat), float(lng))
-
-# Bổ sung tọa độ gốc từ JSON nếu Excel thiếu
-for cable_name, coords in json_cable_shapes.items():
-    if coords:
-        start_pt, end_pt = coords[0], coords[-1]
-        for _, row in df_cable[df_cable['Tên đoạn cáp'].astype(str).str.strip() == cable_name].iterrows():
-            u = normalize_node(row['Điểm KN1'])
-            v = normalize_node(row['Điểm KN2'])
-            if u and u not in hdn_coords:
-                hdn_coords[u] = (start_pt[0], start_pt[1])
-            if v and v not in hdn_coords:
-                hdn_coords[v] = (end_pt[0], end_pt[1])
-
-# 5. Xây dựng đồ thị mạng cáp & TÍNH CHIỀU DÀI THỰC TẾ THEO CÁC ĐIỂM TỌA ĐỘ
+# 5. Xây dựng đồ thị mạng cáp dựa hoàn toàn vào khoảng cách thực từ JSON
 G = nx.Graph()
 for _, row in df_cable.iterrows():
     u = normalize_node(row['Điểm KN1'])
     v = normalize_node(row['Điểm KN2'])
     cable_name = str(row['Tên đoạn cáp']).strip()
     
-    # Tính chiều dài thực dựa trên chuỗi tọa độ chi tiết của JSON
+    # Tính chiều dài thực tế từ chuỗi tọa độ chi tiết của file JSON
     if cable_name in json_cable_shapes:
         length = calculate_polyline_length(json_cable_shapes[cable_name])
     else:
@@ -363,7 +354,7 @@ if 'search_performed' not in st.session_state:
 map_data = None
 all_nodes = sorted(list(G.nodes()))
 
-# 6. MENU SIDEBAR
+# 6. GIAO DIỆN CHỌN TẬP ĐIỂM VÀ TÌM ĐIỂM ĐỨT
 with st.sidebar:
     current_dir = os.path.dirname(os.path.abspath(__file__)) if '__file__' in globals() else os.getcwd()
     logo_path = os.path.join(current_dir, "FPT_Telecom_logo.png")
@@ -441,8 +432,7 @@ with st.sidebar:
                 start_d = accumulated_dist
                 accumulated_dist += seg_len
                 
-                # Căn chỉnh thứ tự tọa độ từ u sang v
-                oriented_coords = get_oriented_cable_coords(edge_data['cable'], u, v, json_cable_shapes, hdn_coords)
+                oriented_coords = get_oriented_cable_coords(edge_data['cable'], u, v, json_cable_shapes, json_node_coords)
 
                 seg_info = {
                     'u': u,
@@ -466,7 +456,6 @@ with st.sidebar:
                 cable_name = target_segment['cable']
                 offset = target_dist - target_segment['start_dist']
                 
-                # Định vị vị trí đứt theo đúng khúc cua thực tế trên bản đồ
                 fault_lat, fault_lng = interpolate_on_polyline(target_segment['coords'], offset)
 
                 if fault_lat and fault_lng:
@@ -485,9 +474,9 @@ with st.sidebar:
                         'target_dist': target_dist
                     }
                 else:
-                    st.warning("Thiếu dữ liệu tọa độ Lat/Lng cho đoạn cáp chứa vị trí đứt.")
+                    st.warning("Thiếu dữ liệu tọa độ trong file JSON cho đoạn cáp này.")
 
-# 7. BẢN ĐỒ BÊN PHẢI HIỂN THỊ CHÍNH XÁC KHÚC CUA
+# 7. HIỂN THỊ BẢN ĐỒ DỰA TRÊN TOÀN BỘ DỮ LIỆU TỌA ĐỘ JSON
 if map_data:
     m = folium.Map(
         location=[map_data['fault_lat'], map_data['fault_lng']], 
@@ -521,7 +510,6 @@ if map_data:
     
     folium.LayerControl().add_to(m)
 
-    # Nối toàn bộ chuỗi tọa độ đa điểm của tuyến cáp
     full_route_coords = []
     for seg in map_data['cable_segments']:
         full_route_coords.extend(seg['coords'])
@@ -534,12 +522,12 @@ if map_data:
             weight=6,
             opacity=0.9,
             delay=1000,
-            tooltip="Lộ trình cáp mạng thực tế"
+            tooltip="Lộ trình cáp mạng thực tế (JSON)"
         ).add_to(m)
 
     for node in map_data['node_path']:
-        if node in hdn_coords:
-            coord = hdn_coords[node]
+        if node in json_node_coords:
+            coord = json_node_coords[node]
             
             if node == map_data['td_a']:
                 icon_color, icon_name = "green", "play"
@@ -616,7 +604,6 @@ else:
         iconLoading="fa fa-spinner fa-spin"
     ).add_to(default_map)
 
-    # Hiển thị tất cả các tuyến cáp thực tế có trong JSON khi chưa tra cứu
     for c_name, coords in json_cable_shapes.items():
         folium.PolyLine(
             coords,
