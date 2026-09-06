@@ -1,5 +1,7 @@
 import os
 import re
+import json
+import math
 import networkx as nx
 import pandas as pd
 import streamlit as st
@@ -16,49 +18,46 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS Streamlit (Xóa hiệu ứng bóng chữ)
+# 2. Inject CSS Streamlit (Phẳng, chữ xanh dương, xóa text-shadow)
 st.markdown("""
     <style>
-    /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
     header[data-testid="stHeader"] {
         background-color: transparent !important;
         z-index: 999999 !important;
-        pointer-events: none; /* Tránh đè click lên bản đồ */
+        pointer-events: none;
     }
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* 2. ĐỊNH DẠNG VÀ DI CHUYỂN NÚT TOGGLE SIDEBAR SANG SÁT GÓC TRÁI */
     button[data-testid="stHeaderIconButton"],
     [data-testid="stSidebarCollapseButton"] button {
-        pointer-events: auto !important;                     /* Bật lại click cho nút */
-        position: fixed !important;                          /* Cố định vị trí trên màn hình */
-        top: 10px !important;                                /* Cách mép trên 10px */
-        left: 10px !important;                               /* Dời sát góc TRÁI màn hình */
-        z-index: 1000000 !important;                         /* Nổi lên trên cùng */
-        background-color: #FFEDD5 !important;                /* Nền cam nhạt */
-        color: #EA580C !important;                           /* Chữ cam đậm */
-        border-radius: 50% !important;                       /* Bo tròn dạng hình tròn */
+        pointer-events: auto !important;
+        position: fixed !important;
+        top: 10px !important;
+        left: 10px !important;
+        z-index: 1000000 !important;
+        background-color: #FFEDD5 !important;
+        color: #EA580C !important;
+        border-radius: 50% !important;
         width: 40px !important;
         height: 40px !important;
         padding: 0px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        border: 2px solid #FF5F1F !important;                /* Viền Cam Neon */
+        border: 2px solid #FF5F1F !important;
         box-shadow: 0 0 10px rgba(255, 95, 31, 0.5), 0 4px 12px rgba(0, 0, 0, 0.2) !important;
         transition: all 0.2s ease-in-out !important;
     }
 
     button[data-testid="stHeaderIconButton"]:hover,
     [data-testid="stSidebarCollapseButton"] button:hover {
-        background-color: #FED7AA !important;                /* Cam nhạt hơn chút khi hover */
-        border-color: #FF7F3E !important;                      
+        background-color: #FED7AA !important;
+        border-color: #FF7F3E !important;
         box-shadow: 0 0 15px rgba(255, 127, 62, 0.8), 0 4px 15px rgba(0, 0, 0, 0.3) !important;
         transform: scale(1.08);
     }
 
-    /* 3. BẢN ĐỒ TRÀN SÁT CÁC CẠNH MÀN HÌNH */
     .block-container {
         padding-top: 0rem !important;
         padding-bottom: 0rem !important;
@@ -67,7 +66,6 @@ st.markdown("""
         max-width: 100% !important;
     }
 
-    /* 4. MENU BÊN TRÁI (SIDEBAR) TĂNG ĐỘ TRONG SUỐT */
     [data-testid="stSidebar"] {
         background: rgba(255, 255, 255, 0.15) !important;
         backdrop-filter: blur(18px) saturate(180%) !important;
@@ -77,7 +75,6 @@ st.markdown("""
         box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05) !important;
     }
 
-    /* 5. TOÀN BỘ CHỮ CHUYỂN SANG MÀU XANH DƯƠNG - ĐÃ XÓA HIỆU ỨNG ĐỔ BÓNG (TEXT-SHADOW: NONE) */
     [data-testid="stSidebar"] h1, 
     [data-testid="stSidebar"] h2, 
     [data-testid="stSidebar"] h3, 
@@ -85,17 +82,16 @@ st.markdown("""
     [data-testid="stSidebar"] .stMarkdown,
     [data-testid="stSidebar"] p,
     [data-testid="stSidebar"] span {
-        color: #1D4ED8 !important;                          /* Chữ màu Xanh Dương đậm */
-        font-weight: 700 !important;                        /* Giữ độ đậm để dễ đọc */
-        text-shadow: none !important;                       /* Đã xóa hiệu ứng bóng/phát sáng */
-    }
-
-    [data-testid="stSidebar"] h1 {
-        color: #1E40AF !important;                          /* Tiêu đề xanh dương đậm hơn */
+        color: #1D4ED8 !important;
+        font-weight: 700 !important;
         text-shadow: none !important;
     }
 
-    /* 6. Ô NHẬP & SELECTBOX MÀU CHỮ XANH DƯƠNG */
+    [data-testid="stSidebar"] h1 {
+        color: #1E40AF !important;
+        text-shadow: none !important;
+    }
+
     [data-testid="stSidebar"] input, 
     [data-testid="stSidebar"] div[data-baseweb="select"] {
         background-color: rgba(255, 255, 255, 0.5) !important;
@@ -106,7 +102,6 @@ st.markdown("""
         text-shadow: none !important;
     }
 
-    /* Menu xổ xuống của Selectbox */
     div[data-baseweb="popover"] {
         background-color: rgba(255, 255, 255, 0.95) !important;
         color: #1D4ED8 !important;
@@ -116,7 +111,6 @@ st.markdown("""
         border-color: rgba(37, 99, 235, 0.3) !important;
     }
 
-    /* 7. ĐỔI MÀU NỀN TẤT CẢ NÚT BẤM BÊN BẢNG SIDEBAR SANG MÀU CAM NHẠT */
     [data-testid="stSidebar"] .stButton > button, 
     [data-testid="stSidebar"] .stLinkButton > a {
         background-color: #FFEDD5 !important;
@@ -129,7 +123,6 @@ st.markdown("""
         text-shadow: none !important;
     }
 
-    /* Đổi màu khi di chuột (Hover) vào nút bấm */
     [data-testid="stSidebar"] .stButton > button:hover, 
     [data-testid="stSidebar"] .stLinkButton > a:hover {
         background-color: #FED7AA !important;
@@ -144,25 +137,18 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Hàm bổ sung CSS + FontAwesome trực tiếp vào iframe Folium
 def apply_map_custom_css(folium_map):
     font_awesome_link = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">'
     folium_map.get_root().html.add_child(folium.Element(font_awesome_link))
 
     custom_css = """
     <style>
-    /* Ẩn nút Zoom + / - */
-    .leaflet-control-zoom {
-        display: none !important;
-    }
-
-    /* Dời nút định vị xuống dưới (máp lề trái) */
+    .leaflet-control-zoom { display: none !important; }
     .leaflet-control-locate {
         margin-top: 70px !important;
         margin-left: 10px !important;
         border: none !important;
     }
-
     .leaflet-control-locate a {
         background-color: #2563EB !important;
         color: #FFFFFF !important;
@@ -175,14 +161,11 @@ def apply_map_custom_css(folium_map):
         align-items: center !important;
         justify-content: center !important;
     }
-
     .leaflet-control-locate a span.fa,
     .leaflet-control-locate a span.fas {
         font-size: 16px !important;
         color: #FFFFFF !important;
     }
-
-    /* DỜI NÚT CHUYỂN LAYER (BÊN PHẢI) XUỐNG NGANG HÀNG NÚT ĐỊNH VỊ */
     .leaflet-control-layers {
         margin-top: 70px !important;
         margin-right: 10px !important;
@@ -194,7 +177,7 @@ def apply_map_custom_css(folium_map):
     """
     folium_map.get_root().html.add_child(folium.Element(custom_css))
 
-# 3. Tải dữ liệu Excel
+# 3. Tải dữ liệu Excel & JSON
 @st.cache_data
 def load_data():
     file_path = "Data.xlsx"
@@ -203,10 +186,66 @@ def load_data():
     df_hdn = pd.read_excel(file_path, sheet_name="HĐN")
     return df_uplink, df_cable, df_hdn
 
+@st.cache_data
+def load_json_cable_shapes(json_file_path="TQGP001.json"):
+    """
+    Hàm đọc file TQGP001.json và trích xuất danh sách tọa độ thực tế của tuyến cáp.
+    Hỗ trợ cả GeoJSON (LineString/MultiLineString) và JSON tự định nghĩa.
+    """
+    cable_shapes = {}
+    if not os.path.exists(json_file_path):
+        return cable_shapes
+        
+    try:
+        with open(json_file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        # Trường hợp 1: Chuẩn GeoJSON
+        if isinstance(data, dict) and data.get("type") == "FeatureCollection":
+            for feature in data.get("features", []):
+                props = feature.get("properties", {})
+                cable_name = props.get("name") or props.get("TEN_DOAN_CAP") or props.get("code") or props.get("id")
+                geom = feature.get("geometry", {})
+                
+                if geom.get("type") == "LineString":
+                    # GeoJSON dạng [lng, lat], đổi thành [lat, lng] cho Folium
+                    coords = [[p[1], p[0]] for p in geom.get("coordinates", [])]
+                    if cable_name:
+                        cable_shapes[str(cable_name).strip()] = coords
+                elif geom.get("type") == "MultiLineString":
+                    coords = []
+                    for line in geom.get("coordinates", []):
+                        coords.extend([[p[1], p[0]] for p in line])
+                    if cable_name:
+                        cable_shapes[str(cable_name).strip()] = coords
+
+        # Trường hợp 2: Dạng danh sách các object JSON
+        elif isinstance(data, list):
+            for item in data:
+                cable_name = item.get("cable_name") or item.get("name") or item.get("code")
+                coords = item.get("coordinates") or item.get("points") or item.get("path")
+                if cable_name and coords:
+                    # Tự động phát hiện nếu tọa độ đang dạng [lng, lat]
+                    formatted_coords = []
+                    for pt in coords:
+                        if isinstance(pt, (list, tuple)) and len(pt) >= 2:
+                            # Nếu lng > lat (ở VN, Lng ~105-109, Lat ~8-23)
+                            if pt[0] > pt[1]:
+                                formatted_coords.append([pt[1], pt[0]])
+                            else:
+                                formatted_coords.append([pt[0], pt[1]])
+                    if formatted_coords:
+                        cable_shapes[str(cable_name).strip()] = formatted_coords
+    except Exception as e:
+        st.error(f"Lỗi khi đọc file TQGP001.json: {e}")
+
+    return cable_shapes
+
 try:
     df_uplink, df_cable, df_hdn = load_data()
+    json_cable_shapes = load_json_cable_shapes("TQGP001.json")
 except Exception as e:
-    st.error(f"Lỗi khi đọc file Data.xlsx: {e}")
+    st.error(f"Lỗi khi tải dữ liệu: {e}")
     st.stop()
 
 # Chuẩn hóa tên tập điểm
@@ -220,6 +259,32 @@ def normalize_node(node_str):
         prefix, num, suffix = match.groups()
         return f"{prefix}.{int(num):04d}/{suffix}"
     return s
+
+# Tính khoảng cách giữa 2 điểm Lat/Lng (mét)
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6371000  # Bán kính Trái Đất (mét)
+    phi1, phi2 = math.radians(lat1), math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlambda = math.radians(lon2 - lon1)
+    a = math.sin(dphi/2)**2 + math.cos(phi1)*math.cos(phi2)*math.sin(dlambda/2)**2
+    return 2 * R * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+# Nội suy vị trí đứt trên đường PolyLine thực tế từ JSON
+def interpolate_on_polyline(coords, target_offset):
+    if not coords or len(coords) < 2:
+        return None
+    accumulated = 0.0
+    for i in range(len(coords) - 1):
+        p1, p2 = coords[i], coords[i+1]
+        seg_len = haversine(p1[0], p1[1], p2[0], p2[1])
+        if accumulated + seg_len >= target_offset:
+            remain = target_offset - accumulated
+            ratio = remain / seg_len if seg_len > 0 else 0
+            lat = p1[0] + ratio * (p2[0] - p1[0])
+            lng = p1[1] + ratio * (p2[1] - p1[1])
+            return lat, lng
+        accumulated += seg_len
+    return coords[-1][0], coords[-1][1]
 
 # 4. Xây dựng đồ thị mạng cáp
 G = nx.Graph()
@@ -248,7 +313,6 @@ for _, row in df_hdn.iterrows():
     if pd.notnull(lat) and pd.notnull(lng):
         hdn_coords[name] = (float(lat), float(lng))
 
-# Khởi tạo Session State
 if 'search_performed' not in st.session_state:
     st.session_state.search_performed = False
 
@@ -257,7 +321,6 @@ all_nodes = sorted(list(G.nodes()))
 
 # 6. MENU DẠNG DỌC BÊN TRÁI (SIDEBAR)
 with st.sidebar:
-    # --- XỬ LÝ VÀ HIỂN THỊ LOGO FPT TELECOM ---
     current_dir = os.path.dirname(os.path.abspath(__file__)) if '__file__' in globals() else os.getcwd()
     logo_path = os.path.join(current_dir, "FPT_Telecom_logo.png")
     
@@ -352,18 +415,26 @@ with st.sidebar:
             if target_dist > accumulated_dist:
                 st.error(f"Khoảng cách nhập vào ({target_dist}m) vượt quá tổng chiều dài tuyến ({accumulated_dist:.1f}m)!")
             elif target_segment:
-                u_coord = hdn_coords.get(target_segment['u'])
-                v_coord = hdn_coords.get(target_segment['v'])
+                cable_name = target_segment['cable']
+                offset = target_dist - target_segment['start_dist']
+                fault_lat, fault_lng = None, None
 
-                if u_coord and v_coord:
-                    offset = target_dist - target_segment['start_dist']
-                    ratio = offset / target_segment['length'] if target_segment['length'] > 0 else 0
-                    
-                    fault_lat = u_coord[0] + ratio * (v_coord[0] - u_coord[0])
-                    fault_lng = u_coord[1] + ratio * (v_coord[1] - u_coord[1])
+                # Ưu tiên 1: Lấy đường đi uốn lượn thực tế từ TQGP001.json
+                if cable_name in json_cable_shapes:
+                    raw_coords = json_cable_shapes[cable_name]
+                    fault_lat, fault_lng = interpolate_on_polyline(raw_coords, offset)
 
-                    st.success(f"⚠️ **Vị trí đứt nằm trong đoạn cáp:**\n\n**{target_segment['cable']}**\n\n({target_segment['u']} ➔ {target_segment['v']})")
+                # Ưu tiên 2: Dự phòng tuyến thẳng nếu không có dữ liệu JSON
+                if fault_lat is None or fault_lng is None:
+                    u_coord = hdn_coords.get(target_segment['u'])
+                    v_coord = hdn_coords.get(target_segment['v'])
+                    if u_coord and v_coord:
+                        ratio = offset / target_segment['length'] if target_segment['length'] > 0 else 0
+                        fault_lat = u_coord[0] + ratio * (v_coord[0] - u_coord[0])
+                        fault_lng = u_coord[1] + ratio * (v_coord[1] - u_coord[1])
 
+                if fault_lat and fault_lng:
+                    st.success(f"⚠️ **Vị trí đứt nằm trong đoạn cáp:**\n\n**{cable_name}**\n\n({target_segment['u']} ➔ {target_segment['v']})")
                     gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
                     st.link_button("🚗 Chỉ đường Google Maps", gmaps_url, type="primary", use_container_width=True)
 
@@ -371,6 +442,7 @@ with st.sidebar:
                         'fault_lat': fault_lat,
                         'fault_lng': fault_lng,
                         'node_path': node_path,
+                        'cable_segments': cable_segments,
                         'td_a': td_a,
                         'td_b': td_b,
                         'target_dist': target_dist
@@ -412,9 +484,25 @@ if map_data:
     
     folium.LayerControl().add_to(m)
 
-    path_coords = [hdn_coords[n] for n in map_data['node_path'] if n in hdn_coords]
-    if len(path_coords) > 1:
-        folium.PolyLine(path_coords, color="#1e40af", weight=6, opacity=0.85, tooltip="Tuyến cáp").add_to(m)
+    # Hiển thị tất cả đoạn cáp trong chuỗi TQGP001 từ JSON (nếu có)
+    has_json_path = False
+    for seg in map_data['cable_segments']:
+        c_name = seg['cable']
+        if c_name in json_cable_shapes:
+            has_json_path = True
+            folium.PolyLine(
+                json_cable_shapes[c_name],
+                color="#FF5F1F",
+                weight=6,
+                opacity=0.9,
+                tooltip=f"Đoạn cáp thực tế (JSON): {c_name}"
+            ).add_to(m)
+
+    # Nếu không tìm thấy tọa độ JSON -> Dùng tọa độ HĐN vẽ tuyến cáp mặc định
+    if not has_json_path:
+        path_coords = [hdn_coords[n] for n in map_data['node_path'] if n in hdn_coords]
+        if len(path_coords) > 1:
+            folium.PolyLine(path_coords, color="#1e40af", weight=6, opacity=0.85, tooltip="Tuyến cáp").add_to(m)
 
     if map_data['td_a'] in hdn_coords:
         folium.Marker(hdn_coords[map_data['td_a']], popup=f"TĐ A: {map_data['td_a']}", icon=folium.Icon(color="green")).add_to(m)
@@ -430,9 +518,16 @@ if map_data:
     apply_map_custom_css(m)
     st_folium(m, width="100%", height=1000, key="fault_map")
 else:
+    # Bản đồ mặc định
+    init_lat, init_lng = 21.0285, 105.8542
+    if json_cable_shapes:
+        first_cable = list(json_cable_shapes.values())[0]
+        if first_cable:
+            init_lat, init_lng = first_cable[0][0], first_cable[0][1]
+
     default_map = folium.Map(
-        location=[21.0285, 105.8542],
-        zoom_start=12,
+        location=[init_lat, init_lng],
+        zoom_start=14 if json_cable_shapes else 12,
         tiles=None,
         zoom_control=False
     )
@@ -450,6 +545,16 @@ else:
         icon="fa fa-location-arrow", 
         iconLoading="fa fa-spinner fa-spin"
     ).add_to(default_map)
+
+    # Hiển thị trước tất cả đoạn cáp từ TQGP001.json
+    for c_name, coords in json_cable_shapes.items():
+        folium.PolyLine(
+            coords,
+            color="#2563EB",
+            weight=4,
+            opacity=0.7,
+            tooltip=f"Tuyến cáp JSON: {c_name}"
+        ).add_to(default_map)
 
     apply_map_custom_css(default_map)
     st_folium(default_map, width="100%", height=1000, key="default_map")
