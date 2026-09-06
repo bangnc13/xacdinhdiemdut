@@ -7,8 +7,9 @@ import pandas as pd
 import streamlit as st
 import folium
 from folium import DivIcon
-from folium.plugins import LocateControl
+from folium.plugins import LocateControl, AntPath
 from streamlit_folium import st_folium
+import streamlit.components.v1 as components
 from PIL import Image
 
 # 1. Cấu hình trang
@@ -139,20 +140,14 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def apply_map_custom_css(folium_map, fault_lat=None, fault_lng=None):
-    # Nạp CSS/JS của FontAwesome & Leaflet Routing Machine
-    font_awesome = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">'
-    routing_css = '<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />'
-    routing_js = '<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>'
-    
-    folium_map.get_root().html.add_child(folium.Element(font_awesome))
-    folium_map.get_root().html.add_child(folium.Element(routing_css))
-    folium_map.get_root().html.add_child(folium.Element(routing_js))
+    font_awesome_link = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">'
+    folium_map.get_root().html.add_child(folium.Element(font_awesome_link))
 
-    nav_button_and_script = ""
+    nav_script = ""
     if fault_lat and fault_lng:
-        nav_button_and_script = f"""
+        nav_script = f"""
         <div style="position: absolute; top: 15px; left: 60px; z-index: 1000;">
-            <button id="btn-draw-route" onclick="drawRouteToFault()" style="
+            <button onclick="navigateToFault()" style="
                 background-color: #059669;
                 color: white;
                 border: none;
@@ -166,83 +161,25 @@ def apply_map_custom_css(folium_map, fault_lat=None, fault_lng=None):
                 align-items: center;
                 gap: 8px;
             " onmouseover="this.style.backgroundColor='#047857'" onmouseout="this.style.backgroundColor='#059669'">
-                <i class="fa-solid fa-route"></i> Vẽ lộ trình chỉ đường trên Map
+                <i class="fa-solid fa-diamond-turn-right"></i> Chỉ đường từ GPS tới vị trí đứt
             </button>
         </div>
-
         <script>
-        var currentRoutingControl = null;
-
-        function drawRouteToFault() {{
-            var btn = document.getElementById("btn-draw-route");
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang lấy vị trí GPS...';
-            
-            if (!navigator.geolocation) {{
-                alert("Trình duyệt của bạn không hỗ trợ Geolocation!");
-                btn.innerHTML = '<i class="fa-solid fa-route"></i> Vẽ lộ trình chỉ đường trên Map';
-                return;
+        function navigateToFault() {{
+            if (navigator.geolocation) {{
+                navigator.geolocation.getCurrentPosition(function(position) {{
+                    var userLat = position.coords.latitude;
+                    var userLng = position.coords.longitude;
+                    var url = "https://www.google.com/maps/dir/?api=1&origin=" + userLat + "," + userLng + "&destination={fault_lat},{fault_lng}&travelmode=driving";
+                    window.open(url, '_blank');
+                }}, function(error) {{
+                    alert("Không thể lấy vị trí hiện tại của bạn. Mở định vị mặc định.");
+                    var fallbackUrl = "https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}";
+                    window.open(fallbackUrl, '_blank');
+                }}, {{ enableHighAccuracy: true, timeout: 10000 }});
+            }} else {{
+                alert("Trình duyệt không hỗ trợ Geolocation!");
             }}
-
-            navigator.geolocation.getCurrentPosition(function(position) {{
-                var userLat = position.coords.latitude;
-                var userLng = position.coords.longitude;
-                btn.innerHTML = '<i class="fa-solid fa-check"></i> Đã tìm thấy vị trí GPS!';
-
-                // Lấy đối tượng map từ Leaflet
-                var mapObj = null;
-                for (var key in window) {{
-                    if (key.startsWith("map_") && window[key] instanceof L.Map) {{
-                        mapObj = window[key];
-                        break;
-                    }}
-                }}
-
-                if (!mapObj) {{
-                    alert("Không thể khởi tạo lớp bản đồ!");
-                    return;
-                }}
-
-                // Bỏ tuyến đường cũ nếu đã vẽ trước đó
-                if (currentRoutingControl) {{
-                    mapObj.removeControl(currentRoutingControl);
-                }}
-
-                // Vẽ đường đi trên bản đồ bằng OpenStreetMap Routing Engine
-                currentRoutingControl = L.Routing.control({{
-                    waypoints: [
-                        L.latLng(userLat, userLng),
-                        L.latLng({fault_lat}, {fault_lng})
-                    ],
-                    routeWhileDragging: false,
-                    addWaypoints: false,
-                    draggableWaypoints: false,
-                    fitSelectedRoutes: true,
-                    lineOptions: {{
-                        styles: [{{color: '#2563EB', opacity: 0.8, weight: 6}}]
-                    }},
-                    createMarker: function(i, wp) {{
-                        if (i === 0) {{
-                            return L.marker(wp.latLng, {{
-                                icon: L.divIcon({{
-                                    className: 'custom-gps-icon',
-                                    html: '<div style="background-color:#2563EB; width:16px; height:16px; border-radius:50%; border:3px solid white; box-shadow:0 0 8px rgba(0,0,0,0.5);"></div>',
-                                    iconSize: [16, 16],
-                                    iconAnchor: [8, 8]
-                                }})
-                            }}).bindPopup("Vị trí của bạn");
-                        }}
-                        return null; // Không tạo đè marker ở điểm đứt cáp
-                    }}
-                }}).addTo(mapObj);
-
-                setTimeout(function() {{
-                    btn.innerHTML = '<i class="fa-solid fa-route"></i> Cập nhật lại lộ trình';
-                }}, 2000);
-
-            }}, function(error) {{
-                alert("Không thể truy cập GPS! Vui lòng bật định vị trên thiết bị/trình duyệt.");
-                btn.innerHTML = '<i class="fa-solid fa-route"></i> Thử lại vẽ lộ trình';
-            }}, {{ enableHighAccuracy: true, timeout: 10000 }});
         }}
         </script>
         """
@@ -279,16 +216,8 @@ def apply_map_custom_css(folium_map, fault_lat=None, fault_lng=None):
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
     }}
-    /* Tùy chỉnh bảng hướng dẫn đường đi Leaflet Routing */
-    .leaflet-routing-container {{
-        background-color: rgba(255, 255, 255, 0.95) !important;
-        border-radius: 8px !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
-        font-family: sans-serif !important;
-        max-width: 280px !important;
-    }}
     </style>
-    {nav_button_and_script}
+    {nav_script}
     """
     folium_map.get_root().html.add_child(folium.Element(custom_css))
 
@@ -539,7 +468,7 @@ with st.sidebar:
                     st.success(f"⚠️ **Vị trí đứt nằm trong đoạn cáp:**\n\n**{cable_name}**\n\n({target_segment['u']} ➔ {target_segment['v']})")
                     
                     gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
-                    st.link_button("🌐 Mở App Google Maps", gmaps_url, type="primary", use_container_width=True)
+                    st.link_button("📍 Mở trên Google Maps", gmaps_url, type="primary", use_container_width=True)
 
                     map_data = {
                         'fault_lat': fault_lat,
@@ -587,24 +516,30 @@ if map_data:
     
     folium.LayerControl().add_to(m)
 
-    # Hiển thị các đoạn cáp viễn thông
-    has_json_path = False
+    # Hiển thị lộ trình bằng AntPath (Hiệu ứng dòng chảy di chuyển đến điểm đứt)
+    full_route_coords = []
     for seg in map_data['cable_segments']:
         c_name = seg['cable']
         if c_name in json_cable_shapes:
-            has_json_path = True
-            folium.PolyLine(
-                json_cable_shapes[c_name],
-                color="#FF5F1F",
-                weight=6,
-                opacity=0.9,
-                tooltip=f"Đoạn cáp: {c_name}"
-            ).add_to(m)
+            full_route_coords.extend(json_cable_shapes[c_name])
+        else:
+            u_coord = hdn_coords.get(seg['u'])
+            v_coord = hdn_coords.get(seg['v'])
+            if u_coord:
+                full_route_coords.append(u_coord)
+            if v_coord:
+                full_route_coords.append(v_coord)
 
-    if not has_json_path:
-        path_coords = [hdn_coords[n] for n in map_data['node_path'] if n in hdn_coords]
-        if len(path_coords) > 1:
-            folium.PolyLine(path_coords, color="#1e40af", weight=6, opacity=0.85, tooltip="Tuyến cáp").add_to(m)
+    if full_route_coords:
+        AntPath(
+            locations=full_route_coords,
+            color="#FF5F1F",
+            pulse_color="#FFFFFF",
+            weight=6,
+            opacity=0.9,
+            delay=1000,
+            tooltip="Lộ trình cáp mạng"
+        ).add_to(m)
 
     # Hiển thị Marker và Nhãn tên TĐ
     for node in map_data['node_path']:
