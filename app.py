@@ -23,7 +23,7 @@ st.markdown("""
         z-index: 999999 !important;
     }
 
-    /* 2. ẨN HOÀN TOÀN CÁC BIỂU TƯỢNG BÊN PHẢI (GITHUB/CON MÈO, FORK, STAR, MENU 3 CHẤM, DEPLOY) */
+    /* 2. ẨN HOÀN TOÀN CÁC BIỂU TƯỢNG BÊN PHẢI */
     #MainMenu { visibility: hidden !important; }
     footer { visibility: hidden !important; }
     [data-testid="stToolbar"] { display: none !important; }
@@ -32,21 +32,23 @@ st.markdown("""
     .stAppDeployButton { display: none !important; }
     a[href*="github.com"] { display: none !important; }
 
-    /* 3. NÚT HIỆN MENU MẶC ĐỊNH CỦA STREAMLIT (BO TRÒN MÀU XANH NEON) */
+    /* 3. ĐỊNH DẠNG NÚT TOGGLE SIDEBAR BẰNG XANH NEON & BO TRÒN */
     button[data-testid="stHeaderIconButton"],
     [data-testid="stSidebarCollapseButton"] button,
-    [data-testid="stSidebarCollapsedControl"] button {
+    [data-testid="stSidebarCollapsedControl"] button,
+    button[aria-label="Expand sidebar"],
+    button[aria-label="Collapse sidebar"] {
         background-color: #0F172A !important;
         color: #00FF66 !important;
         border-radius: 50% !important;
-        width: 42px !important;
-        height: 42px !important;
+        width: 44px !important;
+        height: 44px !important;
         padding: 0px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         border: 2px solid #00FF66 !important;
-        box-shadow: 0 0 12px rgba(0, 255, 102, 0.8), 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+        box-shadow: 0 0 14px rgba(0, 255, 102, 0.9), 0 4px 12px rgba(0, 0, 0, 0.6) !important;
         transition: all 0.2s ease-in-out !important;
     }
 
@@ -56,16 +58,17 @@ st.markdown("""
         background-color: #1E293B !important;
         border-color: #66FF99 !important;
         color: #FFFFFF !important;
-        box-shadow: 0 0 18px rgba(0, 255, 102, 1), 0 4px 15px rgba(0, 0, 0, 0.6) !important;
-        transform: scale(1.08);
+        box-shadow: 0 0 20px rgba(0, 255, 102, 1), 0 4px 15px rgba(0, 0, 0, 0.7) !important;
+        transform: scale(1.1);
     }
 
-    /* Vị trí nút khi menu thu gọn */
+    /* Vị trí cố định của nút Toggle Sidebar khi thu gọn Menu */
     [data-testid="stSidebarCollapsedControl"] {
         position: fixed !important;
-        top: 12px !important;
-        left: 12px !important;
+        top: 15px !important;
+        left: 15px !important;
         z-index: 999999 !important;
+        display: block !important;
     }
 
     /* 4. BẢN ĐỒ TRÀN SÁT CÁC CẠNH MÀN HÌNH */
@@ -127,53 +130,22 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Hàm bổ sung CSS, FontAwesome + Nút Mở Menu nằm ngay TRÊN nút định vị
+# Hàm bổ sung CSS + FontAwesome cho Folium Map
 def apply_map_custom_css(folium_map):
     font_awesome_link = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">'
     folium_map.get_root().html.add_child(folium.Element(font_awesome_link))
 
-    # CSS & JS bổ sung nút Mở Menu phía trên Nút Định Vị
-    custom_script = """
+    custom_css = """
     <style>
     /* Ẩn nút Zoom + / - */
     .leaflet-control-zoom {
         display: none !important;
     }
 
-    /* Nút Mở Menu nằm phía trên (top: 15px) */
-    .leaflet-control-toggle-sidebar {
-        margin-top: 15px !important;
-        margin-left: 10px !important;
-        border: none !important;
-    }
-
-    .leaflet-control-toggle-sidebar a {
-        background-color: #0F172A !important;
-        color: #00FF66 !important;
-        border-radius: 50% !important;
-        border: 2px solid #00FF66 !important;
-        box-shadow: 0 0 12px rgba(0, 255, 102, 0.8), 0 4px 12px rgba(0, 0, 0, 0.5) !important;
-        width: 36px !important;
-        height: 36px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        text-decoration: none !important;
-        transition: all 0.2s ease-in-out !important;
-    }
-
-    .leaflet-control-toggle-sidebar a:hover {
-        background-color: #1E293B !important;
-        border-color: #66FF99 !important;
-        color: #FFFFFF !important;
-        box-shadow: 0 0 18px rgba(0, 255, 102, 1), 0 4px 15px rgba(0, 0, 0, 0.6) !important;
-        transform: scale(1.08);
-    }
-
-    /* Nút Định vị dời xuống phía dưới (top: 60px) */
+    /* Dời nút Định Vị xuống dưới nút Mở Menu (top: 70px) */
     .leaflet-control-locate {
-        margin-top: 10px !important;
-        margin-left: 10px !important;
+        margin-top: 70px !important;
+        margin-left: 15px !important;
         border: none !important;
     }
 
@@ -183,8 +155,8 @@ def apply_map_custom_css(folium_map):
         border-radius: 8px !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        width: 36px !important;
-        height: 36px !important;
+        width: 40px !important;
+        height: 40px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -192,52 +164,12 @@ def apply_map_custom_css(folium_map):
 
     .leaflet-control-locate a span.fa,
     .leaflet-control-locate a span.fas {
-        font-size: 16px !important;
+        font-size: 18px !important;
         color: #FFFFFF !important;
     }
     </style>
-
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        setTimeout(function() {
-            var mapElement = document.querySelector('.folium-map');
-            if (mapElement && window[mapElement.id]) {
-                var map = window[mapElement.id];
-
-                // Tạo Custom Control cho nút Toggle Sidebar
-                L.Control.ToggleSidebar = L.Control.extend({
-                    options: { position: 'topleft' },
-                    onAdd: function (map) {
-                        var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-toggle-sidebar');
-                        var link = L.DomUtil.create('a', '', container);
-                        link.href = '#';
-                        link.title = 'Mở / Đóng Menu';
-                        link.innerHTML = '<i class="fa-solid fa-bars" style="font-size: 16px;"></i>';
-
-                        L.DomEvent.disableClickPropagation(container);
-                        L.DomEvent.on(link, 'click', function (e) {
-                            L.DomEvent.preventDefault(e);
-                            // Gọi sự kiện click tới nút sidebar của Streamlit ở trang cha
-                            var parentDoc = window.parent.document;
-                            var btn = parentDoc.querySelector('[data-testid="stSidebarCollapsedControl"] button') || 
-                                      parentDoc.querySelector('[data-testid="stSidebarCollapseButton"] button') ||
-                                      parentDoc.querySelector('button[data-testid="stHeaderIconButton"]');
-                            if (btn) {
-                                btn.click();
-                            }
-                        });
-
-                        return container;
-                    }
-                });
-
-                map.addControl(new L.Control.ToggleSidebar());
-            }
-        }, 500);
-    });
-    </script>
     """
-    folium_map.get_root().html.add_child(folium.Element(custom_script))
+    folium_map.get_root().html.add_child(folium.Element(custom_css))
 
 # 3. Tải dữ liệu Excel
 @st.cache_data
