@@ -1,3 +1,4 @@
+import os
 import re
 import networkx as nx
 import pandas as pd
@@ -5,6 +6,7 @@ import streamlit as st
 import folium
 from folium.plugins import LocateControl
 from streamlit_folium import st_folium
+from PIL import Image
 
 # 1. Cấu hình trang
 st.set_page_config(
@@ -45,7 +47,7 @@ st.markdown("""
     button[data-testid="stHeaderIconButton"]:hover,
     [data-testid="stSidebarCollapseButton"] button:hover {
         background-color: #1D4ED8 !important;
-        border-color: #FF7F3E !important;                     /* Viền sáng hơn khi hover */
+        border-color: #FF7F3E !important;                      /* Viền sáng hơn khi hover */
         box-shadow: 0 0 15px rgba(255, 127, 62, 1), 0 4px 15px rgba(0, 0, 0, 0.6) !important;
         transform: scale(1.08);
     }
@@ -213,6 +215,21 @@ all_nodes = sorted(list(G.nodes()))
 
 # 6. MENU DẠNG DỌC BÊN TRÁI (SIDEBAR)
 with st.sidebar:
+    # --- XỬ LÝ VÀ HIỂN THỊ LOGO FPT TELECOM ---
+    current_dir = os.path.dirname(os.path.abspath(__file__)) if '__file__' in globals() else os.getcwd()
+    logo_path = os.path.join(current_dir, "FPT_Telecom_logo.png")
+    
+    if os.path.exists(logo_path):
+        # Ưu tiên load ảnh local
+        try:
+            logo_img = Image.open(logo_path)
+            st.image(logo_img, use_container_width=True)
+        except Exception:
+            st.image("https://upload.wikimedia.org/wikipedia/commons/1/11/FPT_Telecom_logo.svg", width=220)
+    else:
+        # Tự động fallback sang URL online nếu chưa có file local
+        st.image("https://upload.wikimedia.org/wikipedia/commons/1/11/FPT_Telecom_logo.svg", width=220)
+
     st.title("📍 TOOL XÁC ĐỊNH SỰ CỐ")
     st.markdown("---")
     
