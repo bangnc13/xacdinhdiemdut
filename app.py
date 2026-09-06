@@ -14,10 +14,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS: Tùy biến nút Toggle Sidebar chuẩn của Streamlit
+# 2. Inject CSS: Tùy biến vị trí nút Zoom (+ / -) và giao diện
 st.markdown("""
     <style>
-    /* 1. HIỆN LẠI HEADER NHƯNG TRONG SUỐT VÀ CHỈ GIỮ LẠI NÚT TOGGLE SIDEBAR */
+    /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
     header[data-testid="stHeader"] {
         background-color: transparent !important;
         z-index: 999999 !important;
@@ -115,6 +115,35 @@ st.markdown("""
 
     iframe {
         border: none !important;
+    }
+
+    /* 8. DI CHUYỂN NÚT ZOOM (+ / -) XUỐNG DƯỚI GÓC DƯỚI BÊN PHẢI */
+    .leaflet-control-zoom {
+        position: fixed !important;
+        bottom: 25px !important;
+        right: 25px !important;
+        top: auto !important;
+        left: auto !important;
+        z-index: 9999 !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+    }
+
+    .leaflet-control-zoom a {
+        background-color: #1E293B !important;
+        color: #60A5FA !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+        width: 36px !important;
+        height: 36px !important;
+        line-height: 36px !important;
+        font-size: 18px !important;
+        font-weight: bold !important;
+    }
+
+    .leaflet-control-zoom a:hover {
+        background-color: #2563EB !important;
+        color: #FFFFFF !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -297,12 +326,13 @@ with st.sidebar:
                 else:
                     st.warning("Thiếu dữ liệu tọa độ Lat/Lng cho đoạn cáp chứa vị trí đứt.")
 
-# 7. BẢN ĐỒ FULL TRÀN VIỀN BÊN PHẢI
+# 7. BẢN ĐỒ FULL TRÀN VIỀN BÊN PHẢI (Cấu hình zoomControl='bottomright')
 if map_data:
     m = folium.Map(
         location=[map_data['fault_lat'], map_data['fault_lng']], 
         zoom_start=17,
-        tiles=None
+        tiles=None,
+        zoom_control=True
     )
 
     folium.TileLayer(
@@ -344,7 +374,8 @@ else:
     default_map = folium.Map(
         location=[21.0285, 105.8542],
         zoom_start=12,
-        tiles=None
+        tiles=None,
+        zoom_control=True
     )
     folium.TileLayer(
         tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
