@@ -147,7 +147,7 @@ def load_all_json_cable_shapes(search_pattern="TQGP*.json"):
             st.warning(f"Lỗi khi đọc file {json_file_path}: {e}")
     return cable_shapes
 
-# Thuật toán gọi API OSRM để lấy đường di chuyển theo đường giao thông thực tế
+# API OSRM lấy tuyến giao thông thực tế
 @st.cache_data
 def get_osrm_route(lat1, lon1, lat2, lon2):
     try:
@@ -187,21 +187,17 @@ def haversine(lat1, lon1, lat2, lon2):
     a = math.sin(dphi/2)**2 + math.cos(phi1)*math.cos(phi2)*math.sin(dlambda/2)**2
     return 2 * R * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
-# Nội suy vị trí đứt theo tỷ lệ độ dài khai báo so với độ dài tuyến đường thực
 def interpolate_on_polyline_scaled(coords, target_offset, decl_length):
     if not coords or len(coords) < 2:
         return None
     
-    # 1. Tính tổng độ dài địa lý thực tế của polyline
     geo_length = 0.0
     for i in range(len(coords) - 1):
         geo_length += haversine(coords[i][0], coords[i][1], coords[i+1][0], coords[i+1][1])
     
-    # 2. Quy đổi khoảng cách đo được dựa trên tỷ lệ khai báo
     scale_factor = geo_length / decl_length if (decl_length > 0 and geo_length > 0) else 1.0
     adjusted_target = target_offset * scale_factor
 
-    # 3. Nội suy vị trí trên chuỗi tọa độ
     accumulated = 0.0
     for i in range(len(coords) - 1):
         p1, p2 = coords[i], coords[i+1]
@@ -215,15 +211,23 @@ def interpolate_on_polyline_scaled(coords, target_offset, decl_length):
         accumulated += seg_len
     return coords[-1][0], coords[-1][1]
 
-# 4. Đồ thị mạng cáp
+# 4. Đồ thị mạng cáp (Đã thêm lấy Dung lượng từ Cột F)
 G = nx.Graph()
 for _, row in df_cable.iterrows():
     u = normalize_node(row['Điểm KN1'])
     v = normalize_node(row['Điểm KN2'])
     cable_name = str(row['Tên đoạn cáp']).strip()
+    
     try: length = float(row['Chiều dài thực (m)'])
     except: length = 0.0
-    if u and v: G.add_edge(u, v, cable=cable_name, length=length)
+    
+    # Lấy thông tin dung lượng từ Cột F (Cột thứ 6, index 5)
+    capacity = row.iloc[5] if len(row) > 5 else row.get('Dung lượng', 'N/A')
+    if pd.isna(capacity): 
+        capacity = 'Không xác định'
+
+    if u and v: 
+        G.add_edge(u, v, cable=cable_name, length=length, capacity=capacity)
 
 # 5. Tọa độ HĐN
 df_hdn['Lat_clean'] = pd.to_numeric(df_hdn['Lat'].astype(str).str.replace(',', '.'), errors='coerce')
@@ -295,12 +299,20 @@ with st.sidebar:
                 start_d = accumulated_dist
                 accumulated_dist += seg_len
                 
-                seg_info = {'u': u, 'v': v, 'cable': edge_data['cable'], 'length': seg_len, 'start_dist': start_d, 'end_dist': accumulated_dist}
+                seg_info = {
+                    'u': u, 
+                    'v': v, 
+                    'cable': edge_data['cable'], 
+                    'length': seg_len, 
+                    'capacity': edge_data.get('capacity', 'N/A'),
+                    'start_dist': start_d, 
+                    'end_dist': accumulated_dist
+                }
                 cable_segments.append(seg_info)
                 if start_d <= target_dist <= accumulated_dist and target_segment is None:
                     target_segment = seg_info
 
-            st.info(f"📏 **Chiều dài tuyến khai báo:** {accumulated_dist:.1f} m")
+            st.info(f"📏 **Chiều dài tổng tuyến:** {accumulated_dist:.1f} m")
 
             if target_dist > accumulated_dist:
                 st.error(f"Khoảng cách nhập vào ({target_dist}m) vượt quá chiều dài tuyến ({accumulated_dist:.1f}m)!")
@@ -310,10 +322,8 @@ with st.sidebar:
                 u_coord = hdn_coords.get(target_segment['u'])
                 v_coord = hdn_coords.get(target_segment['v'])
 
-                # Ưu tiên 1: Lấy từ JSON
                 if cable_name in json_cable_shapes:
                     raw_coords = json_cable_shapes[cable_name]
-                # Ưu tiên 2: Dùng OSRM để nắn đường đi xe máy giữa 2 tập điểm
                 elif u_coord and v_coord:
                     raw_coords = get_osrm_route(u_coord[0], u_coord[1], v_coord[0], v_coord[1])
                 else:
@@ -328,7 +338,13 @@ with st.sidebar:
                 fault_lat, fault_lng = interpolate_on_polyline_scaled(raw_coords, offset, target_segment['length'])
 
                 if fault_lat and fault_lng:
-                    st.success(f"⚠️ **Vị trí đứt nằm trong đoạn cáp:**\n\n**{cable_name}**\n\n({target_segment['u']} ➔ {target_segment['v']})")
+                    st.success(
+                        f"⚠️ **Vị trí đứt nằm trong đoạn cáp:**\n\n"
+                        f"**{cable_name}**\n\n"
+                        f"📍 **Lộ trình đoạn:** {target_segment['u']} ➔ {target_segment['v']}\n\n"
+                        f"📏 **Chiều dài đoạn cáp bị lỗi:** {target_segment['length']:.1f} m\n\n"
+                        f"🔌 **Dung lượng đoạn cáp:** {target_segment['capacity']}"
+                    )
                     gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
                     st.link_button("📍 Mở chỉ đường Google Maps", gmaps_url, type="primary", use_container_width=True)
 
