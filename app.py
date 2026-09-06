@@ -161,7 +161,7 @@ def apply_map_custom_css(folium_map, fault_lat=None, fault_lng=None):
                 align-items: center;
                 gap: 8px;
             " onmouseover="this.style.backgroundColor='#047857'" onmouseout="this.style.backgroundColor='#059669'">
-                <i class="fa-solid fa-diamond-turn-right"></i> Chỉ đường từ GPS tới vị trí đứt
+                <i class="fa-solid fa-diamond-turn-right"></i> 
             </button>
         </div>
         <script>
