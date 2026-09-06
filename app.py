@@ -6,9 +6,64 @@ import folium
 from folium.plugins import LocateControl
 from streamlit_folium import st_folium
 
-st.set_page_config(page_title="Xác định điểm đứt cáp & Dẫn đường", layout="wide")
+# 1. Cấu hình trang Full layout
+st.set_page_config(
+    page_title="Xác định điểm đứt cáp & Dẫn đường",
+    page_icon="📍",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-# 1. Hàm tải dữ liệu từ file Excel
+# 2. Inject Custom CSS: Tạo hiệu ứng Sidebar Blur & Tràn màn hình Map
+st.markdown("""
+    <style>
+    /* Ẩn bớt padding dư thừa của Streamlit */
+    .block-container {
+        padding-top: 1rem !important;
+        padding-bottom: 0rem !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        max-width: 100% !important;
+    }
+
+    /* CSS Sidebar dạng kính mờ (Glassmorphism / Blur Effect) */
+    [data-testid="stSidebar"] {
+        background: rgba(18, 24, 38, 0.75) !important;
+        backdrop-filter: blur(12px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Màu chữ và label trong Sidebar */
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, 
+    [data-testid="stSidebar"] label, [data-testid="stSidebar"] .stMarkdown {
+        color: #f1f5f9 !important;
+    }
+
+    /* Đổi màu input trong Sidebar cho nổi bật */
+    [data-testid="stSidebar"] input {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 8px !important;
+    }
+
+    /* Style cho Nút Bấm chính */
+    .stButton > button {
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    /* Responsive cho màn hình Map full viền */
+    iframe {
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# 3. Hàm tải dữ liệu Excel
 @st.cache_data
 def load_data():
     file_path = "Data.xlsx"
@@ -35,7 +90,7 @@ def normalize_node(node_str):
         return f"{prefix}.{int(num):04d}/{suffix}"
     return s
 
-# 2. Xây dựng đồ thị kết nối từ sheet Đoạn cáp
+# 4. Xây dựng đồ thị mạng cáp
 G = nx.Graph()
 for _, row in df_cable.iterrows():
     u = normalize_node(row['Điểm KN1'])
@@ -50,7 +105,7 @@ for _, row in df_cable.iterrows():
     if u and v:
         G.add_edge(u, v, cable=cable_name, length=length)
 
-# 3. Làm sạch và trích xuất tọa độ từ sheet HĐN
+# 5. Trích xuất tọa độ HĐN
 df_hdn['Lat_clean'] = pd.to_numeric(df_hdn['Lat'].astype(str).str.replace(',', '.'), errors='coerce')
 df_hdn['Lng_clean'] = pd.to_numeric(df_hdn['Lng'].astype(str).str.replace(',', '.'), errors='coerce')
 
@@ -62,39 +117,40 @@ for _, row in df_hdn.iterrows():
     if pd.notnull(lat) and pd.notnull(lng):
         hdn_coords[name] = (float(lat), float(lng))
 
-st.title("📍 Xác Định Vị Trí Sự Cố Cáp & Dẫn Đường GPS")
+# 6. MENU DẠNG DỌC BÊN TRÁI (SIDEBAR)
+with st.sidebar:
+    st.title("📍 Cấu Hình Sự Cố")
+    st.markdown("---")
+    
+    td_a_input = st.text_input("Nhập TĐ A:", value="TQGP001.0011/HO")
+    td_b_input = st.text_input("Nhập TĐ B:", value="TQGP001.0013/HO")
+    target_dist = st.number_input("Khoảng cách từ TĐ A (mét):", min_value=0.0, value=100.0, step=1.0)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    search_btn = st.button("🔍 Tìm vị trí sự cố", type="primary", use_container_width=True)
 
-# 4. Khởi tạo Session State
+# Khởi tạo trạng thái Session State
 if 'search_performed' not in st.session_state:
     st.session_state.search_performed = False
 
-# 5. Giao diện nhập liệu
-col1, col2, col3 = st.columns(3)
-with col1:
-    td_a_input = st.text_input("Nhập TĐ A:", value="TQGP001.0011/HO")
-with col2:
-    td_b_input = st.text_input("Nhập TĐ B:", value="TQGP001.0013/HO")
-with col3:
-    target_dist = st.number_input("Khoảng cách đo từ TĐ A (mét):", min_value=0.0, value=100.0, step=1.0)
-
-if st.button("Tìm vị trí sự cố", type="primary"):
+if search_btn:
     st.session_state.search_performed = True
     st.session_state.td_a = normalize_node(td_a_input)
     st.session_state.td_b = normalize_node(td_b_input)
     st.session_state.target_dist = target_dist
 
-# 6. Xử lý và hiển thị kết quả
+# 7. HIỂN THỊ KẾT QUẢ & BẢN ĐỒ FULL MÀN HÌNH BÊN PHẢI
 if st.session_state.search_performed:
     td_a = st.session_state.td_a
     td_b = st.session_state.td_b
     target_dist = st.session_state.target_dist
 
     if not td_a or not td_b:
-        st.warning("Vui lòng nhập đầy đủ thông tin TĐ A và TĐ B!")
+        st.warning("Vui lòng nhập đầy đủ thông tin TĐ A và TĐ B ở menu bên trái!")
     elif not G.has_node(td_a) or not G.has_node(td_b):
-        st.error("Một trong hai tập điểm nhập vào không tồn tại trong sheet Đoạn cáp!")
+        st.error("Một trong hai tập điểm nhập vào không tồn tại trong dữ liệu!")
     elif not nx.has_path(G, td_a, td_b):
-        st.error(f"Không tìm thấy đường đi giữa {td_a} và {td_b} trong dữ liệu Đoạn cáp!")
+        st.error(f"Không tìm thấy tuyến cáp nối giữa {td_a} và {td_b}!")
     else:
         node_path = nx.shortest_path(G, td_a, td_b, weight='length')
         
@@ -122,13 +178,14 @@ if st.session_state.search_performed:
             if start_d <= target_dist <= accumulated_dist and target_segment is None:
                 target_segment = seg_info
 
-        st.info(f"Tổng chiều dài tuyến cáp từ {td_a} đến {td_b}: **{accumulated_dist:.1f} m**")
-
+        # Hiển thị thanh thông tin ngang trên đầu bản đồ
+        info_col1, info_col2 = st.columns([1, 1])
+        with info_col1:
+            st.info(f"📏 Tổng chiều dài tuyến ({td_a} ➔ {td_b}): **{accumulated_dist:.1f} m**")
+        
         if target_dist > accumulated_dist:
             st.error(f"Khoảng cách nhập vào ({target_dist}m) vượt quá tổng chiều dài tuyến cáp ({accumulated_dist:.1f}m)!")
         elif target_segment:
-            st.success(f"Vị trí sự cố nằm trên đoạn cáp: **{target_segment['cable']}** (giữa {target_segment['u']} và {target_segment['v']})")
-
             u_coord = hdn_coords.get(target_segment['u'])
             v_coord = hdn_coords.get(target_segment['v'])
 
@@ -139,11 +196,14 @@ if st.session_state.search_performed:
                 fault_lat = u_coord[0] + ratio * (v_coord[0] - u_coord[0])
                 fault_lng = u_coord[1] + ratio * (v_coord[1] - u_coord[1])
 
-                # Tạo link mở Google Maps dẫn đường trực tiếp
-                gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
-                st.link_button("🚗 Mở Google Maps để chỉ đường tới điểm đứt", gmaps_url, type="primary")
+                with info_col2:
+                    st.success(f"⚠️ Đoạn đứt: **{target_segment['cable']}** ({target_segment['u']} ➔ {target_segment['v']})")
 
-                # KHỞI TẠO BẢN ĐỒ VỚI TILE ĐƯỜNG PHỐ (STREET MAP) MẶC ĐỊNH
+                # Nút điều hướng Google Maps Dẫn đường
+                gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
+                st.link_button("🚗 Mở Google Maps Chỉ Đường", gmaps_url, type="primary", use_container_width=True)
+
+                # KHỞI TẠO BẢN ĐỒ
                 m = folium.Map(
                     location=[fault_lat, fault_lng], 
                     zoom_start=17,
@@ -151,7 +211,7 @@ if st.session_state.search_performed:
                     attr="OpenStreetMap"
                 )
 
-                # Thêm Layer Google Maps Đường Phố
+                # Lớp Google Maps Đường phố
                 folium.TileLayer(
                     tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
                     attr="Google",
@@ -160,7 +220,7 @@ if st.session_state.search_performed:
                     control=True
                 ).add_to(m)
 
-                # Thêm Layer Google Maps Ảnh Vệ Tinh (Hỗ trợ soi vị trí thực địa)
+                # Lớp Google Maps Vệ tinh
                 folium.TileLayer(
                     tiles="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
                     attr="Google",
@@ -169,31 +229,31 @@ if st.session_state.search_performed:
                     control=True
                 ).add_to(m)
 
-                # Nút định vị GPS vị trí hiện tại của điện thoại/máy tính
+                # Định vị GPS vị trí hiện tại
                 LocateControl(auto_start=False, flyTo=True).add_to(m)
-
-                # Bổ sung Bảng chọn chuyển đổi Layer bản đồ góc trên bên phải
                 folium.LayerControl().add_to(m)
 
-                # Vẽ tuyến cáp
+                # Vẽ Tuyến cáp
                 path_coords = [hdn_coords[n] for n in node_path if n in hdn_coords]
                 if len(path_coords) > 1:
-                    folium.PolyLine(path_coords, color="blue", weight=5, opacity=0.8, tooltip="Tuyến cáp").add_to(m)
+                    folium.PolyLine(path_coords, color="#1e40af", weight=6, opacity=0.85, tooltip="Tuyến cáp").add_to(m)
 
-                # Marker TĐ A và TĐ B
+                # Marker Đầu/Cuối
                 if td_a in hdn_coords:
                     folium.Marker(hdn_coords[td_a], popup=f"TĐ A: {td_a}", icon=folium.Icon(color="green")).add_to(m)
                 if td_b in hdn_coords:
                     folium.Marker(hdn_coords[td_b], popup=f"TĐ B: {td_b}", icon=folium.Icon(color="black")).add_to(m)
 
-                # Marker vị trí điểm đứt cáp
+                # Marker Điểm Đứt Cáp
                 folium.Marker(
                     [fault_lat, fault_lng],
                     popup=f"Vị trí đứt cáp: {target_dist}m từ {td_a}",
                     icon=folium.Icon(color="red", icon="wrench", prefix="fa")
                 ).add_to(m)
 
-                # Render bản đồ lên Streamlit
-                st_folium(m, width=1000, height=550, key="fault_map")
+                # BẢN ĐỒ FULL VIỀN & CHIỀU CAO LỚN (750px)
+                st_folium(m, width="100%", height=750, key="fault_map")
             else:
                 st.warning("Thiếu dữ liệu tọa độ Lat/Lng hợp lệ trong sheet HĐN cho đoạn cáp chứa vị trí đứt.")
+else:
+    st.info("👈 Hãy nhập thông tin điểm A, điểm B và bấm **'Tìm vị trí sự cố'** từ Menu bên trái để hiển thị bản đồ.")
