@@ -161,12 +161,12 @@ if 'search_performed' not in st.session_state:
 
 # 6. MENU DẠNG DỌC BÊN TRÁI (SIDEBAR) VỚI CHỮ MÀU CAM
 with st.sidebar:
-    st.title("📍 Cấu Hình Sự Cố")
+    st.title("📍 TOOL XÁC ĐỊNH SỰ CỐ ")
     st.markdown("---")
     
     td_a_input = st.text_input("Nhập TĐ Đo:", value="TQGP001.0011/HO")
     td_b_input = st.text_input("Nhập TĐ Đến:", value="TQGP001.0013/HO")
-    target_dist_input = st.number_input("Khoảng cách từ đo được (mét):", min_value=0.0, value=100.0, step=1.0)
+    target_dist_input = st.number_input("Khoảng cách đo được (mét):", min_value=0.0, value=100.0, step=1.0)
     
     st.markdown("<br>", unsafe_allow_html=True)
     if st.button("🔍 Tìm vị trí sự cố", type="primary", use_container_width=True):
