@@ -19,7 +19,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS Streamlit (Phẳng, chữ xanh dương, xóa text-shadow)
+# 2. Inject CSS Streamlit
 st.markdown("""
     <style>
     header[data-testid="stHeader"] {
@@ -134,19 +134,6 @@ st.markdown("""
 
     iframe {
         border: none !important;
-    }
-    
-    /* CSS nhãn TĐ hiển thị trên bản đồ (Chuyển sang màu cam) */
-    .node-label {
-        font-size: 12px;
-        font-weight: bold;
-        color: #EA580C;
-        background-color: rgba(255, 255, 255, 0.95);
-        border: 1.5px solid #FF5F1F;
-        padding: 2px 6px;
-        border-radius: 4px;
-        white-space: nowrap;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
     }
     </style>
 """, unsafe_allow_html=True)
@@ -504,7 +491,7 @@ if map_data:
         if len(path_coords) > 1:
             folium.PolyLine(path_coords, color="#1e40af", weight=6, opacity=0.85, tooltip="Tuyến cáp").add_to(m)
 
-    # Hiển thị Marker và Nhãn tên TĐ màu cam
+    # Hiển thị Marker và Nhãn tên TĐ (Inline CSS trực tiếp chữ màu đỏ)
     for node in map_data['node_path']:
         if node in hdn_coords:
             coord = hdn_coords[node]
@@ -516,7 +503,7 @@ if map_data:
             else:
                 icon_color, icon_name = "blue", "circle"
 
-            # 1. Vẽ Marker biểu tượng
+            # 1. Biểu tượng Marker
             folium.Marker(
                 coord,
                 popup=f"<b>{node}</b>",
@@ -524,13 +511,28 @@ if map_data:
                 icon=folium.Icon(color=icon_color, icon=icon_name, prefix="fa")
             ).add_to(m)
 
-            # 2. Vẽ Nhãn Tên TĐ (màu cam)
+            # 2. Nhãn Tên TĐ trực tiếp trên Map - Chữ màu ĐỎ (#DC2626)
+            label_html = f'''
+                <div style="
+                    font-size: 12px;
+                    font-weight: 800;
+                    color: #DC2626;
+                    background-color: rgba(255, 255, 255, 0.95);
+                    border: 1.5px solid #EF4444;
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                    white-space: nowrap;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+                    display: inline-block;
+                ">{node}</div>
+            '''
+
             folium.Marker(
                 coord,
                 icon=DivIcon(
                     icon_size=(150, 36),
                     icon_anchor=(-15, 12),
-                    html=f'<div class="node-label">{node}</div>'
+                    html=label_html
                 )
             ).add_to(m)
 
