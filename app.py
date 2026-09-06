@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS: Tùy biến giao diện và ẩn nút Zoom
+# 2. Inject CSS: Tùy biến giao diện, ẩn nút Zoom & làm đẹp nút định vị
 st.markdown("""
     <style>
     /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
@@ -120,6 +120,27 @@ st.markdown("""
     /* 8. ẨN HOÀN TOÀN NÚT ZOOM (+ / -) */
     .leaflet-control-zoom {
         display: none !important;
+    }
+
+    /* 9. TÙY BIẾN ICON VÀ NÚT ĐỊNH VỊ NỔI ĐẸP MẮT */
+    .leaflet-control-locate a {
+        background-color: #1E293B !important;
+        color: #3B82F6 !important;
+        border-radius: 50% !important;
+        border: 2px solid rgba(59, 130, 246, 0.6) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+        width: 40px !important;
+        height: 40px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .leaflet-control-locate a:hover {
+        background-color: #2563EB !important;
+        color: #FFFFFF !important;
+        transform: scale(1.1);
     }
     </style>
 """, unsafe_allow_html=True)
@@ -327,7 +348,14 @@ if map_data:
         control=True
     ).add_to(m)
 
-    LocateControl(auto_start=False, flyTo=True).add_to(m)
+    # ĐỊNH VỊ VỚI ICON TÙY BIẾN ĐẸP HƠN
+    LocateControl(
+        auto_start=False, 
+        flyTo=True, 
+        icon="fa-crosshairs", 
+        iconLoading="fa-spinner fa-spin"
+    ).add_to(m)
+    
     folium.LayerControl().add_to(m)
 
     path_coords = [hdn_coords[n] for n in map_data['node_path'] if n in hdn_coords]
@@ -360,5 +388,13 @@ else:
         overlay=False,
         control=False
     ).add_to(default_map)
-    LocateControl(auto_start=False, flyTo=True).add_to(default_map)
+
+    # ĐỊNH VỊ VỚI ICON TÙY BIẾN ĐẸP HƠN
+    LocateControl(
+        auto_start=False, 
+        flyTo=True, 
+        icon="fa-crosshairs", 
+        iconLoading="fa-spinner fa-spin"
+    ).add_to(default_map)
+
     st_folium(default_map, width="100%", height=1000, key="default_map")
