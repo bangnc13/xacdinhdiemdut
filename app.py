@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS Streamlit ( Sidebar trong suốt + Chữ xanh dương + Nút mở Menu dưới Nút Định vị )
+# 2. Inject CSS Streamlit (Sidebar trong suốt + Chữ xanh dương + NÚT BẤM MÀU CAM NHẠT)
 st.markdown("""
     <style>
     /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
@@ -28,40 +28,34 @@ st.markdown("""
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* 2. ÉP CẢ CONTAINER VÀ NÚT TOGGLE SIDEBAR DỜI XUỐNG DƯỚI NÚT ĐỊNH VỊ (TOP: 115PX, LEFT: 10PX) */
-    div[data-testid="stSidebarCollapsedControl"],
-    div[data-testid="stSidebarCollapseButton"],
+    /* 2. ĐỊNH DẠNG VÀ DI CHUYỂN NÚT TOGGLE SIDEBAR SANG SÁT GÓC TRÁI */
     button[data-testid="stHeaderIconButton"],
     [data-testid="stSidebarCollapseButton"] button {
         pointer-events: auto !important;                     /* Bật lại click cho nút */
         position: fixed !important;                          /* Cố định vị trí trên màn hình */
-        top: 115px !important;                               /* Nằm dưới nút Định vị ở 70px */
-        left: 10px !important;                               /* Thẳng hàng trái 10px với nút Định vị */
-        right: auto !important;
-        bottom: auto !important;
+        top: 10px !important;                                /* Cách mép trên 10px */
+        left: 10px !important;                               /* Dời sát góc TRÁI màn hình */
         z-index: 1000000 !important;                         /* Nổi lên trên cùng */
         background-color: #FFEDD5 !important;                /* Nền cam nhạt */
         color: #EA580C !important;                           /* Chữ cam đậm */
-        border-radius: 8px !important;                       /* Bo góc vuông tròn nhẹ */
-        width: 36px !important;                              /* Kích thước 36x36px bằng nút định vị */
-        height: 36px !important;
+        border-radius: 50% !important;                       /* Bo tròn dạng hình tròn */
+        width: 40px !important;
+        height: 40px !important;
         padding: 0px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        border: 1px solid rgba(255, 255, 255, 0.4) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        border: 2px solid #FF5F1F !important;                /* Viền Cam Neon */
+        box-shadow: 0 0 10px rgba(255, 95, 31, 0.5), 0 4px 12px rgba(0, 0, 0, 0.2) !important;
         transition: all 0.2s ease-in-out !important;
     }
 
-    /* Hover nút Mở Menu */
-    div[data-testid="stSidebarCollapsedControl"]:hover,
     button[data-testid="stHeaderIconButton"]:hover,
     [data-testid="stSidebarCollapseButton"] button:hover {
         background-color: #FED7AA !important;                /* Cam nhạt hơn chút khi hover */
         border-color: #FF7F3E !important;                      
         box-shadow: 0 0 15px rgba(255, 127, 62, 0.8), 0 4px 15px rgba(0, 0, 0, 0.3) !important;
-        transform: scale(1.05);
+        transform: scale(1.08);
     }
 
     /* 3. BẢN ĐỒ TRÀN SÁT CÁC CẠNH MÀN HÌNH */
@@ -159,7 +153,7 @@ def apply_map_custom_css(folium_map):
         display: none !important;
     }
 
-    /* Dời nút định vị xuống cách mép trên 70px */
+    /* Dời nút định vị xuống dưới (máp lề trái) */
     .leaflet-control-locate {
         margin-top: 70px !important;
         margin-left: 10px !important;
