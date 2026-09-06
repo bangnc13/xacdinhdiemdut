@@ -16,38 +16,44 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS Streamlit (Chuyển viền nút toggle menu sang màu Cam Neon + Bo tròn)
+# 2. Inject CSS Streamlit (Chuyển viền nút toggle menu sang màu Cam Neon + Cố định ở GÓC TRÁI MÀN HÌNH)
 st.markdown("""
     <style>
     /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
     header[data-testid="stHeader"] {
         background-color: transparent !important;
         z-index: 999999 !important;
+        pointer-events: none; /* Tránh đè click lên bản đồ */
     }
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* 2. ĐỊNH DẠNG NÚT BẤM ẨN/HIỆN SIDEBAR: BO TRÒN VÀ VIỀN CAM NEON */
+    /* 2. ĐỊNH DẠNG VÀ DI CHUYỂN NÚT TOGGLE SIDEBAR SANG SÁT GÓC TRÁI */
     button[data-testid="stHeaderIconButton"],
     [data-testid="stSidebarCollapseButton"] button {
+        pointer-events: auto !important;                     /* Bật lại click cho nút */
+        position: fixed !important;                          /* Cố định vị trí trên màn hình */
+        top: 10px !important;                                /* Cách mép trên 10px */
+        left: 10px !important;                               /* Dời sát góc TRÁI màn hình */
+        z-index: 1000000 !important;                         /* Nổi lên trên cùng */
         background-color: #2563EB !important;
         color: white !important;
-        border-radius: 50% !important;                       /* Bo tròn hoàn toàn dạng hình tròn */
+        border-radius: 50% !important;                       /* Bo tròn dạng hình tròn */
         width: 40px !important;
         height: 40px !important;
         padding: 0px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        border: 2px solid #FF5F1F !important;                /* Đường viền màu Cam Neon */
-        box-shadow: 0 0 10px rgba(255, 95, 31, 0.8), 0 4px 12px rgba(0, 0, 0, 0.5) !important; /* Hiệu ứng phát sáng neon */
+        border: 2px solid #FF5F1F !important;                /* Viền Cam Neon */
+        box-shadow: 0 0 10px rgba(255, 95, 31, 0.8), 0 4px 12px rgba(0, 0, 0, 0.5) !important;
         transition: all 0.2s ease-in-out !important;
     }
 
     button[data-testid="stHeaderIconButton"]:hover,
     [data-testid="stSidebarCollapseButton"] button:hover {
         background-color: #1D4ED8 !important;
-        border-color: #FF7F3E !important;                      /* Viền sáng hơn khi hover */
+        border-color: #FF7F3E !important;                      
         box-shadow: 0 0 15px rgba(255, 127, 62, 1), 0 4px 15px rgba(0, 0, 0, 0.6) !important;
         transform: scale(1.08);
     }
@@ -123,7 +129,7 @@ def apply_map_custom_css(folium_map):
         display: none !important;
     }
 
-    /* Dời nút định vị xuống dưới (top: 70px) */
+    /* Dời nút định vị xuống dưới để không bị nút sidebar đè lên */
     .leaflet-control-locate {
         margin-top: 70px !important;
         margin-left: 10px !important;
@@ -220,14 +226,12 @@ with st.sidebar:
     logo_path = os.path.join(current_dir, "FPT_Telecom_logo.png")
     
     if os.path.exists(logo_path):
-        # Ưu tiên load ảnh local
         try:
             logo_img = Image.open(logo_path)
             st.image(logo_img, use_container_width=True)
         except Exception:
             st.image("https://upload.wikimedia.org/wikipedia/commons/1/11/FPT_Telecom_logo.svg", width=220)
     else:
-        # Tự động fallback sang URL online nếu chưa có file local
         st.image("https://upload.wikimedia.org/wikipedia/commons/1/11/FPT_Telecom_logo.svg", width=220)
 
     st.title("📍 TOOL XÁC ĐỊNH SỰ CỐ")
