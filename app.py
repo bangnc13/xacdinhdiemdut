@@ -3,7 +3,6 @@ import networkx as nx
 import pandas as pd
 import streamlit as st
 import folium
-from folium.plugins import LocateControl
 from streamlit_folium import st_folium
 
 # 1. Cấu hình trang
@@ -14,10 +13,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS: Tùy biến vị trí nút Zoom (+ / -) và giao diện
+# 2. Inject CSS: Tùy biến giao diện & Ẩn nút Zoom
 st.markdown("""
     <style>
-    /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
+    /* 1. HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
     header[data-testid="stHeader"] {
         background-color: transparent !important;
         z-index: 999999 !important;
@@ -25,7 +24,7 @@ st.markdown("""
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* 2. ĐỊNH DẠNG NÚT BẤM ẨN/HIỆN SIDEBAR MẶC ĐỊNH THÀNH NÚT NỔI ĐẸP MẮT */
+    /* 2. ĐỊNH DẠNG NÚT BẤM ẨN/HIỆN SIDEBAR NỔI ĐẸP MẮT */
     button[data-testid="stHeaderIconButton"],
     [data-testid="stSidebarCollapseButton"] button {
         background-color: #2563EB !important;
@@ -117,36 +116,91 @@ st.markdown("""
         border: none !important;
     }
 
-    /* 8. DI CHUYỂN NÚT ZOOM (+ / -) XUỐNG GÓC DƯỚI BÊN TRÁI */
+    /* 8. ẨN TẤT CẢ NÚT ZOOM (+ / -) MẶC ĐỊNH */
     .leaflet-control-zoom {
-        position: fixed !important;
-        bottom: 25px !important;
-        left: 25px !important;
-        right: auto !important;
-        top: auto !important;
-        z-index: 9999 !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-        border-radius: 8px !important;
-        overflow: hidden !important;
-    }
-
-    .leaflet-control-zoom a {
-        background-color: #1E293B !important;
-        color: #60A5FA !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-        width: 36px !important;
-        height: 36px !important;
-        line-height: 36px !important;
-        font-size: 18px !important;
-        font-weight: bold !important;
-    }
-
-    .leaflet-control-zoom a:hover {
-        background-color: #2563EB !important;
-        color: #FFFFFF !important;
+        display: none !important;
     }
     </style>
 """, unsafe_allow_html=True)
+
+# Hàm thêm Nút định vị tùy chỉnh đẹp mắt vào bản đồ Folium
+def add_custom_locate_button(m):
+    custom_locate_html = """
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        .custom-locate-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 99999;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #ffffff;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4), 0 2px 6px rgba(0,0,0,0.3);
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .custom-locate-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.6);
+        }
+        .custom-locate-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+    <div id="locate-btn" class="custom-locate-btn" title="Vị trí của tôi">
+        <i class="fa-solid fa-crosshairs"></i>
+    </div>
+    <script>
+        document.getElementById('locate-btn').addEventListener('click', function() {
+            var btnIcon = this.querySelector('i');
+            btnIcon.className = 'fa-solid fa-spinner fa-spin';
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    
+                    // Lấy đối tượng map từ Folium
+                    var mapElement = document.querySelector('.folium-map');
+                    if (mapElement && mapElement._leaflet_map) {
+                        var map = mapElement._leaflet_map;
+                        map.flyTo([lat, lng], 17, { duration: 1.5 });
+                        
+                        // Thêm marker vị trí hiện tại
+                        if (window.userLocationMarker) {
+                            map.removeLayer(window.userLocationMarker);
+                        }
+                        window.userLocationMarker = L.marker([lat, lng], {
+                            icon: L.divIcon({
+                                className: 'user-location-pulse',
+                                html: '<div style="background-color:#2563eb; width:16px; height:16px; border-radius:50%; border:3px solid white; box-shadow:0 0 12px rgba(37,99,235,0.8);"></div>',
+                                iconSize: [16, 16],
+                                iconAnchor: [8, 8]
+                            })
+                        }).addTo(map).bindPopup("Vị trí hiện tại của bạn").openPopup();
+                    }
+                    btnIcon.className = 'fa-solid fa-crosshairs';
+                }, function(error) {
+                    alert("Không thể lấy vị trí hiện tại: " + error.message);
+                    btnIcon.className = 'fa-solid fa-crosshairs';
+                }, { enableHighAccuracy: true });
+            } else {
+                alert("Trình duyệt của bạn không hỗ trợ Định vị GPS!");
+                btnIcon.className = 'fa-solid fa-crosshairs';
+            }
+        });
+    </script>
+    """
+    m.get_root().html.add_child(folium.Element(custom_locate_html))
 
 # 3. Tải dữ liệu Excel
 @st.cache_data
@@ -326,13 +380,13 @@ with st.sidebar:
                 else:
                     st.warning("Thiếu dữ liệu tọa độ Lat/Lng cho đoạn cáp chứa vị trí đứt.")
 
-# 7. BẢN ĐỒ FULL TRÀN VIỀN BÊN PHẢI
+# 7. BẢN ĐỒ FULL TRÀN VIỀN BÊN PHẢI (Không dùng nút zoom mặc định)
 if map_data:
     m = folium.Map(
         location=[map_data['fault_lat'], map_data['fault_lng']], 
         zoom_start=17,
         tiles=None,
-        zoom_control=True
+        zoom_control=False  # Tắt nút Zoom (+/-)
     )
 
     folium.TileLayer(
@@ -351,8 +405,10 @@ if map_data:
         control=True
     ).add_to(m)
 
-    LocateControl(auto_start=False, flyTo=True).add_to(m)
     folium.LayerControl().add_to(m)
+    
+    # Thêm nút Định vị Tùy chỉnh (Đẹp mắt)
+    add_custom_locate_button(m)
 
     path_coords = [hdn_coords[n] for n in map_data['node_path'] if n in hdn_coords]
     if len(path_coords) > 1:
@@ -375,7 +431,7 @@ else:
         location=[21.0285, 105.8542],
         zoom_start=12,
         tiles=None,
-        zoom_control=True
+        zoom_control=False  # Tắt nút Zoom (+/-)
     )
     folium.TileLayer(
         tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
@@ -384,5 +440,8 @@ else:
         overlay=False,
         control=False
     ).add_to(default_map)
-    LocateControl(auto_start=False, flyTo=True).add_to(default_map)
+    
+    # Thêm nút Định vị Tùy chỉnh (Đẹp mắt)
+    add_custom_locate_button(default_map)
+    
     st_folium(default_map, width="100%", height=1000, key="default_map")
