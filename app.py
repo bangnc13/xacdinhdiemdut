@@ -67,79 +67,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-def apply_map_custom_css(folium_map):
-    font_awesome_link = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">'
-    folium_map.get_root().html.add_child(folium.Element(font_awesome_link))
-
-    custom_css = """
-    <style>
-    .leaflet-control-zoom { display: none !important; }
-    .leaflet-control-locate { margin-top: 70px !important; margin-left: 10px !important; border: none !important; }
-    .leaflet-control-locate a {
-        background-color: #2563EB !important; color: #FFFFFF !important;
-        border-radius: 8px !important; width: 36px !important; height: 36px !important;
-        display: flex !important; align-items: center !important; justify-content: center !important;
-    }
-    .leaflet-control-layers { margin-top: 70px !important; margin-right: 10px !important; border-radius: 8px !important; }
-    </style>
-    """
-    folium_map.get_root().html.add_child(folium.Element(custom_css))
-
-# 3. Tải dữ liệu Excel & JSON
-@st.cache_data(ttl=5)
-def load_data():
-    file_path = "Data.xlsx"
-    df_uplink = pd.read_excel(file_path, sheet_name="uplink")
-    df_cable = pd.read_excel(file_path, sheet_name="Đoạn cáp")
-    df_hdn = pd.read_excel(file_path, sheet_name="HĐN")
-    return df_uplink, df_cable, df_hdn
-
-@st.cache_data
-def load_all_json_cable_shapes(search_pattern="*.json"):
-    cable_shapes = {}
-    json_files = glob.glob(search_pattern)
-    for json_file_path in json_files:
-        try:
-            with open(json_file_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            if isinstance(data, dict) and data.get("type") == "FeatureCollection":
-                for feature in data.get("features", []):
-                    props = feature.get("properties", {})
-                    cable_name = props.get("name") or props.get("TEN_DOAN_CAP") or props.get("code") or props.get("id")
-                    geom = feature.get("geometry", {})
-                    if geom.get("type") == "LineString":
-                        coords = [[p[1], p[0]] for p in geom.get("coordinates", [])]
-                        if cable_name: cable_shapes[str(cable_name).strip()] = coords
-                    elif geom.get("type") == "MultiLineString":
-                        coords = []
-                        for line in geom.get("coordinates", []):
-                            coords.extend([[p[1], p[0]] for p in line])
-                        if cable_name: cable_shapes[str(cable_name).strip()] = coords
-        except Exception as e:
-            st.warning(f"Lỗi khi đọc file JSON {json_file_path}: {e}")
-    return cable_shapes
-
-@st.cache_data
-def get_osrm_route(lat1, lon1, lat2, lon2):
-    try:
-        url = f"http://router.project-osrm.org/route/v1/driving/{lon1},{lat1};{lon2},{lat2}?overview=full&geometries=geojson"
-        res = requests.get(url, timeout=3)
-        if res.status_code == 200:
-            data = res.json()
-            if data.get("routes"):
-                coords = data["routes"][0]["geometry"]["coordinates"]
-                return [[p[1], p[0]] for p in coords]
-    except Exception:
-        pass
-    return [[lat1, lon1], [lat2, lon2]]
-
-try:
-    df_uplink, df_cable, df_hdn = load_data()
-    json_cable_shapes = load_all_json_cable_shapes("*.json")
-except Exception as e:
-    st.error(f"Lỗi khi tải dữ liệu: {e}")
-    st.stop()
-
+# 3. Các hàm bổ trợ toán học & địa lý (Thuần túy, chạy cực nhanh)
 def normalize_node(node_str):
     if pd.isna(node_str): return ""
     s = str(node_str).strip()
@@ -160,10 +88,21 @@ def haversine(lat1, lon1, lat2, lon2):
 
 def calculate_polyline_length(coords):
     if not coords or len(coords) < 2: return 0.0
-    total = 0.0
-    for i in range(len(coords) - 1):
-        total += haversine(coords[i][0], coords[i][1], coords[i+1][0], coords[i+1][1])
-    return total
+    return sum(haversine(coords[i][0], coords[i][1], coords[i+1][0], coords[i+1][1]) for i in range(len(coords) - 1))
+
+@st.cache_data(ttl=3600)
+def get_osrm_route(lat1, lon1, lat2, lon2):
+    try:
+        url = f"http://router.project-osrm.org/route/v1/driving/{lon1},{lat1};{lon2},{lat2}?overview=full&geometries=geojson"
+        res = requests.get(url, timeout=2)
+        if res.status_code == 200:
+            data = res.json()
+            if data.get("routes"):
+                coords = data["routes"][0]["geometry"]["coordinates"]
+                return [[p[1], p[0]] for p in coords]
+    except Exception:
+        pass
+    return [[lat1, lon1], [lat2, lon2]]
 
 def process_segment_geometry(raw_coords, u_coord, v_coord, target_length):
     if not raw_coords:
@@ -187,16 +126,12 @@ def process_segment_geometry(raw_coords, u_coord, v_coord, target_length):
         len_top = calculate_polyline_length(path_top)
         len_bottom = calculate_polyline_length(path_bottom)
         
-        if abs(len_top - target_length) < abs(len_bottom - target_length):
-            raw_coords = path_top
-        else:
-            raw_coords = path_bottom
+        raw_coords = path_top if abs(len_top - target_length) < abs(len_bottom - target_length) else path_bottom
 
     return raw_coords
 
 def interpolate_on_polyline_scaled(coords, target_offset, decl_length):
-    if not coords or len(coords) < 2:
-        return None
+    if not coords or len(coords) < 2: return None
     
     geo_length = calculate_polyline_length(coords)
     scale_factor = geo_length / decl_length if (decl_length > 0 and geo_length > 0) else 1.0
@@ -209,90 +144,126 @@ def interpolate_on_polyline_scaled(coords, target_offset, decl_length):
         if accumulated + seg_len >= adjusted_target:
             remain = adjusted_target - accumulated
             ratio = remain / seg_len if seg_len > 0 else 0
-            lat = p1[0] + ratio * (p2[0] - p1[0])
-            lng = p1[1] + ratio * (p2[1] - p1[1])
-            return lat, lng
+            return p1[0] + ratio * (p2[0] - p1[0]), p1[1] + ratio * (p2[1] - p1[1])
         accumulated += seg_len
     return coords[-1][0], coords[-1][1]
 
-# 4. TẠO TỪ ĐIỂN PHÂN CẤP TẬP ĐIỂM TỪ SHEET UPLINK (CỘT D HOẶC NỘI DUNG)
-node_level_map = {}
-if 'TĐ' in df_uplink.columns:
-    # Kiểm tra nếu cột D (chỉ số cột 3) tồn tại
+def apply_map_custom_css(folium_map):
+    font_awesome_link = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">'
+    folium_map.get_root().html.add_child(folium.Element(font_awesome_link))
+    custom_css = """
+    <style>
+    .leaflet-control-zoom { display: none !important; }
+    .leaflet-control-locate { margin-top: 70px !important; margin-left: 10px !important; border: none !important; }
+    .leaflet-control-locate a {
+        background-color: #2563EB !important; color: #FFFFFF !important;
+        border-radius: 8px !important; width: 36px !important; height: 36px !important;
+        display: flex !important; align-items: center !important; justify-content: center !important;
+    }
+    .leaflet-control-layers { margin-top: 70px !important; margin-right: 10px !important; border-radius: 8px !important; }
+    </style>
+    """
+    folium_map.get_root().html.add_child(folium.Element(custom_css))
+
+# 4. TỐI ƯU HÓA LOAD DỮ LIỆU & TÍNH TOÁN DỮ LIỆU ĐỘNG (CACHE TOÀN BỘ)
+@st.cache_data(ttl=3600, show_spinner="Đang xử lý dữ liệu hệ thống...")
+def get_processed_data():
+    file_path = "Data.xlsx"
+    df_uplink = pd.read_excel(file_path, sheet_name="uplink")
+    df_cable = pd.read_excel(file_path, sheet_name="Đoạn cáp")
+    df_hdn = pd.read_excel(file_path, sheet_name="HĐN")
+
+    # 4.1 Tọa độ HĐN
+    df_hdn['Lat_clean'] = pd.to_numeric(df_hdn['Lat'].astype(str).str.replace(',', '.'), errors='coerce')
+    df_hdn['Lng_clean'] = pd.to_numeric(df_hdn['Lng'].astype(str).str.replace(',', '.'), errors='coerce')
+    
+    hdn_coords = {}
+    for _, row in df_hdn.iterrows():
+        name = normalize_node(row['Tên đối tượng'])
+        lat, lng = row['Lat_clean'], row['Lng_clean']
+        if pd.notnull(lat) and pd.notnull(lng):
+            hdn_coords[name] = (float(lat), float(lng))
+
+    # 4.2 Bản đồ Phân cấp (Level Map)
+    node_level_map = {}
     has_col_d = df_uplink.shape[1] >= 4
     for idx, row in df_uplink.iterrows():
-        node_name = normalize_node(row['TĐ'])
-        if not node_name:
-            continue
+        node_name = normalize_node(row['Tên đối tượng'] if 'Tên đối tượng' in row else row['TĐ'])
+        if not node_name: continue
         
         level = None
         if has_col_d and pd.notnull(row.iloc[3]):
             val_d = str(row.iloc[3]).strip().lower()
-            if "1" in val_d:
-                level = 1
-            elif "2" in val_d:
-                level = 2
+            if "1" in val_d: level = 1
+            elif "2" in val_d: level = 2
         
-        # Mặc định quy ước nếu không có cột D: đuôi HO/MO là cấp 2, khác là cấp 1
         if level is None:
-            if node_name.endswith('/HO') or node_name.endswith('/MO'):
-                level = 2
-            else:
-                level = 1
+            level = 2 if (node_name.endswith('/HO') or node_name.endswith('/MO')) else 1
         
         node_level_map[node_name] = level
 
-def get_node_level(node_name):
-    if node_name in node_level_map:
-        return node_level_map[node_name]
-    # Mặc định nếu không nằm trong uplink
-    if node_name.endswith('/HO') or node_name.endswith('/MO'):
-        return 2
-    return 1
+    # 4.3 Đồ thị cáp NetworkX
+    G = nx.Graph()
+    for _, row in df_cable.iterrows():
+        u = normalize_node(row['Điểm KN1'])
+        v = normalize_node(row['Điểm KN2'])
+        cable_name = str(row['Tên đoạn cáp']).strip()
+        
+        try: length = float(row['Chiều dài thực (m)'])
+        except: length = 0.0
+        
+        cap_val = row.get('Dung lượng') if 'Dung lượng' in df_cable.columns else row.iloc[5]
+        if pd.isna(cap_val) or str(cap_val).strip() in ["", "nan", "None"]:
+            capacity_str = "Chưa xác định"
+        else:
+            try: capacity_str = f"{int(float(cap_val))} FO"
+            except: capacity_str = f"{str(cap_val).strip()} FO" if "FO" not in str(cap_val).upper() else str(cap_val).strip()
 
-# 5. ĐỒ THỊ MẠNG CÁP
-G = nx.Graph()
-for _, row in df_cable.iterrows():
-    u = normalize_node(row['Điểm KN1'])
-    v = normalize_node(row['Điểm KN2'])
-    cable_name = str(row['Tên đoạn cáp']).strip()
-    
-    try: 
-        length = float(row['Chiều dài thực (m)'])
-    except: 
-        length = 0.0
-    
-    cap_val = row.get('Dung lượng') if 'Dung lượng' in df_cable.columns else row.iloc[5]
-    if pd.isna(cap_val) or str(cap_val).strip() in ["", "nan", "None"]:
-        capacity_str = "Chưa xác định"
-    else:
+        if u and v: 
+            G.add_edge(u, v, cable=cable_name, length=length, capacity=capacity_str)
+
+    # 4.4 Load JSON shapes
+    cable_shapes = {}
+    for json_file_path in glob.glob("*.json"):
         try:
-            val_num = float(cap_val)
-            capacity_str = f"{int(val_num)} FO"
-        except ValueError:
-            capacity_str = f"{str(cap_val).strip()} FO" if "FO" not in str(cap_val).upper() else str(cap_val).strip()
+            with open(json_file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, dict) and data.get("type") == "FeatureCollection":
+                for feature in data.get("features", []):
+                    props = feature.get("properties", {})
+                    cable_name = props.get("name") or props.get("TEN_DOAN_CAP") or props.get("code") or props.get("id")
+                    geom = feature.get("geometry", {})
+                    if geom.get("type") == "LineString":
+                        coords = [[p[1], p[0]] for p in geom.get("coordinates", [])]
+                        if cable_name: cable_shapes[str(cable_name).strip()] = coords
+                    elif geom.get("type") == "MultiLineString":
+                        coords = []
+                        for line in geom.get("coordinates", []):
+                            coords.extend([[p[1], p[0]] for p in line])
+                        if cable_name: cable_shapes[str(cable_name).strip()] = coords
+        except Exception:
+            pass
 
-    if u and v: 
-        G.add_edge(u, v, cable=cable_name, length=length, capacity=capacity_str)
+    return G, hdn_coords, node_level_map, cable_shapes
 
-# 6. Tọa độ HĐN
-df_hdn['Lat_clean'] = pd.to_numeric(df_hdn['Lat'].astype(str).str.replace(',', '.'), errors='coerce')
-df_hdn['Lng_clean'] = pd.to_numeric(df_hdn['Lng'].astype(str).str.replace(',', '.'), errors='coerce')
+# Tải nhanh toàn bộ cấu trúc dữ liệu đã cache
+try:
+    G, hdn_coords, node_level_map, json_cable_shapes = get_processed_data()
+    all_nodes = sorted(list(G.nodes()))
+except Exception as e:
+    st.error(f"Lỗi khởi tạo dữ liệu: {e}")
+    st.stop()
 
-hdn_coords = {}
-for _, row in df_hdn.iterrows():
-    name = normalize_node(row['Tên đối tượng'])
-    lat, lng = row['Lat_clean'], row['Lng_clean']
-    if pd.notnull(lat) and pd.notnull(lng):
-        hdn_coords[name] = (float(lat), float(lng))
+def get_node_level(node_name):
+    if node_name in node_level_map: return node_level_map[node_name]
+    return 2 if (node_name.endswith('/HO') or node_name.endswith('/MO')) else 1
 
 if 'search_performed' not in st.session_state:
     st.session_state.search_performed = False
 
 map_data = None
-all_nodes = sorted(list(G.nodes()))
 
-# 7. MENU BÊN TRÁI - THUẬT TOÁN LỌC THEO PHÂN CẤP CẤP 1 & CẤP 2
+# 5. GIAO DIỆN BÊN TRÁI & TỐI ƯU THUẬT TOÁN LỌC TĐ
 with st.sidebar:
     current_dir = os.path.dirname(os.path.abspath(__file__)) if '__file__' in globals() else os.getcwd()
     logo_path = os.path.join(current_dir, "FPT_Telecom_logo.png")
@@ -306,32 +277,26 @@ with st.sidebar:
     
     selected_td_a = st.selectbox("Nhập / Chọn TĐ Đo:", options=all_nodes, index=0 if all_nodes else None)
     
-    # === THUẬT TOÁN LỌC TĐ ĐẾN THEO CẤP VÀ LOẠI BỎ /TO, /FO ===
+    # === THUẬT TOÁN LỌC NHANH VỚI MẢNG TẬP HỢP (FAST SET COMPREHENSION) ===
     related_nodes = []
     if selected_td_a and G.has_node(selected_td_a):
-        # Lấy tất cả các TĐ liên thông
-        connected_component = nx.node_connected_component(G, selected_td_a)
-        
-        # BƯỚC 1: Loại bỏ TĐ A và tất cả các TĐ có đuôi /TO hoặc /FO
-        valid_candidates = [
-            node for node in connected_component 
-            if node != selected_td_a and not (node.endswith('/TO') or node.endswith('/FO'))
-        ]
-        
-        # BƯỚC 2: Kiểm tra cấp của TĐ Đo (TĐ A)
+        connected_nodes = nx.node_connected_component(G, selected_td_a)
         level_a = get_node_level(selected_td_a)
         
+        # Tối ưu hóa điều kiện lọc bằng 1 vòng lặp nhanh duy nhất
         if level_a == 2:
-            # Nếu TĐ A là Cấp 2: Chỉ lấy các TĐ B là Cấp 1 hoặc Cấp 2
-            filtered_list = []
-            for node in valid_candidates:
-                lvl = get_node_level(node)
-                if lvl in [1, 2]:
-                    filtered_list.append(node)
-            related_nodes = sorted(filtered_list)
+            related_nodes = sorted([
+                node for node in connected_nodes
+                if node != selected_td_a 
+                and not (node.endswith('/TO') or node.endswith('/FO'))
+                and get_node_level(node) in [1, 2]
+            ])
         else:
-            # Nếu TĐ A là Cấp 1: Được phép lấy tất cả các TĐ liên quan (đã loại bỏ /TO, /FO)
-            related_nodes = sorted(valid_candidates)
+            related_nodes = sorted([
+                node for node in connected_nodes
+                if node != selected_td_a 
+                and not (node.endswith('/TO') or node.endswith('/FO'))
+            ])
 
     if related_nodes:
         selected_td_b = st.selectbox(
@@ -372,8 +337,7 @@ with st.sidebar:
                 accumulated_dist += seg_len
                 
                 seg_info = {
-                    'u': u, 
-                    'v': v, 
+                    'u': u, 'v': v, 
                     'cable': edge_data['cable'], 
                     'length': seg_len, 
                     'capacity': edge_data.get('capacity', 'Chưa xác định'),
@@ -396,7 +360,6 @@ with st.sidebar:
 
                 raw_coords = json_cable_shapes.get(cable_name, [])
                 processed_coords = process_segment_geometry(raw_coords, u_coord, v_coord, target_segment['length'])
-
                 fault_lat, fault_lng = interpolate_on_polyline_scaled(processed_coords, offset, target_segment['length'])
 
                 if fault_lat and fault_lng:
@@ -416,7 +379,7 @@ with st.sidebar:
                         'td_a': td_a, 'td_b': td_b, 'target_dist': target_dist
                     }
 
-# 8. BẢN ĐỒ
+# 6. BẢN ĐỒ INTERACTIVE
 if map_data:
     m = folium.Map(location=[map_data['fault_lat'], map_data['fault_lng']], zoom_start=17, tiles=None, zoom_control=False)
     folium.TileLayer(tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google", name="Đường phố", overlay=False).add_to(m)
