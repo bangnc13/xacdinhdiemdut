@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS Streamlit (Chuyển viền nút toggle menu sang màu Cam Neon + Cố định ở GÓC TRÁI MÀN HÌNH)
+# 2. Inject CSS Streamlit (Giao diện SÁNG - Lịch sự, Dễ đọc + Giảm độ mờ Sidebar)
 st.markdown("""
     <style>
     /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
@@ -46,7 +46,7 @@ st.markdown("""
         align-items: center !important;
         justify-content: center !important;
         border: 2px solid #FF5F1F !important;                /* Viền Cam Neon */
-        box-shadow: 0 0 10px rgba(255, 95, 31, 0.8), 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+        box-shadow: 0 0 10px rgba(255, 95, 31, 0.8), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
         transition: all 0.2s ease-in-out !important;
     }
 
@@ -54,7 +54,7 @@ st.markdown("""
     [data-testid="stSidebarCollapseButton"] button:hover {
         background-color: #1D4ED8 !important;
         border-color: #FF7F3E !important;                      
-        box-shadow: 0 0 15px rgba(255, 127, 62, 1), 0 4px 15px rgba(0, 0, 0, 0.6) !important;
+        box-shadow: 0 0 15px rgba(255, 127, 62, 1), 0 4px 15px rgba(0, 0, 0, 0.4) !important;
         transform: scale(1.08);
     }
 
@@ -67,16 +67,17 @@ st.markdown("""
         max-width: 100% !important;
     }
 
-    /* 4. MENU BÊN TRÁI (SIDEBAR) TRONG SUỐT VỚI HIỆU ỨNG BLUR KÍNH MỜ */
+    /* 4. MENU BÊN TRÁI (SIDEBAR) GIAO DIỆN SÁNG VỚI HIỆU ỨNG BLUR KÍNH MỜ SÁNG */
     [data-testid="stSidebar"] {
-        background: rgba(15, 23, 42, 0.75) !important;
+        background: rgba(255, 255, 255, 0.88) !important;    /* Nền trắng mờ sáng tinh tế */
         backdrop-filter: blur(16px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-        border-right: 1px solid rgba(59, 130, 246, 0.4) !important;
+        border-right: 1px solid rgba(203, 213, 225, 0.8) !important;
         z-index: 999998 !important;
+        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05) !important;
     }
 
-    /* 5. ĐỔI MÀU CHỮ TRÊN MENU */
+    /* 5. ĐỔI MÀU CHỮ SANG TÔNG ĐẬM (DỄ ĐỌC TRÊN NỀN SÁNG) */
     [data-testid="stSidebar"] h1, 
     [data-testid="stSidebar"] h2, 
     [data-testid="stSidebar"] h3, 
@@ -84,24 +85,32 @@ st.markdown("""
     [data-testid="stSidebar"] .stMarkdown,
     [data-testid="stSidebar"] p,
     [data-testid="stSidebar"] span {
-        color: #60A5FA !important;
+        color: #1E293B !important;                          /* Màu xanh đen đậm */
         font-weight: 600 !important;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        text-shadow: none !important;
     }
 
     [data-testid="stSidebar"] h1 {
-        color: #3B82F6 !important;
+        color: #2563EB !important;                          /* Tiêu đề xanh FPT */
     }
 
-    /* 6. Ô NHẬP & SELECTBOX */
-    [data-testid="stSidebar"] input, [data-testid="stSidebar"] div[data-baseweb="select"] {
-        background-color: rgba(0, 0, 0, 0.4) !important;
-        color: #93C5FD !important;
+    /* 6. Ô NHẬP & SELECTBOX TÔNG SÁNG */
+    [data-testid="stSidebar"] input, 
+    [data-testid="stSidebar"] div[data-baseweb="select"] {
+        background-color: #F1F5F9 !important;               /* Nền xám nhạt */
+        color: #0F172A !important;                          /* Chữ đen đậm */
+        border: 1px solid #CBD5E1 !important;
         border-radius: 8px !important;
     }
 
+    /* Định dạng menu xổ xuống của Selectbox */
+    div[data-baseweb="popover"] {
+        background-color: #FFFFFF !important;
+        color: #0F172A !important;
+    }
+
     [data-testid="stSidebar"] hr {
-        border-color: rgba(59, 130, 246, 0.4) !important;
+        border-color: #E2E8F0 !important;
     }
 
     .stButton > button, .stLinkButton > a {
@@ -109,6 +118,13 @@ st.markdown("""
         color: #ffffff !important;
         border-radius: 8px !important;
         font-weight: bold !important;
+        border: none !important;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3) !important;
+    }
+
+    .stButton > button:hover, .stLinkButton > a:hover {
+        background-color: #1D4ED8 !important;
+        box-shadow: 0 4px 10px rgba(29, 78, 216, 0.4) !important;
     }
 
     iframe {
@@ -140,7 +156,7 @@ def apply_map_custom_css(folium_map):
         background-color: #2563EB !important;
         color: #FFFFFF !important;
         border-radius: 8px !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
         width: 36px !important;
         height: 36px !important;
