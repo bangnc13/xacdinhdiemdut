@@ -2,6 +2,7 @@ import os
 import re
 import json
 import math
+import glob
 import networkx as nx
 import pandas as pd
 import streamlit as st
@@ -139,7 +140,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Đã bỏ nút chỉ đường từ GPS tới vị trí đứt trong hàm này
 def apply_map_custom_css(folium_map):
     font_awesome_link = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">'
     folium_map.get_root().html.add_child(folium.Element(font_awesome_link))
@@ -180,69 +180,22 @@ def apply_map_custom_css(folium_map):
     """
     folium_map.get_root().html.add_child(folium.Element(custom_css))
 
-# 3. Tải dữ liệu Excel & JSON
-@st.cache_data
-def load_data():
-    file_path = "Data.xlsx"
-    df_uplink = pd.read_excel(file_path, sheet_name="uplink")
-    df_cable = pd.read_excel(file_path, sheet_name="Đoạn cáp")
-    df_hdn = pd.read_excel(file_path, sheet_name="HĐN")
-    return df_uplink, df_cable, df_hdn
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6371000
+    phi1, phi2 = math.radians(lat1), math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlambda = math.radians(lon2 - lon1)
+    a = math.sin(dphi/2)**2 + math.cos(phi1)*math.cos(phi2)*math.sin(dlambda/2)**2
+    return 2 * R * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
-@st.cache_data
-def load_json_cable_shapes(json_file_path="TQGP001.json"):
-    cable_shapes = {}
-    if not os.path.exists(json_file_path):
-        return cable_shapes
-        
-    try:
-        with open(json_file_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
+def calculate_polyline_length(coords):
+    if not coords or len(coords) < 2:
+        return 0.0
+    total = 0.0
+    for i in range(len(coords) - 1):
+        total += haversine(coords[i][0], coords[i][1], coords[i+1][0], coords[i+1][1])
+    return total
 
-        if isinstance(data, dict) and data.get("type") == "FeatureCollection":
-            for feature in data.get("features", []):
-                props = feature.get("properties", {})
-                cable_name = props.get("name") or props.get("TEN_DOAN_CAP") or props.get("code") or props.get("id")
-                geom = feature.get("geometry", {})
-                
-                if geom.get("type") == "LineString":
-                    coords = [[p[1], p[0]] for p in geom.get("coordinates", [])]
-                    if cable_name:
-                        cable_shapes[str(cable_name).strip()] = coords
-                elif geom.get("type") == "MultiLineString":
-                    coords = []
-                    for line in geom.get("coordinates", []):
-                        coords.extend([[p[1], p[0]] for p in line])
-                    if cable_name:
-                        cable_shapes[str(cable_name).strip()] = coords
-
-        elif isinstance(data, list):
-            for item in data:
-                cable_name = item.get("cable_name") or item.get("name") or item.get("code")
-                coords = item.get("coordinates") or item.get("points") or item.get("path")
-                if cable_name and coords:
-                    formatted_coords = []
-                    for pt in coords:
-                        if isinstance(pt, (list, tuple)) and len(pt) >= 2:
-                            if pt[0] > pt[1]:
-                                formatted_coords.append([pt[1], pt[0]])
-                            else:
-                                formatted_coords.append([pt[0], pt[1]])
-                    if formatted_coords:
-                        cable_shapes[str(cable_name).strip()] = formatted_coords
-    except Exception as e:
-        st.error(f"Lỗi khi đọc file TQGP001.json: {e}")
-
-    return cable_shapes
-
-try:
-    df_uplink, df_cable, df_hdn = load_data()
-    json_cable_shapes = load_json_cable_shapes("TQGP001.json")
-except Exception as e:
-    st.error(f"Lỗi khi tải dữ liệu: {e}")
-    st.stop()
-
-# Chuẩn hóa tên tập điểm
 def normalize_node(node_str):
     if pd.isna(node_str):
         return ""
@@ -254,13 +207,60 @@ def normalize_node(node_str):
         return f"{prefix}.{int(num):04d}/{suffix}"
     return s
 
-def haversine(lat1, lon1, lat2, lon2):
-    R = 6371000
-    phi1, phi2 = math.radians(lat1), math.radians(lat2)
-    dphi = math.radians(lat2 - lat1)
-    dlambda = math.radians(lon2 - lon1)
-    a = math.sin(dphi/2)**2 + math.cos(phi1)*math.cos(phi2)*math.sin(dlambda/2)**2
-    return 2 * R * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+# 3. Tải dữ liệu Excel & Đọc toàn bộ các file JSON trong hệ thống
+@st.cache_data
+def load_data():
+    file_path = "Data.xlsx"
+    df_uplink = pd.read_excel(file_path, sheet_name="uplink")
+    df_cable = pd.read_excel(file_path, sheet_name="Đoạn cáp")
+    df_hdn = pd.read_excel(file_path, sheet_name="HĐN")
+    return df_uplink, df_cable, df_hdn
+
+@st.cache_data
+def load_all_json_cables(directory="."):
+    cable_shapes = {}
+    json_files = glob.glob(os.path.join(directory, "*.json"))
+    
+    for json_file in json_files:
+        try:
+            with open(json_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            if isinstance(data, dict) and data.get("type") == "FeatureCollection":
+                for feature in data.get("features", []):
+                    props = feature.get("properties", {})
+                    cable_name = props.get("name") or props.get("TEN_DOAN_CAP") or props.get("code") or props.get("id")
+                    geom = feature.get("geometry", {})
+                    
+                    if geom.get("type") == "LineString":
+                        coords = [[p[1], p[0]] for p in geom.get("coordinates", [])]
+                        if cable_name and coords:
+                            cable_shapes[str(cable_name).strip()] = coords
+                    elif geom.get("type") == "MultiLineString":
+                        coords = []
+                        for line in geom.get("coordinates", []):
+                            coords.extend([[p[1], p[0]] for p in line])
+                        if cable_name and coords:
+                            cable_shapes[str(cable_name).strip()] = coords
+
+            elif isinstance(data, list):
+                for item in data:
+                    cable_name = item.get("cable_name") or item.get("name") or item.get("code")
+                    coords = item.get("coordinates") or item.get("points") or item.get("path")
+                    if cable_name and coords:
+                        formatted_coords = []
+                        for pt in coords:
+                            if isinstance(pt, (list, tuple)) and len(pt) >= 2:
+                                if pt[0] > pt[1]:
+                                    formatted_coords.append([pt[1], pt[0]])
+                                else:
+                                    formatted_coords.append([pt[0], pt[1]])
+                        if formatted_coords:
+                            cable_shapes[str(cable_name).strip()] = formatted_coords
+        except Exception as e:
+            st.error(f"Lỗi khi đọc file JSON ({os.path.basename(json_file)}): {e}")
+
+    return cable_shapes
 
 def interpolate_on_polyline(coords, target_offset):
     if not coords or len(coords) < 2:
@@ -278,22 +278,14 @@ def interpolate_on_polyline(coords, target_offset):
         accumulated += seg_len
     return coords[-1][0], coords[-1][1]
 
-# 4. Xây dựng đồ thị mạng cáp
-G = nx.Graph()
-for _, row in df_cable.iterrows():
-    u = normalize_node(row['Điểm KN1'])
-    v = normalize_node(row['Điểm KN2'])
-    cable_name = str(row['Tên đoạn cáp']).strip()
-    
-    try:
-        length = float(row['Chiều dài thực (m)'])
-    except (ValueError, TypeError):
-        length = 0.0
-        
-    if u and v:
-        G.add_edge(u, v, cable=cable_name, length=length)
+try:
+    df_uplink, df_cable, df_hdn = load_data()
+    json_cable_shapes = load_all_json_cables(".")
+except Exception as e:
+    st.error(f"Lỗi khi tải dữ liệu: {e}")
+    st.stop()
 
-# 5. Trích xuất tọa độ HĐN
+# 4. Trích xuất tọa độ HĐN từ Excel
 df_hdn['Lat_clean'] = pd.to_numeric(df_hdn['Lat'].astype(str).str.replace(',', '.'), errors='coerce')
 df_hdn['Lng_clean'] = pd.to_numeric(df_hdn['Lng'].astype(str).str.replace(',', '.'), errors='coerce')
 
@@ -305,13 +297,45 @@ for _, row in df_hdn.iterrows():
     if pd.notnull(lat) and pd.notnull(lng):
         hdn_coords[name] = (float(lat), float(lng))
 
+# Bổ sung tọa độ từ JSON vào hdn_coords cho các điểm chưa có trong Excel
+for cable_name, coords in json_cable_shapes.items():
+    if coords:
+        start_pt, end_pt = coords[0], coords[-1]
+        # Lấy tọa độ đầu cuối làm điểm tham chiếu dự phòng
+        for _, row in df_cable[df_cable['Tên đoạn cáp'].astype(str).str.strip() == cable_name].iterrows():
+            u = normalize_node(row['Điểm KN1'])
+            v = normalize_node(row['Điểm KN2'])
+            if u and u not in hdn_coords:
+                hdn_coords[u] = (start_pt[0], start_pt[1])
+            if v and v not in hdn_coords:
+                hdn_coords[v] = (end_pt[0], end_pt[1])
+
+# 5. Xây dựng đồ thị mạng cáp (Kết hợp chiều dài tính từ JSON nếu Excel thiếu)
+G = nx.Graph()
+for _, row in df_cable.iterrows():
+    u = normalize_node(row['Điểm KN1'])
+    v = normalize_node(row['Điểm KN2'])
+    cable_name = str(row['Tên đoạn cáp']).strip()
+    
+    try:
+        length = float(row['Chiều dài thực (m)'])
+    except (ValueError, TypeError):
+        length = 0.0
+        
+    # Nâng cấp: Tính chiều dài chính xác bằng tọa độ polyline JSON nếu Excel để trống hoặc = 0
+    if length <= 0 and cable_name in json_cable_shapes:
+        length = calculate_polyline_length(json_cable_shapes[cable_name])
+        
+    if u and v:
+        G.add_edge(u, v, cable=cable_name, length=length)
+
 if 'search_performed' not in st.session_state:
     st.session_state.search_performed = False
 
 map_data = None
 all_nodes = sorted(list(G.nodes()))
 
-# 6. MENU DẠNG DỌC BÊN TRÁI (SIDEBAR)
+# 6. MENU SIDEBAR
 with st.sidebar:
     current_dir = os.path.dirname(os.path.abspath(__file__)) if '__file__' in globals() else os.getcwd()
     logo_path = os.path.join(current_dir, "FPT_Telecom_logo.png")
@@ -411,6 +435,7 @@ with st.sidebar:
                 offset = target_dist - target_segment['start_dist']
                 fault_lat, fault_lng = None, None
 
+                # Định vị điểm đứt chính xác từ các điểm tọa độ tuyến cáp
                 if cable_name in json_cable_shapes:
                     raw_coords = json_cable_shapes[cable_name]
                     fault_lat, fault_lng = interpolate_on_polyline(raw_coords, offset)
@@ -441,7 +466,7 @@ with st.sidebar:
                 else:
                     st.warning("Thiếu dữ liệu tọa độ Lat/Lng cho đoạn cáp chứa vị trí đứt.")
 
-# 7. BẢN ĐỒ FULL TRÀN VIỀN BÊN PHẢI
+# 7. BẢN ĐỒ BÊN PHẢI
 if map_data:
     m = folium.Map(
         location=[map_data['fault_lat'], map_data['fault_lng']], 
@@ -475,7 +500,6 @@ if map_data:
     
     folium.LayerControl().add_to(m)
 
-    # Hiển thị lộ trình bằng AntPath (Hiệu ứng dòng chảy di chuyển đến điểm đứt)
     full_route_coords = []
     for seg in map_data['cable_segments']:
         c_name = seg['cable']
@@ -500,7 +524,6 @@ if map_data:
             tooltip="Lộ trình cáp mạng"
         ).add_to(m)
 
-    # Hiển thị Marker và Nhãn tên TĐ
     for node in map_data['node_path']:
         if node in hdn_coords:
             coord = hdn_coords[node]
@@ -543,7 +566,6 @@ if map_data:
                 )
             ).add_to(m)
 
-    # Marker Vị trí đứt cáp (Màu Đỏ)
     folium.Marker(
         [map_data['fault_lat'], map_data['fault_lng']],
         popup=f"Vị trí đứt cáp: {map_data['target_dist']}m từ {map_data['td_a']}",
@@ -587,7 +609,7 @@ else:
             color="#2563EB",
             weight=4,
             opacity=0.7,
-            tooltip=f"Tuyến cáp JSON: {c_name}"
+            tooltip=f"Tuyến cáp: {c_name}"
         ).add_to(default_map)
 
     apply_map_custom_css(default_map)
