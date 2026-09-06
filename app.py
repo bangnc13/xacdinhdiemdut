@@ -23,7 +23,7 @@ st.markdown("""
         z-index: 999999 !important;
     }
 
-    /* 2. ẨN HOÀN TOÀN TẤT CẢ BIỂU TƯỢNG BÊN PHẢI */
+    /* 2. ẨN HOÀN TOÀN CÁC BIỂU TƯỢNG BÊN PHẢI (GITHUB/CON MÈO, FORK, STAR, MENU 3 CHẤM, DEPLOY) */
     #MainMenu { visibility: hidden !important; }
     footer { visibility: hidden !important; }
     [data-testid="stToolbar"] { display: none !important; }
@@ -32,7 +32,7 @@ st.markdown("""
     .stAppDeployButton { display: none !important; }
     a[href*="github.com"] { display: none !important; }
 
-    /* 3. NÚT HIỆN MENU / BO TRÒN MÀU XANH NEON */
+    /* 3. NÚT HIỆN MENU MẶC ĐỊNH CỦA STREAMLIT (BO TRÒN MÀU XANH NEON) */
     button[data-testid="stHeaderIconButton"],
     [data-testid="stSidebarCollapseButton"] button,
     [data-testid="stSidebarCollapsedControl"] button {
@@ -127,21 +127,52 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Hàm bổ sung CSS + FontAwesome trực tiếp vào iframe Folium
+# Hàm bổ sung CSS, FontAwesome + Nút Mở Menu nằm ngay TRÊN nút định vị
 def apply_map_custom_css(folium_map):
     font_awesome_link = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">'
     folium_map.get_root().html.add_child(folium.Element(font_awesome_link))
 
-    custom_css = """
+    # CSS & JS bổ sung nút Mở Menu phía trên Nút Định Vị
+    custom_script = """
     <style>
     /* Ẩn nút Zoom + / - */
     .leaflet-control-zoom {
         display: none !important;
     }
 
-    /* Dời nút định vị xuống dưới (top: 70px) */
+    /* Nút Mở Menu nằm phía trên (top: 15px) */
+    .leaflet-control-toggle-sidebar {
+        margin-top: 15px !important;
+        margin-left: 10px !important;
+        border: none !important;
+    }
+
+    .leaflet-control-toggle-sidebar a {
+        background-color: #0F172A !important;
+        color: #00FF66 !important;
+        border-radius: 50% !important;
+        border: 2px solid #00FF66 !important;
+        box-shadow: 0 0 12px rgba(0, 255, 102, 0.8), 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+        width: 36px !important;
+        height: 36px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-decoration: none !important;
+        transition: all 0.2s ease-in-out !important;
+    }
+
+    .leaflet-control-toggle-sidebar a:hover {
+        background-color: #1E293B !important;
+        border-color: #66FF99 !important;
+        color: #FFFFFF !important;
+        box-shadow: 0 0 18px rgba(0, 255, 102, 1), 0 4px 15px rgba(0, 0, 0, 0.6) !important;
+        transform: scale(1.08);
+    }
+
+    /* Nút Định vị dời xuống phía dưới (top: 60px) */
     .leaflet-control-locate {
-        margin-top: 70px !important;
+        margin-top: 10px !important;
         margin-left: 10px !important;
         border: none !important;
     }
@@ -165,8 +196,48 @@ def apply_map_custom_css(folium_map):
         color: #FFFFFF !important;
     }
     </style>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        setTimeout(function() {
+            var mapElement = document.querySelector('.folium-map');
+            if (mapElement && window[mapElement.id]) {
+                var map = window[mapElement.id];
+
+                // Tạo Custom Control cho nút Toggle Sidebar
+                L.Control.ToggleSidebar = L.Control.extend({
+                    options: { position: 'topleft' },
+                    onAdd: function (map) {
+                        var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-toggle-sidebar');
+                        var link = L.DomUtil.create('a', '', container);
+                        link.href = '#';
+                        link.title = 'Mở / Đóng Menu';
+                        link.innerHTML = '<i class="fa-solid fa-bars" style="font-size: 16px;"></i>';
+
+                        L.DomEvent.disableClickPropagation(container);
+                        L.DomEvent.on(link, 'click', function (e) {
+                            L.DomEvent.preventDefault(e);
+                            // Gọi sự kiện click tới nút sidebar của Streamlit ở trang cha
+                            var parentDoc = window.parent.document;
+                            var btn = parentDoc.querySelector('[data-testid="stSidebarCollapsedControl"] button') || 
+                                      parentDoc.querySelector('[data-testid="stSidebarCollapseButton"] button') ||
+                                      parentDoc.querySelector('button[data-testid="stHeaderIconButton"]');
+                            if (btn) {
+                                btn.click();
+                            }
+                        });
+
+                        return container;
+                    }
+                });
+
+                map.addControl(new L.Control.ToggleSidebar());
+            }
+        }, 500);
+    });
+    </script>
     """
-    folium_map.get_root().html.add_child(folium.Element(custom_css))
+    folium_map.get_root().html.add_child(folium.Element(custom_script))
 
 # 3. Tải dữ liệu Excel
 @st.cache_data
