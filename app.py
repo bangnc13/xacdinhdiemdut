@@ -14,17 +14,35 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS & JavaScript: Nút bấm Ẩn/Hiện Sidebar trên màn hình Map
+# 2. Inject CSS: Tùy biến nút Toggle Sidebar chuẩn của Streamlit
 st.markdown("""
     <style>
-    /* 1. ẨN HOÀN TOÀN THANH HEADER TRÊN CÙNG */
+    /* 1. HIỆN LẠI HEADER NHƯNG TRONG SUỐT VÀ CHỈ GIỮ LẠI NÚT TOGGLE SIDEBAR */
     header[data-testid="stHeader"] {
-        display: none !important;
+        background-color: transparent !important;
+        z-index: 999999 !important;
     }
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* 2. BẢN ĐỒ TRÀN SÁT CÁC CẠNH MÀN HÌNH */
+    /* 2. ĐỊNH DẠNG NÚT BẤM ẨN/HIỆN SIDEBAR MẶC ĐỊNH THÀNH NÚT NỔI ĐẸP MẮT */
+    button[data-testid="stHeaderIconButton"],
+    [data-testid="stSidebarCollapseButton"] button {
+        background-color: #2563EB !important;
+        color: white !important;
+        border-radius: 8px !important;
+        padding: 6px 12px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+
+    button[data-testid="stHeaderIconButton"]:hover,
+    [data-testid="stSidebarCollapseButton"] button:hover {
+        background-color: #1D4ED8 !important;
+        transform: scale(1.05);
+    }
+
+    /* 3. BẢN ĐỒ TRÀN SÁT CÁC CẠNH MÀN HÌNH */
     .block-container {
         padding-top: 0rem !important;
         padding-bottom: 0rem !important;
@@ -33,16 +51,16 @@ st.markdown("""
         max-width: 100% !important;
     }
 
-    /* 3. MENU BÊN TRÁI (SIDEBAR) TRONG SUỐT VỚI HIỆU ỨNG BLUR KÍNH MỜ */
+    /* 4. MENU BÊN TRÁI (SIDEBAR) TRONG SUỐT VỚI HIỆU ỨNG BLUR KÍNH MỜ */
     [data-testid="stSidebar"] {
-        background: rgba(15, 23, 42, 0.7) !important;
+        background: rgba(15, 23, 42, 0.75) !important;
         backdrop-filter: blur(16px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
         border-right: 1px solid rgba(59, 130, 246, 0.4) !important;
         z-index: 999998 !important;
     }
 
-    /* 4. ĐỔI MÀU CHỮ TRÊN MENU THÀNH MÀU XANH DƯƠNG */
+    /* 5. ĐỔI MÀU CHỮ TRÊN MENU THÀNH MÀU XANH DƯƠNG */
     [data-testid="stSidebar"] h1, 
     [data-testid="stSidebar"] h2, 
     [data-testid="stSidebar"] h3, 
@@ -55,45 +73,18 @@ st.markdown("""
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
     }
 
-    /* Đổi màu tiêu đề chính */
     [data-testid="stSidebar"] h1 {
         color: #3B82F6 !important;
     }
 
-    /* 5. Ô NHẬP & SELECTBOX DỮ LIỆU BÊN SIDEBAR */
+    /* 6. Ô NHẬP & SELECTBOX DỮ LIỆU BÊN SIDEBAR */
     [data-testid="stSidebar"] input, [data-testid="stSidebar"] div[data-baseweb="select"] {
         background-color: rgba(0, 0, 0, 0.4) !important;
         color: #93C5FD !important;
         border-radius: 8px !important;
     }
 
-    /* 6. NÚT NỔI ẨN/HIỆN MENU TRÊN MÀN HÌNH BẢN ĐỒ */
-    .toggle-menu-btn {
-        position: fixed;
-        top: 15px;
-        left: 15px;
-        z-index: 999999;
-        background-color: #2563EB;
-        color: white;
-        border: none;
-        padding: 10px 16px;
-        border-radius: 8px;
-        font-weight: bold;
-        font-size: 14px;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        transition: all 0.2s ease-in-out;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .toggle-menu-btn:hover {
-        background-color: #1D4ED8;
-        transform: scale(1.05);
-    }
-
-    /* STYLE NÚT BẤM VÀ ĐƯỜNG KẺ GẠCH MÀU XANH DƯƠNG */
+    /* 7. STYLE NÚT BẤM VÀ ĐƯỜNG KẺ GẠCH MÀU XANH DƯƠNG */
     [data-testid="stSidebar"] hr {
         border-color: rgba(59, 130, 246, 0.4) !important;
     }
@@ -126,26 +117,6 @@ st.markdown("""
         border: none !important;
     }
     </style>
-
-    <!-- HTML & JavaScript tạo nút Toggle Menu trên bản đồ -->
-    <button class="toggle-menu-btn" onclick="toggleSidebar()">
-        ☰ Ẩn / Hiện Menu
-    </button>
-
-    <script>
-    function toggleSidebar() {
-        const sidebar = window.parent.document.querySelector('[data-testid="stSidebar"]');
-        if (sidebar) {
-            if (sidebar.style.display === "none" || sidebar.style.visibility === "hidden") {
-                sidebar.style.display = "block";
-                sidebar.style.visibility = "visible";
-            } else {
-                sidebar.style.display = "none";
-                sidebar.style.visibility = "hidden";
-            }
-        }
-    }
-    </script>
 """, unsafe_allow_html=True)
 
 # 3. Tải dữ liệu Excel
