@@ -129,6 +129,25 @@ st.markdown("""
         z-index: 9999 !important;
     }
 
+    /* Định dạng icon 🎯 trên nút Locate */
+    .leaflet-control-locate a {
+        background-color: #1E293B !important;
+        color: #FFFFFF !important;
+        border-radius: 8px !important;
+        width: 36px !important;
+        height: 36px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 18px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        text-decoration: none !important;
+    }
+
+    .leaflet-control-locate a:hover {
+        background-color: #2563EB !important;
+    }
+
     /* Nút Chuyển Layer Map - Ở giữa (Dưới nút Định vị) */
     .leaflet-top.leaflet-right .leaflet-control-layers {
         position: fixed !important;
@@ -373,7 +392,8 @@ if map_data:
         control=True
     ).add_to(m)
 
-    LocateControl(auto_start=False, flyTo=True).add_to(m)
+    # Thay đổi icon của nút Locate thành 🎯 tại đây
+    LocateControl(auto_start=False, flyTo=True, icon="🎯").add_to(m)
     folium.LayerControl().add_to(m)
 
     path_coords = [hdn_coords[n] for n in map_data['node_path'] if n in hdn_coords]
@@ -406,5 +426,7 @@ else:
         overlay=False,
         control=False
     ).add_to(default_map)
-    LocateControl(auto_start=False, flyTo=True).add_to(default_map)
+
+    # Thay đổi icon của nút Locate thành 🎯 tại đây
+    LocateControl(auto_start=False, flyTo=True, icon="🎯").add_to(default_map)
     st_folium(default_map, width="100%", height=1000, key="default_map")
