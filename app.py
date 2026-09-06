@@ -23,7 +23,7 @@ st.markdown("""
         z-index: 999999 !important;
     }
 
-    /* 2. ẨN HOÀN TOÀN TẤT CẢ BIỂU TƯỢNG BÊN PHẢI (GITHUBAI/CON MÈO, FORK, STAR, MENU 3 CHẤM, DEPLOY) */
+    /* 2. ẨN HOÀN TOÀN TẤT CẢ BIỂU TƯỢNG BÊN PHẢI (GITHUB/CON MÈO, FORK, STAR, MENU 3 CHẤM, DEPLOY) */
     #MainMenu {visibility: hidden !important;}
     footer {visibility: hidden !important;}
     [data-testid="stToolbar"] {display: none !important;}
@@ -32,29 +32,40 @@ st.markdown("""
     .stAppDeployButton {display: none !important;}
     a[href*="github.com"] {display: none !important;}
 
-    /* 3. ĐỊNH DẠNG NÚT BẤM ẨN/HIỆN SIDEBAR: BO TRÒN VÀ VIỀN CAM NEON */
+    /* 3. ĐỊNH DẠNG NÚT BẤM HIỆN/ẨN MENU TRÊN BẢN ĐỒ (XANH NEON & BO TRÒN) */
     button[data-testid="stHeaderIconButton"],
-    [data-testid="stSidebarCollapseButton"] button {
-        background-color: #2563EB !important;
-        color: white !important;
-        border-radius: 50% !important;                       /* Bo tròn hoàn toàn dạng hình tròn */
-        width: 40px !important;
-        height: 40px !important;
+    [data-testid="stSidebarCollapseButton"] button,
+    [data-testid="stSidebarCollapsedControl"] button {
+        background-color: #0F172A !important;                /* Nền tối nổi bật */
+        color: #00FF66 !important;                           /* Icon màu xanh neon */
+        border-radius: 50% !important;                       /* Bo tròn hoàn toàn */
+        width: 42px !important;
+        height: 42px !important;
         padding: 0px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        border: 2px solid #FF5F1F !important;                /* Đường viền màu Cam Neon */
-        box-shadow: 0 0 10px rgba(255, 95, 31, 0.8), 0 4px 12px rgba(0, 0, 0, 0.5) !important; /* Hiệu ứng phát sáng neon */
+        border: 2px solid #00FF66 !important;                /* Đường viền màu Xanh Neon */
+        box-shadow: 0 0 12px rgba(0, 255, 102, 0.8), 0 4px 12px rgba(0, 0, 0, 0.5) !important; /* Hiệu ứng phát sáng Xanh Neon */
         transition: all 0.2s ease-in-out !important;
     }
 
     button[data-testid="stHeaderIconButton"]:hover,
-    [data-testid="stSidebarCollapseButton"] button:hover {
-        background-color: #1D4ED8 !important;
-        border-color: #FF7F3E !important;                     /* Viền sáng hơn khi hover */
-        box-shadow: 0 0 15px rgba(255, 127, 62, 1), 0 4px 15px rgba(0, 0, 0, 0.6) !important;
+    [data-testid="stSidebarCollapseButton"] button:hover,
+    [data-testid="stSidebarCollapsedControl"] button:hover {
+        background-color: #1E293B !important;
+        border-color: #66FF99 !important;                     /* Viền sáng hơn khi hover */
+        color: #FFFFFF !important;
+        box-shadow: 0 0 18px rgba(0, 255, 102, 1), 0 4px 15px rgba(0, 0, 0, 0.6) !important;
         transform: scale(1.08);
+    }
+
+    /* Đảm bảo nút bấm khi menu bị đóng vẫn hiển thị đè lên bản đồ */
+    [data-testid="stSidebarCollapsedControl"] {
+        position: fixed !important;
+        top: 12px !important;
+        left: 12px !important;
+        z-index: 999999 !important;
     }
 
     /* 4. BẢN ĐỒ TRÀN SÁT CÁC CẠNH MÀN HÌNH */
