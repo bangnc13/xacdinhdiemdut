@@ -10,7 +10,7 @@ from PIL import Image
 
 # 1. Cấu hình trang
 st.set_page_config(
-    page_title="Xác định điểm đứt cáp & Dẫn đường",
+    page_title="Make by BangNC13",
     page_icon="📍",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -258,7 +258,7 @@ with st.sidebar:
     else:
         st.image("https://upload.wikimedia.org/wikipedia/commons/1/11/FPT_Telecom_logo.svg", width=220)
 
-    st.title("📍 TOOL XÁC ĐỊNH SỰ CỐ")
+    st.title("📍XÁC ĐỊNH ĐIỂM ĐỨT")
     st.markdown("---")
     
     selected_td_a = st.selectbox(
@@ -350,7 +350,7 @@ with st.sidebar:
                     fault_lat = u_coord[0] + ratio * (v_coord[0] - u_coord[0])
                     fault_lng = u_coord[1] + ratio * (v_coord[1] - u_coord[1])
 
-                    st.success(f"⚠️ **Đoạn cáp đứt:**\n\n**{target_segment['cable']}**\n\n({target_segment['u']} ➔ {target_segment['v']})")
+                    st.success(f"⚠️ **Vị trí đứt nằm trong đoạn cáp:**\n\n**{target_segment['cable']}**\n\n({target_segment['u']} ➔ {target_segment['v']})")
 
                     gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
                     st.link_button("🚗 Chỉ đường Google Maps", gmaps_url, type="primary", use_container_width=True)
