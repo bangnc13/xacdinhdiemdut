@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS Streamlit (Sidebar siêu trong suốt + Chữ Xanh Dương)
+# 2. Inject CSS Streamlit (Sidebar trong suốt + Chữ xanh dương + NÚT BẤM MÀU CAM NHẠT)
 st.markdown("""
     <style>
     /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
@@ -36,8 +36,8 @@ st.markdown("""
         top: 10px !important;                                /* Cách mép trên 10px */
         left: 10px !important;                               /* Dời sát góc TRÁI màn hình */
         z-index: 1000000 !important;                         /* Nổi lên trên cùng */
-        background-color: #2563EB !important;
-        color: white !important;
+        background-color: #FFEDD5 !important;                /* Nền cam nhạt */
+        color: #EA580C !important;                           /* Chữ cam đậm */
         border-radius: 50% !important;                       /* Bo tròn dạng hình tròn */
         width: 40px !important;
         height: 40px !important;
@@ -46,15 +46,15 @@ st.markdown("""
         align-items: center !important;
         justify-content: center !important;
         border: 2px solid #FF5F1F !important;                /* Viền Cam Neon */
-        box-shadow: 0 0 10px rgba(255, 95, 31, 0.8), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        box-shadow: 0 0 10px rgba(255, 95, 31, 0.5), 0 4px 12px rgba(0, 0, 0, 0.2) !important;
         transition: all 0.2s ease-in-out !important;
     }
 
     button[data-testid="stHeaderIconButton"]:hover,
     [data-testid="stSidebarCollapseButton"] button:hover {
-        background-color: #1D4ED8 !important;
+        background-color: #FED7AA !important;                /* Cam nhạt hơn chút khi hover */
         border-color: #FF7F3E !important;                      
-        box-shadow: 0 0 15px rgba(255, 127, 62, 1), 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+        box-shadow: 0 0 15px rgba(255, 127, 62, 0.8), 0 4px 15px rgba(0, 0, 0, 0.3) !important;
         transform: scale(1.08);
     }
 
@@ -114,18 +114,25 @@ st.markdown("""
         border-color: rgba(37, 99, 235, 0.3) !important;
     }
 
-    .stButton > button, .stLinkButton > a {
-        background-color: #2563EB !important;
-        color: #ffffff !important;
+    /* 7. ĐỔI MÀU NỀN TẤT CẢ NÚT BẤM BÊN BẢNG SIDEBAR SANG MÀU CAM NHẠT */
+    [data-testid="stSidebar"] .stButton > button, 
+    [data-testid="stSidebar"] .stLinkButton > a {
+        background-color: #FFEDD5 !important;                /* Nền Cam nhạt mềm mại */
+        color: #C2410C !important;                           /* Chữ Cam đậm nổi bật */
+        border: 1.5px solid #FDBA74 !important;               /* Viền Cam nhạt */
         border-radius: 8px !important;
         font-weight: bold !important;
-        border: none !important;
-        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4) !important;
+        box-shadow: 0 2px 8px rgba(234, 88, 12, 0.15) !important;
+        transition: all 0.2s ease-in-out !important;
     }
 
-    .stButton > button:hover, .stLinkButton > a:hover {
-        background-color: #1D4ED8 !important;
-        box-shadow: 0 4px 12px rgba(29, 78, 216, 0.5) !important;
+    /* Đổi màu khi di chuột (Hover) vào nút bấm */
+    [data-testid="stSidebar"] .stButton > button:hover, 
+    [data-testid="stSidebar"] .stLinkButton > a:hover {
+        background-color: #FED7AA !important;                /* Cam đậm hơn một chút khi hover */
+        color: #9A3412 !important;                           
+        border-color: #FB923C !important;
+        box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3) !important;
     }
 
     iframe {
