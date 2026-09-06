@@ -14,11 +14,8 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS: Tùy biến giao diện, ẩn Zoom, Fix Icon & Đặt nút định vị góc dưới bên trái
+# 2. Inject CSS Streamlit (Chỉ xử lý giao diện Streamlit & Sidebar)
 st.markdown("""
-    <!-- Load FontAwesome 6 để hiển thị icon định vị chính xác -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
     /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
     header[data-testid="stHeader"] {
@@ -28,7 +25,7 @@ st.markdown("""
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* 2. ĐỊNH DẠNG NÚT BẤM ẨN/HIỆN SIDEBAR MẶC ĐỊNH THÀNH NÚT NỔI ĐẸP MẮT */
+    /* 2. NÚT BẤM ẨN/HIỆN SIDEBAR */
     button[data-testid="stHeaderIconButton"],
     [data-testid="stSidebarCollapseButton"] button {
         background-color: #2563EB !important;
@@ -63,7 +60,7 @@ st.markdown("""
         z-index: 999998 !important;
     }
 
-    /* 5. ĐỔI MÀU CHỮ TRÊN MENU THÀNH MÀU XANH DƯƠNG */
+    /* 5. ĐỔI MÀU CHỮ TRÊN MENU */
     [data-testid="stSidebar"] h1, 
     [data-testid="stSidebar"] h2, 
     [data-testid="stSidebar"] h3, 
@@ -80,59 +77,48 @@ st.markdown("""
         color: #3B82F6 !important;
     }
 
-    /* 6. Ô NHẬP & SELECTBOX DỮ LIỆU BÊN SIDEBAR */
+    /* 6. Ô NHẬP & SELECTBOX */
     [data-testid="stSidebar"] input, [data-testid="stSidebar"] div[data-baseweb="select"] {
         background-color: rgba(0, 0, 0, 0.4) !important;
         color: #93C5FD !important;
         border-radius: 8px !important;
     }
 
-    /* 7. STYLE NÚT BẤM VÀ ĐƯỜNG KẺ GẠCH MÀU XANH DƯƠNG */
     [data-testid="stSidebar"] hr {
         border-color: rgba(59, 130, 246, 0.4) !important;
     }
 
-    .stButton > button {
-        background-color: #2563EB !important;
-        color: #ffffff !important;
-        border: none !important;
-        border-radius: 8px !important;
-        font-weight: bold !important;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4) !important;
-    }
-    
-    .stButton > button:hover {
-        background-color: #1D4ED8 !important;
-    }
-
-    .stLinkButton > a {
+    .stButton > button, .stLinkButton > a {
         background-color: #2563EB !important;
         color: #ffffff !important;
         border-radius: 8px !important;
         font-weight: bold !important;
-    }
-    
-    .stLinkButton > a:hover {
-        background-color: #1D4ED8 !important;
     }
 
     iframe {
         border: none !important;
     }
+    </style>
+""", unsafe_allow_html=True)
 
-    /* 8. ẨN HOÀN TOÀN NÚT ZOOM (+ / -) */
+# Hàm bổ sung CSS + FontAwesome trực tiếp vào bản đồ Folium
+def apply_map_custom_css(folium_map):
+    # Load FontAwesome 6 trực tiếp vào iframe
+    font_awesome_link = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">'
+    folium_map.get_root().html.add_child(folium.Element(font_awesome_link))
+
+    # CSS di chuyển nút định vị xuống vị trí khoanh đỏ (top: 70px) & ẩn zoom
+    custom_css = """
+    <style>
+    /* Ẩn nút Zoom + / - */
     .leaflet-control-zoom {
         display: none !important;
     }
 
-    /* 9. CHUYỂN NÚT ĐỊNH VỊ XUỐNG GÓC DƯỚI BÊN TRÁI (KHÔNG BAO GIỜ BỊ CHỒNG) */
+    /* Dời nút định vị xuống dưới (top: 70px) để không bị nút toggle che khuất */
     .leaflet-control-locate {
-        position: fixed !important;
-        bottom: 30px !important;     /* Đặt ở góc dưới */
-        left: 20px !important;       /* Căn lề trái sát viền */
-        top: auto !important;        /* Hủy bỏ vị trí top cũ */
-        right: auto !important;
-        z-index: 99999 !important;
+        margin-top: 70px !important;
+        margin-left: 10px !important;
         border: none !important;
     }
 
@@ -142,27 +128,21 @@ st.markdown("""
         border-radius: 8px !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        width: 40px !important;
-        height: 40px !important;
+        width: 36px !important;
+        height: 36px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        transition: all 0.2s ease !important;
     }
 
-    .leaflet-control-locate a:hover {
-        background-color: #1D4ED8 !important;
-        transform: scale(1.08);
-    }
-
-    /* Styling icon bên trong */
     .leaflet-control-locate a span.fa,
     .leaflet-control-locate a span.fas {
-        font-size: 18px !important;
+        font-size: 16px !important;
         color: #FFFFFF !important;
     }
     </style>
-""", unsafe_allow_html=True)
+    """
+    folium_map.get_root().html.add_child(folium.Element(custom_css))
 
 # 3. Tải dữ liệu Excel
 @st.cache_data
@@ -223,8 +203,6 @@ if 'search_performed' not in st.session_state:
     st.session_state.search_performed = False
 
 map_data = None
-
-# Danh sách tất cả tập điểm
 all_nodes = sorted(list(G.nodes()))
 
 # 6. MENU DẠNG DỌC BÊN TRÁI (SIDEBAR)
@@ -232,20 +210,17 @@ with st.sidebar:
     st.title("📍 TOOL XÁC ĐỊNH SỰ CỐ")
     st.markdown("---")
     
-    # Ô Chọn TĐ Đo
     selected_td_a = st.selectbox(
         "Nhập / Chọn TĐ Đo:",
         options=all_nodes,
         index=0 if all_nodes else None
     )
     
-    # Lọc danh sách tập điểm liên quan
     related_nodes = []
     if selected_td_a and G.has_node(selected_td_a):
         related_nodes = sorted(list(nx.node_connected_component(G, selected_td_a)))
         related_nodes = [node for node in related_nodes if node != selected_td_a]
 
-    # Ô Chọn TĐ Đến
     if related_nodes:
         selected_td_b = st.selectbox(
             "Chọn TĐ Đến (Đã lọc theo TĐ Đo):",
@@ -272,7 +247,6 @@ with st.sidebar:
         else:
             st.error("Vui lòng chọn TĐ Đo và TĐ Đến hợp lệ!")
 
-    # KHU VỰC HIỂN THỊ KẾT QUẢ PHÂN TÍCH
     if st.session_state.search_performed:
         st.markdown("---")
         st.subheader("📊 Kết Quả Phân Tích")
@@ -327,7 +301,6 @@ with st.sidebar:
 
                     st.success(f"⚠️ **Đoạn cáp đứt:**\n\n**{target_segment['cable']}**\n\n({target_segment['u']} ➔ {target_segment['v']})")
 
-                    # Nút mở Google Maps chỉ đường
                     gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
                     st.link_button("🚗 Chỉ đường Google Maps", gmaps_url, type="primary", use_container_width=True)
 
@@ -367,7 +340,6 @@ if map_data:
         control=True
     ).add_to(m)
 
-    # ĐỊNH VỊ VỚI ICON LOCATION TÍCH HỢP CHUẨN
     LocateControl(
         auto_start=False, 
         flyTo=True, 
@@ -392,6 +364,9 @@ if map_data:
         icon=folium.Icon(color="red", icon="wrench", prefix="fa")
     ).add_to(m)
 
+    # Áp dụng CSS sửa vị trí nút định vị vào bản đồ
+    apply_map_custom_css(m)
+
     st_folium(m, width="100%", height=1000, key="fault_map")
 else:
     default_map = folium.Map(
@@ -408,12 +383,14 @@ else:
         control=False
     ).add_to(default_map)
 
-    # ĐỊNH VỊ VỚI ICON LOCATION TÍCH HỢP CHUẨN
     LocateControl(
         auto_start=False, 
         flyTo=True, 
         icon="fa fa-location-arrow", 
         iconLoading="fa fa-spinner fa-spin"
     ).add_to(default_map)
+
+    # Áp dụng CSS sửa vị trí nút định vị vào bản đồ
+    apply_map_custom_css(default_map)
 
     st_folium(default_map, width="100%", height=1000, key="default_map")
