@@ -6,7 +6,7 @@ import folium
 from folium.plugins import LocateControl
 from streamlit_folium import st_folium
 
-# 1. Cấu hình trang Full layout
+# 1. Cấu hình trang
 st.set_page_config(
     page_title="Xác định điểm đứt cáp & Dẫn đường",
     page_icon="📍",
@@ -14,51 +14,58 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject Custom CSS: Tối ưu Sidebar kính mờ & Bản đồ tràn toàn bộ màn hình
+# 2. Inject CSS: Ẩn thanh Header Streamlit + Tạo Sidebar trong suốt Blur + Full Screen Map
 st.markdown("""
     <style>
-    /* Xóa khoảng trắng lề của Streamlit để bản đồ tràn màn hình */
+    /* 1. ẨN HOÀN TOÀN THANH HEADER TRÊN CÙNG (Biểu tượng GitHub, Fork, Deploy, Menu 3 chấm...) */
+    header[data-testid="stHeader"] {
+        display: none !important;
+    }
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+
+    /* 2. LOẠI BỎ PADDING CỦA MÀN HÌNH CHÍNH ĐỂ MAP TRÀN SÁT MÉP TRÊN VÀ CÁC CẠNH */
     .block-container {
-        padding-top: 0.5rem !important;
+        padding-top: 0rem !important;
         padding-bottom: 0rem !important;
-        padding-left: 0.5rem !important;
-        padding-right: 0.5rem !important;
+        padding-left: 0rem !important;
+        padding-right: 0rem !important;
         max-width: 100% !important;
     }
 
-    /* CSS Sidebar dạng kính mờ (Glassmorphism) */
+    /* 3. MENU BÊN TRÁI (SIDEBAR) TRONG SUỐT VỚI HIỆU ỨNG BLUR KÍNH MỜ */
     [data-testid="stSidebar"] {
-        background: rgba(18, 24, 38, 0.85) !important;
-        backdrop-filter: blur(14px) saturate(180%) !important;
-        -webkit-backdrop-filter: blur(14px) saturate(180%) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background: rgba(15, 23, 42, 0.45) !important; /* Nền trong suốt 45% */
+        backdrop-filter: blur(16px) saturate(180%) !important; /* Hiệu ứng mờ đục blur */
+        -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
     }
 
-    /* Định dạng màu chữ trong Sidebar */
+    /* Đổi màu chữ và nhãn trong Sidebar cho dễ đọc trên nền trong suốt */
     [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, 
     [data-testid="stSidebar"] label, [data-testid="stSidebar"] .stMarkdown {
-        color: #f1f5f9 !important;
+        color: #ffffff !important;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.6);
     }
 
     /* Ô nhập dữ liệu trong Sidebar */
     [data-testid="stSidebar"] input {
-        background-color: rgba(255, 255, 255, 0.08) !important;
+        background-color: rgba(255, 255, 255, 0.12) !important;
         color: #ffffff !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
         border-radius: 8px !important;
     }
 
-    /* Style cho các Nút bấm */
+    /* Style nút bấm */
     .stButton > button, .stLinkButton > a {
         border-radius: 8px !important;
         font-weight: 600 !important;
-        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
     }
     
-    /* Tránh khung iframe bản đồ bị bo lề dư thừa */
+    /* Bản đồ tràn viền tuyệt đối */
     iframe {
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        border: none !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -121,7 +128,7 @@ for _, row in df_hdn.iterrows():
 if 'search_performed' not in st.session_state:
     st.session_state.search_performed = False
 
-# 6. MENU DẠNG DỌC BÊN TRÁI (SIDEBAR) - Bao gồm Nhập liệu & Kết quả trả về
+# 6. MENU DẠNG DỌC BÊN TRÁI (SIDEBAR) TRONG SUỐT BLUR
 with st.sidebar:
     st.title("📍 Cấu Hình Sự Cố")
     st.markdown("---")
@@ -198,11 +205,10 @@ with st.sidebar:
 
                     st.success(f"⚠️ **Đoạn cáp đứt:**\n\n**{target_segment['cable']}**\n\n({target_segment['u']} ➔ {target_segment['v']})")
 
-                    # NÚT MỞ GOOGLE MAPS DẪN ĐƯỜNG ĐẶT BÊN SIDEBAR
+                    # Nút mở Google Maps dẫn đường trong Sidebar
                     gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
                     st.link_button("🚗 Chỉ đường Google Maps", gmaps_url, type="primary", use_container_width=True)
 
-                    # Lưu dữ liệu vẽ bản đồ
                     map_data = {
                         'fault_lat': fault_lat,
                         'fault_lng': fault_lng,
@@ -214,7 +220,7 @@ with st.sidebar:
                 else:
                     st.warning("Thiếu dữ liệu tọa độ Lat/Lng cho đoạn cáp chứa vị trí đứt.")
 
-# 7. HIỂN THỊ BẢN ĐỒ FULL VIỀN Ở MÀN HÌNH CHÍNH (BÊN PHẢI)
+# 7. HIỂN THỊ BẢN ĐỒ FULL TRÀN CẠNH TRÊN VÀ TOÀN MÀN HÌNH
 if map_data:
     m = folium.Map(
         location=[map_data['fault_lat'], map_data['fault_lng']], 
@@ -223,7 +229,7 @@ if map_data:
         attr="OpenStreetMap"
     )
 
-    # Lớp Google Maps Đường phố
+    # Layer Google Maps Đường phố
     folium.TileLayer(
         tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
         attr="Google",
@@ -232,7 +238,7 @@ if map_data:
         control=True
     ).add_to(m)
 
-    # Lớp Google Maps Vệ tinh
+    # Layer Google Maps Vệ tinh
     folium.TileLayer(
         tiles="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
         attr="Google",
@@ -241,7 +247,7 @@ if map_data:
         control=True
     ).add_to(m)
 
-    # Nút định vị GPS vị trí thực của điện thoại/máy tính
+    # Nút định vị GPS thực tế
     LocateControl(auto_start=False, flyTo=True).add_to(m)
     folium.LayerControl().add_to(m)
 
@@ -263,15 +269,15 @@ if map_data:
         icon=folium.Icon(color="red", icon="wrench", prefix="fa")
     ).add_to(m)
 
-    # Hiển thị bản đồ tràn màn hình chính (Chiều cao 820px)
-    st_folium(m, width="100%", height=820, key="fault_map")
+    # Render bản đồ tràn cạnh trên màn hình (Chiều cao 1000px)
+    st_folium(m, width="100%", height=1000, key="fault_map")
 else:
-    # Bản đồ mặc định khi chưa bấm tìm kiếm
+    # Màn hình mặc định tràn viền sát cạnh trên
     default_map = folium.Map(
-        location=[21.0285, 105.8542], # Tọa độ mặc định
+        location=[21.0285, 105.8542],
         zoom_start=12,
         tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
         attr="Google"
     )
     LocateControl(auto_start=False, flyTo=True).add_to(default_map)
-    st_folium(default_map, width="100%", height=820, key="default_map")
+    st_folium(default_map, width="100%", height=1000, key="default_map")
