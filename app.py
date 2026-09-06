@@ -136,17 +136,17 @@ st.markdown("""
         border: none !important;
     }
     
-    /* CSS nhãn TĐ hiển thị trên bản đồ */
+    /* CSS nhãn TĐ hiển thị trên bản đồ (Chuyển sang màu cam) */
     .node-label {
         font-size: 12px;
         font-weight: bold;
-        color: #0F172A;
-        background-color: rgba(255, 255, 255, 0.9);
-        border: 1.5px solid #2563EB;
+        color: #EA580C;
+        background-color: rgba(255, 255, 255, 0.95);
+        border: 1.5px solid #FF5F1F;
         padding: 2px 6px;
         border-radius: 4px;
         white-space: nowrap;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
     }
     </style>
 """, unsafe_allow_html=True)
@@ -504,12 +504,11 @@ if map_data:
         if len(path_coords) > 1:
             folium.PolyLine(path_coords, color="#1e40af", weight=6, opacity=0.85, tooltip="Tuyến cáp").add_to(m)
 
-    # Hiển thị Marker và Nhãn tên TĐ hiển thị cố định trực tiếp trên màn hình map
+    # Hiển thị Marker và Nhãn tên TĐ màu cam
     for node in map_data['node_path']:
         if node in hdn_coords:
             coord = hdn_coords[node]
             
-            # Chọn màu Marker tương ứng
             if node == map_data['td_a']:
                 icon_color, icon_name = "green", "play"
             elif node == map_data['td_b']:
@@ -517,7 +516,7 @@ if map_data:
             else:
                 icon_color, icon_name = "blue", "circle"
 
-            # 1. Vẽ Marker thông thường
+            # 1. Vẽ Marker biểu tượng
             folium.Marker(
                 coord,
                 popup=f"<b>{node}</b>",
@@ -525,7 +524,7 @@ if map_data:
                 icon=folium.Icon(color=icon_color, icon=icon_name, prefix="fa")
             ).add_to(m)
 
-            # 2. Vẽ Nhãn Tên hiển thị cố định ngay cạnh Marker trên bản đồ
+            # 2. Vẽ Nhãn Tên TĐ (màu cam)
             folium.Marker(
                 coord,
                 icon=DivIcon(
