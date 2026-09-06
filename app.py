@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS: Tinh chỉnh màu chữ Menu sang MÀU CAM + Tùy biến Sidebar Blur
+# 2. Inject CSS: Tinh chỉnh màu chữ Menu sang MÀU XANH DƯƠNG + Tùy biến Sidebar Blur
 st.markdown("""
     <style>
     /* 1. ẨN HOÀN TOÀN THANH HEADER TRÊN CÙNG */
@@ -35,13 +35,13 @@ st.markdown("""
 
     /* 3. MENU BÊN TRÁI (SIDEBAR) TRONG SUỐT VỚI HIỆU ỨNG BLUR KÍNH MỜ */
     [data-testid="stSidebar"] {
-        background: rgba(15, 23, 42, 0.55) !important;
+        background: rgba(15, 23, 42, 0.7) !important;
         backdrop-filter: blur(16px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-        border-right: 1px solid rgba(255, 140, 0, 0.3) !important;
+        border-right: 1px solid rgba(59, 130, 246, 0.4) !important;
     }
 
-    /* 4. ĐỔI MÀU CHỮ TRÊN MENU THÀNH MÀU CAM (#FF8C00 & #FFA500) */
+    /* 4. ĐỔI MÀU CHỮ TRÊN MENU THÀNH MÀU XANH DƯƠNG (#3B82F6 & #60A5FA) */
     [data-testid="stSidebar"] h1, 
     [data-testid="stSidebar"] h2, 
     [data-testid="stSidebar"] h3, 
@@ -49,50 +49,56 @@ st.markdown("""
     [data-testid="stSidebar"] .stMarkdown,
     [data-testid="stSidebar"] p,
     [data-testid="stSidebar"] span {
-        color: #FF8C00 !important; /* Màu cam chính */
+        color: #60A5FA !important;
         font-weight: 600 !important;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
     }
 
-    /* Đổi màu tiêu đề chính thành cam sáng hơn */
+    /* Đổi màu tiêu đề chính thành xanh dương đậm rực hơn */
     [data-testid="stSidebar"] h1 {
-        color: #FF7A00 !important;
+        color: #3B82F6 !important;
     }
 
-    /* 5. Ô NHẬP DỮ LIỆU BÊN SIDEBAR: VIỀN VÀ CHỮ KHI NHẬP MÀU CAM */
+    /* 5. Ô NHẬP DỮ LIỆU BÊN SIDEBAR: VIỀN VÀ CHỮ KHI NHẬP MÀU XANH DƯƠNG */
     [data-testid="stSidebar"] input {
-        background-color: rgba(0, 0, 0, 0.3) !important;
-        color: #FF9F29 !important;
-        border: 1px solid rgba(255, 140, 0, 0.5) !important;
+        background-color: rgba(0, 0, 0, 0.4) !important;
+        color: #93C5FD !important;
+        border: 1px solid rgba(59, 130, 246, 0.5) !important;
         border-radius: 8px !important;
     }
     
     [data-testid="stSidebar"] input:focus {
-        border-color: #FF7A00 !important;
-        box-shadow: 0 0 8px rgba(255, 122, 0, 0.6) !important;
+        border-color: #2563EB !important;
+        box-shadow: 0 0 8px rgba(37, 99, 235, 0.6) !important;
     }
 
-    /* 6. STYLE NÚT BẤM VÀ ĐƯỜNG KẺ GẠCH MÀU CAM */
+    /* 6. STYLE NÚT BẤM VÀ ĐƯỜNG KẺ GẠCH MÀU XANH DƯƠNG */
     [data-testid="stSidebar"] hr {
-        border-color: rgba(255, 140, 0, 0.4) !important;
+        border-color: rgba(59, 130, 246, 0.4) !important;
     }
 
     .stButton > button {
-        background-color: #FF7A00 !important;
+        background-color: #2563EB !important;
         color: #ffffff !important;
         border: none !important;
         border-radius: 8px !important;
         font-weight: bold !important;
-        box-shadow: 0 4px 12px rgba(255, 122, 0, 0.3) !important;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4) !important;
     }
     
     .stButton > button:hover {
-        background-color: #E06B00 !important;
+        background-color: #1D4ED8 !important;
     }
 
     .stLinkButton > a {
+        background-color: #2563EB !important;
+        color: #ffffff !important;
         border-radius: 8px !important;
         font-weight: bold !important;
+    }
+    
+    .stLinkButton > a:hover {
+        background-color: #1D4ED8 !important;
     }
 
     iframe {
@@ -159,7 +165,7 @@ for _, row in df_hdn.iterrows():
 if 'search_performed' not in st.session_state:
     st.session_state.search_performed = False
 
-# 6. MENU DẠNG DỌC BÊN TRÁI (SIDEBAR) VỚI CHỮ MÀU CAM
+# 6. MENU DẠNG DỌC BÊN TRÁI (SIDEBAR) VỚI CHỮ MÀU XANH DƯƠNG
 with st.sidebar:
     st.title("📍 TOOL XÁC ĐỊNH SỰ CỐ ")
     st.markdown("---")
