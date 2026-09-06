@@ -117,19 +117,20 @@ st.markdown("""
         border: none !important;
     }
 
-    /* 8. ĐẶT NÚT ĐỊNH VỊ, CHUYỂN LAYER VÀ ZOOM Ở GÓC DƯỚI BÊN PHẢI */
+    /* 8. CẤU HÌNH VỊ TRÍ CÁC NÚT Ở GÓC DƯỚI BÊN PHẢI */
     
-    /* Nút Định vị (Locate) - Trên cùng */
-    .leaflet-top.leaflet-left .leaflet-control-locate {
+    /* Move & Custom Nút Định vị (Locate) sang góc dưới bên phải */
+    .leaflet-control-locate {
         position: fixed !important;
         bottom: 165px !important;
         right: 20px !important;
         top: auto !important;
         left: auto !important;
         z-index: 9999 !important;
+        margin: 0 !important;
     }
 
-    /* Tùy biến giao diện nút Locate */
+    /* Thiết lập khung nút bấm Locate */
     .leaflet-control-locate a {
         background-color: #1E293B !important;
         border-radius: 8px !important;
@@ -147,14 +148,16 @@ st.markdown("""
         background-color: #2563EB !important;
     }
 
-    /* Ẩn các icon FontAwesome/Glyphicon mặc định gây ô vuông trắng */
+    /* Ẩn hoàn toàn icon FontAwesome/Glyphicon gốc */
     .leaflet-control-locate a span, 
-    .leaflet-control-locate a i {
+    .leaflet-control-locate a i,
+    .leaflet-control-locate a .fa,
+    .leaflet-control-locate a .glyphicon {
         display: none !important;
     }
 
-    /* Ép hiển thị icon 🎯 bằng CSS */
-    .leaflet-control-locate a::before {
+    /* Thay thế biểu tượng bằng emoji 🎯 */
+    .leaflet-control-locate a::after {
         content: "🎯" !important;
         font-size: 18px !important;
         display: block !important;
@@ -162,17 +165,18 @@ st.markdown("""
     }
 
     /* Nút Chuyển Layer Map - Ở giữa (Dưới nút Định vị) */
-    .leaflet-top.leaflet-right .leaflet-control-layers {
+    .leaflet-control-layers {
         position: fixed !important;
         bottom: 105px !important;
         right: 20px !important;
         top: auto !important;
         left: auto !important;
         z-index: 9999 !important;
+        margin: 0 !important;
     }
 
-    /* Nút Zoom (+ / -) - Ở dưới cùng (Dưới nút Layer) */
-    .leaflet-top.leaflet-left .leaflet-control-zoom {
+    /* Nút Zoom (+ / -) - Ở dưới cùng */
+    .leaflet-control-zoom {
         position: fixed !important;
         bottom: 20px !important;
         right: 20px !important;
@@ -182,6 +186,7 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
         border-radius: 8px !important;
         overflow: hidden !important;
+        margin: 0 !important;
     }
 
     .leaflet-control-zoom a {
@@ -405,7 +410,6 @@ if map_data:
         control=True
     ).add_to(m)
 
-    # Khởi tạo LocateControl không truyền icon tùy biến (CSS sẽ đảm nhiệm việc này)
     LocateControl(auto_start=False, flyTo=True).add_to(m)
     folium.LayerControl().add_to(m)
 
@@ -440,6 +444,5 @@ else:
         control=False
     ).add_to(default_map)
 
-    # Khởi tạo LocateControl mặc định
     LocateControl(auto_start=False, flyTo=True).add_to(default_map)
     st_folium(default_map, width="100%", height=1000, key="default_map")
