@@ -490,33 +490,33 @@ if map_data:
         if len(path_coords) > 1:
             folium.PolyLine(path_coords, color="#1e40af", weight=6, opacity=0.85, tooltip="Tuyến cáp").add_to(m)
 
-    # --- HIỂN THỊ TẤT CẢ CÁC TẬP ĐIỂM (TĐ) LIÊN QUAN TRÊN TIẾN TRÌNH TUYẾN CÁP ---
-    for idx, node in enumerate(map_data['node_path']):
+    # Hiển thị tất cả các Tập điểm (TĐ) trên tuyến
+    for node in map_data['node_path']:
         if node in hdn_coords:
             coord = hdn_coords[node]
             
             if node == map_data['td_a']:
-                # TĐ Đo (Điểm đầu - Màu Xanh lá)
+                # TĐ Đo (Màu Xanh lá)
                 folium.Marker(
                     coord,
-                    popup=f"<b>TĐ Đo (Gốc):</b> {node}",
-                    tooltip=f"TĐ Đo: {node}",
+                    popup=f"<b>{node}</b>",
+                    tooltip=node,
                     icon=folium.Icon(color="green", icon="play", prefix="fa")
                 ).add_to(m)
             elif node == map_data['td_b']:
-                # TĐ Đến (Điểm cuối - Màu Đen)
+                # TĐ Đến (Màu Đen)
                 folium.Marker(
                     coord,
-                    popup=f"<b>TĐ Đến:</b> {node}",
-                    tooltip=f"TĐ Đến: {node}",
+                    popup=f"<b>{node}</b>",
+                    tooltip=node,
                     icon=folium.Icon(color="black", icon="flag-checkered", prefix="fa")
                 ).add_to(m)
             else:
-                # Tất cả TĐ Trung gian nằm trên tuyến (Màu Xanh Dương)
+                # TĐ Trung gian: Hiển thị trực tiếp tên node, không kèm tiền tố
                 folium.Marker(
                     coord,
-                    popup=f"<b>TĐ Trung gian #{idx}:</b> {node}",
-                    tooltip=f"TĐ Trung gian: {node}",
+                    popup=f"<b>{node}</b>",
+                    tooltip=node,
                     icon=folium.Icon(color="blue", icon="circle", prefix="fa")
                 ).add_to(m)
 
