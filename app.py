@@ -143,15 +143,11 @@ def apply_map_custom_css(folium_map, fault_lat=None, fault_lng=None):
     font_awesome_link = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">'
     folium_map.get_root().html.add_child(folium.Element(font_awesome_link))
 
-    nav_button_html = ""
+    nav_script = ""
     if fault_lat and fault_lng:
-        # Sử dụng đường dẫn URL dạng Google Maps Navigation tiêu chuẩn
-        # Khi nhấn vào trên thiết bị di động, hệ thống sẽ tự hỏi mở ứng dụng Google Maps
-        gmaps_nav_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}&travelmode=driving"
-        
-        nav_button_html = f"""
+        nav_script = f"""
         <div style="position: absolute; top: 15px; left: 60px; z-index: 1000;">
-            <a href="{gmaps_nav_url}" target="_blank" style="
+            <button onclick="navigateToFault()" style="
                 background-color: #059669;
                 color: white;
                 border: none;
@@ -164,12 +160,28 @@ def apply_map_custom_css(folium_map, fault_lat=None, fault_lng=None):
                 display: flex;
                 align-items: center;
                 gap: 8px;
-                text-decoration: none;
-                font-family: sans-serif;
             " onmouseover="this.style.backgroundColor='#047857'" onmouseout="this.style.backgroundColor='#059669'">
-                <i class="fa-solid fa-diamond-turn-right"></i>
-            </a>
+                <i class="fa-solid fa-diamond-turn-right"></i> Chỉ đường từ GPS tới vị trí đứt
+            </button>
         </div>
+        <script>
+        function navigateToFault() {{
+            if (navigator.geolocation) {{
+                navigator.geolocation.getCurrentPosition(function(position) {{
+                    var userLat = position.coords.latitude;
+                    var userLng = position.coords.longitude;
+                    var url = "https://www.google.com/maps/dir/?api=1&origin=" + userLat + "," + userLng + "&destination={fault_lat},{fault_lng}&travelmode=driving";
+                    window.open(url, '_blank');
+                }}, function(error) {{
+                    alert("Không thể lấy vị trí hiện tại của bạn. Mở định vị mặc định.");
+                    var fallbackUrl = "https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}";
+                    window.open(fallbackUrl, '_blank');
+                }}, {{ enableHighAccuracy: true, timeout: 10000 }});
+            }} else {{
+                alert("Trình duyệt không hỗ trợ Geolocation!");
+            }}
+        }}
+        </script>
         """
 
     custom_css = f"""
@@ -205,7 +217,7 @@ def apply_map_custom_css(folium_map, fault_lat=None, fault_lng=None):
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
     }}
     </style>
-    {nav_button_html}
+    {nav_script}
     """
     folium_map.get_root().html.add_child(folium.Element(custom_css))
 
@@ -455,8 +467,8 @@ with st.sidebar:
                 if fault_lat and fault_lng:
                     st.success(f"⚠️ **Vị trí đứt nằm trong đoạn cáp:**\n\n**{cable_name}**\n\n({target_segment['u']} ➔ {target_segment['v']})")
                     
-                    gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}&travelmode=driving"
-                    st.link_button("📍", gmaps_url, type="primary", use_container_width=True)
+                    gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
+                    st.link_button("📍 Mở trên Google Maps", gmaps_url, type="primary", use_container_width=True)
 
                     map_data = {
                         'fault_lat': fault_lat,
@@ -504,7 +516,7 @@ if map_data:
     
     folium.LayerControl().add_to(m)
 
-    # Hiển thị lộ trình bằng AntPath
+    # Hiển thị lộ trình bằng AntPath (Hiệu ứng dòng chảy di chuyển đến điểm đứt)
     full_route_coords = []
     for seg in map_data['cable_segments']:
         c_name = seg['cable']
@@ -572,35 +584,16 @@ if map_data:
                 )
             ).add_to(m)
 
-    # Marker Vị trí đứt cáp + Popup hỗ trợ mở chỉ đường
-    popup_html = f"""
-    <div style="font-family: sans-serif; min-width: 160px; text-align: center;">
-        <h4 style="margin: 0 0 8px 0; color: #DC2626;">Vị trí đứt cáp</h4>
-        <p style="margin: 0 0 8px 0; font-size: 12px;">{map_data['target_dist']}m từ {map_data['td_a']}</p>
-        <a href="https://www.google.com/maps/dir/?api=1&destination={map_data['fault_lat']},{map_data['fault_lng']}&travelmode=driving" 
-           target="_blank" 
-           style="background-color: #2563EB; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: bold; display: inline-block;">
-           <i class="fa-solid fa-location-arrow"></i> Chỉ đường ngay
-        </a>
-    </div>
-    """
-
+    # Marker Vị trí đứt cáp (Màu Đỏ)
     folium.Marker(
         [map_data['fault_lat'], map_data['fault_lng']],
-        popup=folium.Popup(popup_html, max_width=250),
-        tooltip="Click để mở chỉ đường vị trí sự cố",
+        popup=f"Vị trí đứt cáp: {map_data['target_dist']}m từ {map_data['td_a']}",
+        tooltip="Vị trí sự cố đứt cáp",
         icon=folium.Icon(color="red", icon="wrench", prefix="fa")
     ).add_to(m)
 
     apply_map_custom_css(m, fault_lat=map_data['fault_lat'], fault_lng=map_data['fault_lng'])
-    
-    # Bổ sung các tham số Sandbox để cho phép bật tab mới từ Iframe
-    st_folium(
-        m, 
-        width="100%", 
-        height=1000, 
-        key="fault_map"
-    )
+    st_folium(m, width="100%", height=1000, key="fault_map")
 else:
     init_lat, init_lng = 21.0285, 105.8542
     if json_cable_shapes:
