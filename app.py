@@ -113,8 +113,8 @@ def apply_map_custom_css(folium_map):
     """
     folium_map.get_root().html.add_child(folium.Element(custom_css))
 
-# 3. Tải dữ liệu Excel & JSON
-@st.cache_data
+# 3. Tải dữ liệu Excel & JSON - Tự cập nhật khi file thay đổi
+@st.cache_data(ttl=5)
 def load_data():
     file_path = "Data.xlsx"
     df_uplink = pd.read_excel(file_path, sheet_name="uplink")
@@ -211,7 +211,7 @@ def interpolate_on_polyline_scaled(coords, target_offset, decl_length):
         accumulated += seg_len
     return coords[-1][0], coords[-1][1]
 
-# 4. ĐỒ THỊ MẠNG CÁP - ĐÃ CẬP NHẬT TRÍCH XUẤT CỘT 'Dung lượng'
+# 4. ĐỒ THỊ MẠNG CÁP - SỬA ĐỔI ĐỂ ĐỌC CHUẨN DUNG LƯỢNG CỘT F
 G = nx.Graph()
 for _, row in df_cable.iterrows():
     u = normalize_node(row['Điểm KN1'])
@@ -223,15 +223,17 @@ for _, row in df_cable.iterrows():
     except: 
         length = 0.0
     
-    # Đọc trực tiếp thuộc tính 'Dung lượng' từ cột F
-    cap_val = row.get('Dung lượng')
-    if pd.isna(cap_val) or str(cap_val).strip() == "":
+    # Ép kiểu đọc chính xác cột Dung lượng (cột F)
+    cap_val = row.get('Dung lượng') if 'Dung lượng' in df_cable.columns else row.iloc[5]
+    
+    if pd.isna(cap_val) or str(cap_val).strip() in ["", "nan", "None"]:
         capacity_str = "Chưa xác định"
     else:
-        if isinstance(cap_val, float) and cap_val.is_integer():
-            capacity_str = f"{int(cap_val)} FO"
-        else:
-            capacity_str = f"{cap_val} FO" if str(cap_val).isdigit() else str(cap_val)
+        try:
+            val_num = float(cap_val)
+            capacity_str = f"{int(val_num)} FO"
+        except ValueError:
+            capacity_str = f"{str(cap_val).strip()} FO" if "FO" not in str(cap_val).upper() else str(cap_val).strip()
 
     if u and v: 
         G.add_edge(u, v, cable=cable_name, length=length, capacity=capacity_str)
