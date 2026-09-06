@@ -67,7 +67,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 3. Các hàm bổ trợ toán học & địa lý (Thuần túy, chạy cực nhanh)
+# 3. Các hàm bổ trợ toán học & địa lý
 def normalize_node(node_str):
     if pd.isna(node_str): return ""
     s = str(node_str).strip()
@@ -277,13 +277,12 @@ with st.sidebar:
     
     selected_td_a = st.selectbox("Nhập / Chọn TĐ Đo:", options=all_nodes, index=0 if all_nodes else None)
     
-    # === THUẬT TOÁN LỌC NHANH VỚI MẢNG TẬP HỢP (FAST SET COMPREHENSION) ===
+    # Lọc nhanh danh sách TĐ phù hợp
     related_nodes = []
     if selected_td_a and G.has_node(selected_td_a):
         connected_nodes = nx.node_connected_component(G, selected_td_a)
         level_a = get_node_level(selected_td_a)
         
-        # Tối ưu hóa điều kiện lọc bằng 1 vòng lặp nhanh duy nhất
         if level_a == 2:
             related_nodes = sorted([
                 node for node in connected_nodes
@@ -354,13 +353,15 @@ with st.sidebar:
                 st.error(f"Khoảng cách nhập vào ({target_dist}m) vượt quá chiều dài tuyến ({accumulated_dist:.1f}m)!")
             elif target_segment:
                 cable_name = target_segment['cable']
-                offset = target_dist - target_segment['start_dist']
+                offset_from_u = target_dist - target_segment['start_dist']  # Khoảng cách từ đầu u
+                offset_from_v = target_segment['length'] - offset_from_u    # Khoảng cách đến cuối v
+
                 u_coord = hdn_coords.get(target_segment['u'])
                 v_coord = hdn_coords.get(target_segment['v'])
 
                 raw_coords = json_cable_shapes.get(cable_name, [])
                 processed_coords = process_segment_geometry(raw_coords, u_coord, v_coord, target_segment['length'])
-                fault_lat, fault_lng = interpolate_on_polyline_scaled(processed_coords, offset, target_segment['length'])
+                fault_lat, fault_lng = interpolate_on_polyline_scaled(processed_coords, offset_from_u, target_segment['length'])
 
                 if fault_lat and fault_lng:
                     st.success(
@@ -368,7 +369,11 @@ with st.sidebar:
                         f"**{cable_name}**\n\n"
                         f"📍 **Lộ trình đoạn:** {target_segment['u']} ➔ {target_segment['v']}\n\n"
                         f"📏 **Chiều dài đoạn cáp lỗi:** {target_segment['length']:.1f} m\n\n"
-                        f"🔌 **Dung lượng đoạn cáp:** {target_segment['capacity']}"
+                        f"🔌 **Dung lượng đoạn cáp:** {target_segment['capacity']}\n\n"
+                        f"---\n"
+                        f"🎯 **Chi tiết vị trí điểm đứt:**\n"
+                        f"- Cách **{target_segment['u']}** (Đầu đoạn): **{offset_from_u:.1f} m**\n"
+                        f"- Cách **{target_segment['v']}** (Cuối đoạn): **{offset_from_v:.1f} m**"
                     )
                     gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
                     st.link_button("📍 Mở chỉ đường Google Maps", gmaps_url, type="primary", use_container_width=True)
