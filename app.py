@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS Streamlit (Sidebar trong suốt + Chữ xanh dương + NÚT BẤM MÀU CAM NHẠT)
+# 2. Inject CSS Streamlit (Xóa hiệu ứng bóng chữ)
 st.markdown("""
     <style>
     /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
@@ -67,17 +67,17 @@ st.markdown("""
         max-width: 100% !important;
     }
 
-    /* 4. MENU BÊN TRÁI (SIDEBAR) TĂNG ĐỘ TRONG SUỐT (85% Trong suốt / 15% Nền) */
+    /* 4. MENU BÊN TRÁI (SIDEBAR) TĂNG ĐỘ TRONG SUỐT */
     [data-testid="stSidebar"] {
-        background: rgba(255, 255, 255, 0.15) !important;    /* Nền cực nhẹ giúp tăng độ trong suốt */
-        backdrop-filter: blur(18px) saturate(180%) !important;/* Giữ độ mờ mượt mà */
+        background: rgba(255, 255, 255, 0.15) !important;
+        backdrop-filter: blur(18px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
         border-right: 1px solid rgba(255, 255, 255, 0.3) !important;
         z-index: 999998 !important;
         box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05) !important;
     }
 
-    /* 5. TOÀN BỘ CHỮ CHUYỂN SANG MÀU XANH DƯƠNG */
+    /* 5. TOÀN BỘ CHỮ CHUYỂN SANG MÀU XANH DƯƠNG - ĐÃ XÓA HIỆU ỨNG ĐỔ BÓNG (TEXT-SHADOW: NONE) */
     [data-testid="stSidebar"] h1, 
     [data-testid="stSidebar"] h2, 
     [data-testid="stSidebar"] h3, 
@@ -85,23 +85,25 @@ st.markdown("""
     [data-testid="stSidebar"] .stMarkdown,
     [data-testid="stSidebar"] p,
     [data-testid="stSidebar"] span {
-        color: #1D4ED8 !important;                          /* Chữ màu Xanh Dương đậm rõ nét */
-        font-weight: 700 !important;                        /* Tăng độ đậm để chữ nổi rõ */
-        text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9);    /* Viền vi bóng trắng nhẹ nâng cao khả năng đọc */
+        color: #1D4ED8 !important;                          /* Chữ màu Xanh Dương đậm */
+        font-weight: 700 !important;                        /* Giữ độ đậm để dễ đọc */
+        text-shadow: none !important;                       /* Đã xóa hiệu ứng bóng/phát sáng */
     }
 
     [data-testid="stSidebar"] h1 {
         color: #1E40AF !important;                          /* Tiêu đề xanh dương đậm hơn */
+        text-shadow: none !important;
     }
 
     /* 6. Ô NHẬP & SELECTBOX MÀU CHỮ XANH DƯƠNG */
     [data-testid="stSidebar"] input, 
     [data-testid="stSidebar"] div[data-baseweb="select"] {
-        background-color: rgba(255, 255, 255, 0.5) !important; /* Ô nhập mờ nhẹ */
-        color: #1D4ED8 !important;                          /* Chữ nhập màu xanh dương */
+        background-color: rgba(255, 255, 255, 0.5) !important;
+        color: #1D4ED8 !important;
         border: 1px solid rgba(37, 99, 235, 0.4) !important;
         border-radius: 8px !important;
         font-weight: 600 !important;
+        text-shadow: none !important;
     }
 
     /* Menu xổ xuống của Selectbox */
@@ -117,20 +119,21 @@ st.markdown("""
     /* 7. ĐỔI MÀU NỀN TẤT CẢ NÚT BẤM BÊN BẢNG SIDEBAR SANG MÀU CAM NHẠT */
     [data-testid="stSidebar"] .stButton > button, 
     [data-testid="stSidebar"] .stLinkButton > a {
-        background-color: #FFEDD5 !important;                /* Nền Cam nhạt mềm mại */
-        color: #C2410C !important;                           /* Chữ Cam đậm nổi bật */
-        border: 1.5px solid #FDBA74 !important;               /* Viền Cam nhạt */
+        background-color: #FFEDD5 !important;
+        color: #C2410C !important;
+        border: 1.5px solid #FDBA74 !important;
         border-radius: 8px !important;
         font-weight: bold !important;
         box-shadow: 0 2px 8px rgba(234, 88, 12, 0.15) !important;
         transition: all 0.2s ease-in-out !important;
+        text-shadow: none !important;
     }
 
     /* Đổi màu khi di chuột (Hover) vào nút bấm */
     [data-testid="stSidebar"] .stButton > button:hover, 
     [data-testid="stSidebar"] .stLinkButton > a:hover {
-        background-color: #FED7AA !important;                /* Cam đậm hơn một chút khi hover */
-        color: #9A3412 !important;                           
+        background-color: #FED7AA !important;
+        color: #9A3412 !important;
         border-color: #FB923C !important;
         box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3) !important;
     }
