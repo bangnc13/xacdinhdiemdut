@@ -3,7 +3,7 @@ import networkx as nx
 import pandas as pd
 import streamlit as st
 import folium
-from folium.plugins import LocateControl, ZoomControl
+from folium.plugins import LocateControl
 from streamlit_folium import st_folium
 
 # 1. Cấu hình trang
@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS: Tùy biến giao diện và style cho nút Zoom
+# 2. Inject CSS: Tùy biến giao diện và vị trí nút Zoom (+ / -)
 st.markdown("""
     <style>
     /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
@@ -117,7 +117,19 @@ st.markdown("""
         border: none !important;
     }
 
-    /* 8. TÙY CHỈNH GIAO DIỆN NÚT ZOOM LEAFLET (+ / -) */
+    /* 8. DI CHUYỂN NÚT ZOOM (+ / -) XUỐNG GÓC DƯỚI BÊN PHẢI */
+    .leaflet-top.leaflet-left .leaflet-control-zoom {
+        position: fixed !important;
+        bottom: 30px !important;
+        right: 25px !important;
+        top: auto !important;
+        left: auto !important;
+        z-index: 9999 !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+    }
+
     .leaflet-control-zoom a {
         background-color: #1E293B !important;
         color: #60A5FA !important;
@@ -127,7 +139,6 @@ st.markdown("""
         line-height: 36px !important;
         font-size: 18px !important;
         font-weight: bold !important;
-        border-radius: 6px !important;
     }
 
     .leaflet-control-zoom a:hover {
@@ -315,17 +326,14 @@ with st.sidebar:
                 else:
                     st.warning("Thiếu dữ liệu tọa độ Lat/Lng cho đoạn cáp chứa vị trí đứt.")
 
-# 7. BẢN ĐỒ FULL TRÀN VIỀN BÊN PHẢI (Cấu hình ZoomControl ở góc dưới bên phải)
+# 7. BẢN ĐỒ FULL TRÀN VIỀN BÊN PHẢI
 if map_data:
     m = folium.Map(
         location=[map_data['fault_lat'], map_data['fault_lng']], 
         zoom_start=17,
         tiles=None,
-        zoom_control=False  # Tắt zoom mặc định ở góc trên bên trái
+        zoom_control=True
     )
-
-    # Thêm nút Zoom ở góc dưới bên phải
-    ZoomControl(position='bottomright').add_to(m)
 
     folium.TileLayer(
         tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
@@ -367,12 +375,8 @@ else:
         location=[21.0285, 105.8542],
         zoom_start=12,
         tiles=None,
-        zoom_control=False  # Tắt zoom mặc định ở góc trên bên trái
+        zoom_control=True
     )
-
-    # Thêm nút Zoom ở góc dưới bên phải
-    ZoomControl(position='bottomright').add_to(default_map)
-
     folium.TileLayer(
         tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
         attr="Google",
