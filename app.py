@@ -211,7 +211,7 @@ def interpolate_on_polyline_scaled(coords, target_offset, decl_length):
         accumulated += seg_len
     return coords[-1][0], coords[-1][1]
 
-# 4. ĐỒ THỊ MẠNG CÁP - SỬA LỖI ĐỌC DUNG LƯỢNG CỘT F
+# 4. ĐỒ THỊ MẠNG CÁP - ĐÃ CẬP NHẬT TRÍCH XUẤT CỘT 'Dung lượng'
 G = nx.Graph()
 for _, row in df_cable.iterrows():
     u = normalize_node(row['Điểm KN1'])
@@ -223,31 +223,15 @@ for _, row in df_cable.iterrows():
     except: 
         length = 0.0
     
-    # Kỹ thuật đa tầng bẫy dữ liệu Dung Lượng Cột F:
-    capacity_val = None
-    
-    # 1. Tìm theo tên cột có sẵn
-    possible_cols = ['Dung lượng', 'DUNG_LUONG', 'Dung luong', 'Dung Lượng', 'Cap']
-    for col in possible_cols:
-        if col in df_cable.columns:
-            capacity_val = row[col]
-            break
-            
-    # 2. Nếu không thấy theo tên, ép lấy theo vị trí Cột F (Index 5)
-    if capacity_val is None and len(row) > 5:
-        capacity_val = row.iloc[5]
-
-    # 3. Làm sạch giá trị hiển thị
-    if pd.isna(capacity_val) or str(capacity_val).strip() == "":
-        capacity_str = "Chưa cập nhật"
+    # Đọc trực tiếp thuộc tính 'Dung lượng' từ cột F
+    cap_val = row.get('Dung lượng')
+    if pd.isna(cap_val) or str(cap_val).strip() == "":
+        capacity_str = "Chưa xác định"
     else:
-        # Nếu dạng số thực (VD: 24.0) thì chuyển thành số nguyên (24)
-        if isinstance(capacity_val, float) and capacity_val.is_integer():
-            capacity_str = f"{int(capacity_val)} FO"
+        if isinstance(cap_val, float) and cap_val.is_integer():
+            capacity_str = f"{int(cap_val)} FO"
         else:
-            capacity_str = f"{str(capacity_val).strip()}"
-            if not any(unit in capacity_str.lower() for unit in ['fo', 'f', 'sợi', 'soi']):
-                capacity_str += " FO"
+            capacity_str = f"{cap_val} FO" if str(cap_val).isdigit() else str(cap_val)
 
     if u and v: 
         G.add_edge(u, v, cable=cable_name, length=length, capacity=capacity_str)
@@ -327,7 +311,7 @@ with st.sidebar:
                     'v': v, 
                     'cable': edge_data['cable'], 
                     'length': seg_len, 
-                    'capacity': edge_data.get('capacity', 'Chưa cập nhật'),
+                    'capacity': edge_data.get('capacity', 'Chưa xác định'),
                     'start_dist': start_d, 
                     'end_dist': accumulated_dist
                 }
@@ -365,7 +349,7 @@ with st.sidebar:
                         f"⚠️ **Vị trí đứt nằm trong đoạn cáp:**\n\n"
                         f"**{cable_name}**\n\n"
                         f"📍 **Lộ trình đoạn:** {target_segment['u']} ➔ {target_segment['v']}\n\n"
-                        f"📏 **Chiều dài đoạn cáp bị lỗi:** {target_segment['length']:.1f} m\n\n"
+                        f"📏 **Chiều dài đoạn cáp lỗi:** {target_segment['length']:.1f} m\n\n"
                         f"🔌 **Dung lượng đoạn cáp:** {target_segment['capacity']}"
                     )
                     gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
