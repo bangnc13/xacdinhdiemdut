@@ -23,32 +23,30 @@ st.markdown("""
         z-index: 999999 !important;
     }
 
-    /* 2. ẨN HOÀN TOÀN CÁC BIỂU TƯỢNG BÊN PHẢI */
-    #MainMenu { visibility: hidden !important; }
-    footer { visibility: hidden !important; }
-    [data-testid="stToolbar"] { display: none !important; }
-    [data-testid="stDecoration"] { display: none !important; }
-    [data-testid="stStatusWidget"] { display: none !important; }
-    .stAppDeployButton { display: none !important; }
-    a[href*="github.com"] { display: none !important; }
+    /* 2. ẨN HOÀN TOÀN TẤT CẢ BIỂU TƯỢNG BÊN PHẢI (GITHUB/CON MÈO, FORK, STAR, MENU 3 CHẤM, DEPLOY) */
+    #MainMenu {visibility: hidden !important;}
+    footer {visibility: hidden !important;}
+    [data-testid="stToolbar"] {display: none !important;}
+    [data-testid="stDecoration"] {display: none !important;}
+    [data-testid="stStatusWidget"] {display: none !important;}
+    .stAppDeployButton {display: none !important;}
+    a[href*="github.com"] {display: none !important;}
 
-    /* 3. ĐỊNH DẠNG NÚT TOGGLE SIDEBAR BẰNG XANH NEON & BO TRÒN */
+    /* 3. ĐỊNH DẠNG NÚT BẤM HIỆN/ẨN MENU TRÊN BẢN ĐỒ (XANH NEON & BO TRÒN) */
     button[data-testid="stHeaderIconButton"],
     [data-testid="stSidebarCollapseButton"] button,
-    [data-testid="stSidebarCollapsedControl"] button,
-    button[aria-label="Expand sidebar"],
-    button[aria-label="Collapse sidebar"] {
-        background-color: #0F172A !important;
-        color: #00FF66 !important;
-        border-radius: 50% !important;
-        width: 44px !important;
-        height: 44px !important;
+    [data-testid="stSidebarCollapsedControl"] button {
+        background-color: #0F172A !important;                /* Nền tối nổi bật */
+        color: #00FF66 !important;                           /* Icon màu xanh neon */
+        border-radius: 50% !important;                       /* Bo tròn hoàn toàn */
+        width: 42px !important;
+        height: 42px !important;
         padding: 0px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        border: 2px solid #00FF66 !important;
-        box-shadow: 0 0 14px rgba(0, 255, 102, 0.9), 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+        border: 2px solid #00FF66 !important;                /* Đường viền màu Xanh Neon */
+        box-shadow: 0 0 12px rgba(0, 255, 102, 0.8), 0 4px 12px rgba(0, 0, 0, 0.5) !important; /* Hiệu ứng phát sáng Xanh Neon */
         transition: all 0.2s ease-in-out !important;
     }
 
@@ -56,19 +54,18 @@ st.markdown("""
     [data-testid="stSidebarCollapseButton"] button:hover,
     [data-testid="stSidebarCollapsedControl"] button:hover {
         background-color: #1E293B !important;
-        border-color: #66FF99 !important;
+        border-color: #66FF99 !important;                     /* Viền sáng hơn khi hover */
         color: #FFFFFF !important;
-        box-shadow: 0 0 20px rgba(0, 255, 102, 1), 0 4px 15px rgba(0, 0, 0, 0.7) !important;
-        transform: scale(1.1);
+        box-shadow: 0 0 18px rgba(0, 255, 102, 1), 0 4px 15px rgba(0, 0, 0, 0.6) !important;
+        transform: scale(1.08);
     }
 
-    /* Vị trí cố định của nút Toggle Sidebar khi thu gọn Menu */
+    /* Đảm bảo nút bấm khi menu bị đóng vẫn hiển thị đè lên bản đồ */
     [data-testid="stSidebarCollapsedControl"] {
         position: fixed !important;
-        top: 15px !important;
-        left: 15px !important;
+        top: 12px !important;
+        left: 12px !important;
         z-index: 999999 !important;
-        display: block !important;
     }
 
     /* 4. BẢN ĐỒ TRÀN SÁT CÁC CẠNH MÀN HÌNH */
@@ -80,9 +77,9 @@ st.markdown("""
         max-width: 100% !important;
     }
 
-    /* 5. MENU BÊN TRÁI (SIDEBAR) - ĐỘ TRONG SUỐT 50% */
+    /* 5. MENU BÊN TRÁI (SIDEBAR) TRONG SUỐT VỚI HIỆU ỨNG BLUR KÍNH MỜ */
     [data-testid="stSidebar"] {
-        background: rgba(15, 23, 42, 0.5) !important;
+        background: rgba(15, 23, 42, 0.75) !important;
         backdrop-filter: blur(16px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
         border-right: 1px solid rgba(59, 130, 246, 0.4) !important;
@@ -130,7 +127,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Hàm bổ sung CSS + FontAwesome cho Folium Map
+# Hàm bổ sung CSS + FontAwesome trực tiếp vào iframe Folium
 def apply_map_custom_css(folium_map):
     font_awesome_link = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">'
     folium_map.get_root().html.add_child(folium.Element(font_awesome_link))
@@ -142,10 +139,10 @@ def apply_map_custom_css(folium_map):
         display: none !important;
     }
 
-    /* Dời nút Định Vị xuống dưới nút Mở Menu (top: 70px) */
+    /* Dời nút định vị xuống dưới (top: 70px) */
     .leaflet-control-locate {
         margin-top: 70px !important;
-        margin-left: 15px !important;
+        margin-left: 10px !important;
         border: none !important;
     }
 
@@ -155,8 +152,8 @@ def apply_map_custom_css(folium_map):
         border-radius: 8px !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        width: 40px !important;
-        height: 40px !important;
+        width: 36px !important;
+        height: 36px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -164,7 +161,7 @@ def apply_map_custom_css(folium_map):
 
     .leaflet-control-locate a span.fa,
     .leaflet-control-locate a span.fas {
-        font-size: 18px !important;
+        font-size: 16px !important;
         color: #FFFFFF !important;
     }
     </style>
