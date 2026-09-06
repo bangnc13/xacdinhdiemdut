@@ -14,18 +14,25 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS Streamlit (Chuyển viền nút toggle menu sang màu Cam Neon + Bo tròn)
+# 2. Inject CSS Streamlit
 st.markdown("""
     <style>
-    /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
+    /* 1. HIỆN HEADER TRONG SUỐT CHO NÚT TOGGLE SIDEBAR */
     header[data-testid="stHeader"] {
         background-color: transparent !important;
         z-index: 999999 !important;
     }
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
 
-    /* 2. ĐỊNH DẠNG NÚT BẤM ẨN/HIỆN SIDEBAR: BO TRÒN VÀ VIỀN CAM NEON */
+    /* 2. ẨN HOÀN TOÀN TẤT CẢ BIỂU TƯỢNG BÊN PHẢI (GITHUBAI/CON MÈO, FORK, STAR, MENU 3 CHẤM, DEPLOY) */
+    #MainMenu {visibility: hidden !important;}
+    footer {visibility: hidden !important;}
+    [data-testid="stToolbar"] {display: none !important;}
+    [data-testid="stDecoration"] {display: none !important;}
+    [data-testid="stStatusWidget"] {display: none !important;}
+    .stAppDeployButton {display: none !important;}
+    a[href*="github.com"] {display: none !important;}
+
+    /* 3. ĐỊNH DẠNG NÚT BẤM ẨN/HIỆN SIDEBAR: BO TRÒN VÀ VIỀN CAM NEON */
     button[data-testid="stHeaderIconButton"],
     [data-testid="stSidebarCollapseButton"] button {
         background-color: #2563EB !important;
@@ -50,7 +57,7 @@ st.markdown("""
         transform: scale(1.08);
     }
 
-    /* 3. BẢN ĐỒ TRÀN SÁT CÁC CẠNH MÀN HÌNH */
+    /* 4. BẢN ĐỒ TRÀN SÁT CÁC CẠNH MÀN HÌNH */
     .block-container {
         padding-top: 0rem !important;
         padding-bottom: 0rem !important;
@@ -59,7 +66,7 @@ st.markdown("""
         max-width: 100% !important;
     }
 
-    /* 4. MENU BÊN TRÁI (SIDEBAR) TRONG SUỐT VỚI HIỆU ỨNG BLUR KÍNH MỜ */
+    /* 5. MENU BÊN TRÁI (SIDEBAR) TRONG SUỐT VỚI HIỆU ỨNG BLUR KÍNH MỜ */
     [data-testid="stSidebar"] {
         background: rgba(15, 23, 42, 0.75) !important;
         backdrop-filter: blur(16px) saturate(180%) !important;
@@ -68,7 +75,7 @@ st.markdown("""
         z-index: 999998 !important;
     }
 
-    /* 5. ĐỔI MÀU CHỮ TRÊN MENU */
+    /* 6. ĐỔI MÀU CHỮ TRÊN MENU */
     [data-testid="stSidebar"] h1, 
     [data-testid="stSidebar"] h2, 
     [data-testid="stSidebar"] h3, 
@@ -85,7 +92,7 @@ st.markdown("""
         color: #3B82F6 !important;
     }
 
-    /* 6. Ô NHẬP & SELECTBOX */
+    /* 7. Ô NHẬP & SELECTBOX */
     [data-testid="stSidebar"] input, [data-testid="stSidebar"] div[data-baseweb="select"] {
         background-color: rgba(0, 0, 0, 0.4) !important;
         color: #93C5FD !important;
