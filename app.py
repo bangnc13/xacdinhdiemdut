@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS Streamlit (Chỉ xử lý giao diện Streamlit & Sidebar)
+# 2. Inject CSS Streamlit (Chuyển viền nút toggle menu sang màu Cam Neon + Bo tròn)
 st.markdown("""
     <style>
     /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
@@ -25,21 +25,29 @@ st.markdown("""
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* 2. NÚT BẤM ẨN/HIỆN SIDEBAR */
+    /* 2. ĐỊNH DẠNG NÚT BẤM ẨN/HIỆN SIDEBAR: BO TRÒN VÀ VIỀN CAM NEON */
     button[data-testid="stHeaderIconButton"],
     [data-testid="stSidebarCollapseButton"] button {
         background-color: #2563EB !important;
         color: white !important;
-        border-radius: 8px !important;
-        padding: 6px 12px !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 50% !important;                       /* Bo tròn hoàn toàn dạng hình tròn */
+        width: 40px !important;
+        height: 40px !important;
+        padding: 0px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border: 2px solid #FF5F1F !important;                /* Đường viền màu Cam Neon */
+        box-shadow: 0 0 10px rgba(255, 95, 31, 0.8), 0 4px 12px rgba(0, 0, 0, 0.5) !important; /* Hiệu ứng phát sáng neon */
+        transition: all 0.2s ease-in-out !important;
     }
 
     button[data-testid="stHeaderIconButton"]:hover,
     [data-testid="stSidebarCollapseButton"] button:hover {
         background-color: #1D4ED8 !important;
-        transform: scale(1.05);
+        border-color: #FF7F3E !important;                     /* Viền sáng hơn khi hover */
+        box-shadow: 0 0 15px rgba(255, 127, 62, 1), 0 4px 15px rgba(0, 0, 0, 0.6) !important;
+        transform: scale(1.08);
     }
 
     /* 3. BẢN ĐỒ TRÀN SÁT CÁC CẠNH MÀN HÌNH */
@@ -101,13 +109,11 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Hàm bổ sung CSS + FontAwesome trực tiếp vào bản đồ Folium
+# Hàm bổ sung CSS + FontAwesome trực tiếp vào iframe Folium
 def apply_map_custom_css(folium_map):
-    # Load FontAwesome 6 trực tiếp vào iframe
     font_awesome_link = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">'
     folium_map.get_root().html.add_child(folium.Element(font_awesome_link))
 
-    # CSS di chuyển nút định vị xuống vị trí khoanh đỏ (top: 70px) & ẩn zoom
     custom_css = """
     <style>
     /* Ẩn nút Zoom + / - */
@@ -115,7 +121,7 @@ def apply_map_custom_css(folium_map):
         display: none !important;
     }
 
-    /* Dời nút định vị xuống dưới (top: 70px) để không bị nút toggle che khuất */
+    /* Dời nút định vị xuống dưới (top: 70px) */
     .leaflet-control-locate {
         margin-top: 70px !important;
         margin-left: 10px !important;
@@ -364,9 +370,7 @@ if map_data:
         icon=folium.Icon(color="red", icon="wrench", prefix="fa")
     ).add_to(m)
 
-    # Áp dụng CSS sửa vị trí nút định vị vào bản đồ
     apply_map_custom_css(m)
-
     st_folium(m, width="100%", height=1000, key="fault_map")
 else:
     default_map = folium.Map(
@@ -390,7 +394,5 @@ else:
         iconLoading="fa fa-spinner fa-spin"
     ).add_to(default_map)
 
-    # Áp dụng CSS sửa vị trí nút định vị vào bản đồ
     apply_map_custom_css(default_map)
-
     st_folium(default_map, width="100%", height=1000, key="default_map")
