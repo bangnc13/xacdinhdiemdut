@@ -27,9 +27,7 @@ def normalize_node(node_str):
     if pd.isna(node_str):
         return ""
     s = str(node_str).strip()
-    # Loại bỏ chỉ số cổng ở cuối nếu có (/1, /2...)
     s = re.sub(r'/\d+$', '', s)
-    # Chuẩn hóa dạng số đằng trước slash thành 4 chữ số
     match = re.match(r'([A-Za-z0-9]+)\.(\d+)/([A-Za-z0-9]+)', s)
     if match:
         prefix, num, suffix = match.groups()
@@ -42,22 +40,31 @@ for _, row in df_cable.iterrows():
     u = normalize_node(row['Điểm KN1'])
     v = normalize_node(row['Điểm KN2'])
     cable_name = str(row['Tên đoạn cáp']).strip()
-    length = float(row['Chiều dài thực (m)']) if pd.notnull(row['Chiều dài thực (m)']) else 0.0
+    
+    # Ép kiểu an toàn cho chiều dài
+    try:
+        length = float(row['Chiều dài thực (m)'])
+    except (ValueError, TypeError):
+        length = 0.0
+        
     if u and v:
         G.add_edge(u, v, cable=cable_name, length=length)
 
-# Map tọa độ từ sheet HĐN
+# 3. Lấy tọa độ an toàn từ sheet HĐN (Xử lý dọn dẹp lỗi dữ liệu)
+df_hdn['Lat_clean'] = pd.to_numeric(df_hdn['Lat'].astype(str).str.replace(',', '.'), errors='coerce')
+df_hdn['Lng_clean'] = pd.to_numeric(df_hdn['Lng'].astype(str).str.replace(',', '.'), errors='coerce')
+
 hdn_coords = {}
 for _, row in df_hdn.iterrows():
     name = normalize_node(row['Tên đối tượng'])
-    lat = row['Lat']
-    lng = row['Lng']
+    lat = row['Lat_clean']
+    lng = row['Lng_clean']
     if pd.notnull(lat) and pd.notnull(lng):
         hdn_coords[name] = (float(lat), float(lng))
 
 st.title("📍 Xác Định Vị Trí Sự Cố Cáp Trên Bản Đồ")
 
-# 3. Giao diện nhập liệu
+# 4. Giao diện nhập liệu
 col1, col2, col3 = st.columns(3)
 with col1:
     td_a_input = st.text_input("Nhập TĐ A:", value="TQGP001.0011/HO")
@@ -72,13 +79,13 @@ if st.button("Tìm vị trí sự cố"):
 
     if not td_a or not td_b:
         st.warning("Vui lòng nhập đầy đủ thông tin TĐ A và TĐ B!")
+    elif not G.has_node(td_a) or not G.has_node(td_b):
+        st.error("Một trong hai tập điểm nhập vào không tồn tại trong sheet Đoạn cáp!")
     elif not nx.has_path(G, td_a, td_b):
         st.error(f"Không tìm thấy đường đi giữa {td_a} và {td_b} trong dữ liệu Đoạn cáp!")
     else:
-        # Tìm đường đi ngắn nhất giữa TĐ A và TĐ B
         node_path = nx.shortest_path(G, td_a, td_b, weight='length')
         
-        # Tính khoảng cách tích lũy các đoạn cáp
         cable_segments = []
         accumulated_dist = 0.0
         target_segment = None
@@ -110,7 +117,6 @@ if st.button("Tìm vị trí sự cố"):
         elif target_segment:
             st.success(f"Vị trí sự cố nằm trên đoạn cáp: **{target_segment['cable']}** (giữa {target_segment['u']} và {target_segment['v']})")
 
-            # Tính tọa độ điểm đứt
             u_coord = hdn_coords.get(target_segment['u'])
             v_coord = hdn_coords.get(target_segment['v'])
 
@@ -121,21 +127,17 @@ if st.button("Tìm vị trí sự cố"):
                 fault_lat = u_coord[0] + ratio * (v_coord[0] - u_coord[0])
                 fault_lng = u_coord[1] + ratio * (v_coord[1] - u_coord[1])
 
-                # Hiển thị bản đồ
                 m = folium.Map(location=[fault_lat, fault_lng], zoom_start=16)
 
-                # Vẽ toàn bộ tuyến
                 path_coords = [hdn_coords[n] for n in node_path if n in hdn_coords]
                 if len(path_coords) > 1:
                     folium.PolyLine(path_coords, color="blue", weight=4, opacity=0.8, tooltip="Tuyến cáp").add_to(m)
 
-                # Cắm ghim trạm đầu/cuối
                 if td_a in hdn_coords:
                     folium.Marker(hdn_coords[td_a], popup=f"TĐ A: {td_a}", icon=folium.Icon(color="green")).add_to(m)
                 if td_b in hdn_coords:
                     folium.Marker(hdn_coords[td_b], popup=f"TĐ B: {td_b}", icon=folium.Icon(color="black")).add_to(m)
 
-                # Cắm ghim điểm đứt
                 folium.Marker(
                     [fault_lat, fault_lng],
                     popup=f"Vị trí đứt cáp: {target_dist}m từ {td_a}",
@@ -144,4 +146,4 @@ if st.button("Tìm vị trí sự cố"):
 
                 st_folium(m, width=900, height=500)
             else:
-                st.warning("Thiếu dữ liệu tọa độ Lat/Lng trong sheet HĐN cho đoạn cáp chứa vị trí đứt.")
+                st.warning("Thiếu dữ liệu tọa độ Lat/Lng hợp lệ trong sheet HĐN cho đoạn cáp chứa vị trí đứt.")
