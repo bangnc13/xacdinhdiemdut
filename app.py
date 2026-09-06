@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS: Tinh chỉnh màu chữ Menu sang MÀU XANH DƯƠNG + Tùy biến Sidebar Blur
+# 2. Inject CSS: Tinh chỉnh giao diện Sidebar & Màu sắc
 st.markdown("""
     <style>
     /* 1. ẨN HOÀN TOÀN THANH HEADER TRÊN CÙNG */
@@ -41,7 +41,7 @@ st.markdown("""
         border-right: 1px solid rgba(59, 130, 246, 0.4) !important;
     }
 
-    /* 4. ĐỔI MÀU CHỮ TRÊN MENU THÀNH MÀU XANH DƯƠNG (#3B82F6 & #60A5FA) */
+    /* 4. ĐỔI MÀU CHỮ TRÊN MENU THÀNH MÀU XANH DƯƠNG */
     [data-testid="stSidebar"] h1, 
     [data-testid="stSidebar"] h2, 
     [data-testid="stSidebar"] h3, 
@@ -54,22 +54,16 @@ st.markdown("""
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
     }
 
-    /* Đổi màu tiêu đề chính thành xanh dương đậm rực hơn */
+    /* Đổi màu tiêu đề chính */
     [data-testid="stSidebar"] h1 {
         color: #3B82F6 !important;
     }
 
-    /* 5. Ô NHẬP DỮ LIỆU BÊN SIDEBAR: VIỀN VÀ CHỮ KHI NHẬP MÀU XANH DƯƠNG */
-    [data-testid="stSidebar"] input {
+    /* 5. Ô NHẬP & SELECTBOX DỮ LIỆU BÊN SIDEBAR */
+    [data-testid="stSidebar"] input, [data-testid="stSidebar"] div[data-baseweb="select"] {
         background-color: rgba(0, 0, 0, 0.4) !important;
         color: #93C5FD !important;
-        border: 1px solid rgba(59, 130, 246, 0.5) !important;
         border-radius: 8px !important;
-    }
-    
-    [data-testid="stSidebar"] input:focus {
-        border-color: #2563EB !important;
-        box-shadow: 0 0 8px rgba(37, 99, 235, 0.6) !important;
     }
 
     /* 6. STYLE NÚT BẤM VÀ ĐƯỜNG KẺ GẠCH MÀU XANH DƯƠNG */
@@ -161,29 +155,63 @@ for _, row in df_hdn.iterrows():
     if pd.notnull(lat) and pd.notnull(lng):
         hdn_coords[name] = (float(lat), float(lng))
 
-# Khởi tạo Session State & Khởi tạo biến map_data toàn cục
+# Khởi tạo Session State
 if 'search_performed' not in st.session_state:
     st.session_state.search_performed = False
 
-map_data = None  # Khai báo biến map_data ngoài toàn cục để tránh lỗi NameError
+map_data = None
 
-# 6. MENU DẠNG DỌC BÊN TRÁI (SIDEBAR) VỚI CHỮ MÀU XANH DƯƠNG
+# Danh sách tất cả tập điểm có trong mạng cáp
+all_nodes = sorted(list(G.nodes()))
+
+# 6. MENU DẠNG DỌC BÊN TRÁI (SIDEBAR)
 with st.sidebar:
-    st.title("📍 TOOL XÁC ĐỊNH SỰ CỐ ")
+    st.title("📍 TOOL XÁC ĐỊNH SỰ CỐ")
     st.markdown("---")
     
-    td_a_input = st.text_input("Nhập TĐ Đo:", value="TQGP001.0011/HO")
-    td_b_input = st.text_input("Nhập TĐ Đến:", value="TQGP001.0013/HO")
+    # 1. Ô Chọn/Nhập TĐ Đo
+    selected_td_a = st.selectbox(
+        "Nhập / Chọn TĐ Đo:",
+        options=all_nodes,
+        index=0 if all_nodes else None
+    )
+    
+    # 2. Tự động tìm các tập điểm liên quan đến TĐ Đo được chọn
+    related_nodes = []
+    if selected_td_a and G.has_node(selected_td_a):
+        # Lấy tất cả các đỉnh kết nối thuộc cùng một nhánh liên thông với TĐ Đo
+        related_nodes = sorted(list(nx.node_connected_component(G, selected_td_a)))
+        # Loại bỏ chính TĐ Đo khỏi danh sách chọn TĐ Đến
+        related_nodes = [node for node in related_nodes if node != selected_td_a]
+
+    # 3. Ô Chọn TĐ Đến (Chỉ hiển thị các tập điểm có liên kết)
+    if related_nodes:
+        selected_td_b = st.selectbox(
+            "Chọn TĐ Đến (Đã lọc theo TĐ Đo):",
+            options=related_nodes,
+            index=0
+        )
+    else:
+        selected_td_b = st.selectbox(
+            "Chọn TĐ Đến:",
+            options=["Không có tập điểm liên quan"],
+            disabled=True
+        )
+
     target_dist_input = st.number_input("Khoảng cách đo được (mét):", min_value=0.0, value=100.0, step=1.0)
     
     st.markdown("<br>", unsafe_allow_html=True)
+    
     if st.button("🔍 Tìm vị trí sự cố", type="primary", use_container_width=True):
-        st.session_state.search_performed = True
-        st.session_state.td_a = normalize_node(td_a_input)
-        st.session_state.td_b = normalize_node(td_b_input)
-        st.session_state.target_dist = target_dist_input
+        if selected_td_a and selected_td_b and selected_td_b in related_nodes:
+            st.session_state.search_performed = True
+            st.session_state.td_a = selected_td_a
+            st.session_state.td_b = selected_td_b
+            st.session_state.target_dist = target_dist_input
+        else:
+            st.error("Vui lòng chọn TĐ Đo và TĐ Đến hợp lệ!")
 
-    # KHU VỰC HIỂN THỊ KẾT QUẢ
+    # KHU VỰC HIỂN THỊ KẾT QUẢ PHÂN TÍCH
     if st.session_state.search_performed:
         st.markdown("---")
         st.subheader("📊 Kết Quả Phân Tích")
@@ -192,11 +220,7 @@ with st.sidebar:
         td_b = st.session_state.td_b
         target_dist = st.session_state.target_dist
 
-        if not td_a or not td_b:
-            st.warning("Vui lòng nhập đầy đủ thông tin TĐ A và TĐ B!")
-        elif not G.has_node(td_a) or not G.has_node(td_b):
-            st.error("Một trong hai tập điểm không tồn tại trong dữ liệu!")
-        elif not nx.has_path(G, td_a, td_b):
+        if not nx.has_path(G, td_a, td_b):
             st.error(f"Không tìm thấy tuyến cáp nối giữa {td_a} và {td_b}!")
         else:
             node_path = nx.shortest_path(G, td_a, td_b, weight='length')
@@ -257,7 +281,7 @@ with st.sidebar:
                 else:
                     st.warning("Thiếu dữ liệu tọa độ Lat/Lng cho đoạn cáp chứa vị trí đứt.")
 
-# 7. BẢN ĐỒ FULL TRÀN VIỀN BÊN PHẢI (LOẠI BỎ LỚP TRẮNG OPENSTREETMAP)
+# 7. BẢN ĐỒ FULL TRÀN VIỀN BÊN PHẢI
 if map_data:
     m = folium.Map(
         location=[map_data['fault_lat'], map_data['fault_lng']], 
@@ -265,7 +289,6 @@ if map_data:
         tiles=None
     )
 
-    # Layer Google Maps Đường phố
     folium.TileLayer(
         tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
         attr="Google",
@@ -274,7 +297,6 @@ if map_data:
         control=True
     ).add_to(m)
 
-    # Layer Google Maps Vệ tinh
     folium.TileLayer(
         tiles="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
         attr="Google",
@@ -283,22 +305,18 @@ if map_data:
         control=True
     ).add_to(m)
 
-    # Nút định vị GPS thực tế
     LocateControl(auto_start=False, flyTo=True).add_to(m)
     folium.LayerControl().add_to(m)
 
-    # Vẽ Tuyến cáp
     path_coords = [hdn_coords[n] for n in map_data['node_path'] if n in hdn_coords]
     if len(path_coords) > 1:
         folium.PolyLine(path_coords, color="#1e40af", weight=6, opacity=0.85, tooltip="Tuyến cáp").add_to(m)
 
-    # Marker TĐ A và TĐ B
     if map_data['td_a'] in hdn_coords:
         folium.Marker(hdn_coords[map_data['td_a']], popup=f"TĐ A: {map_data['td_a']}", icon=folium.Icon(color="green")).add_to(m)
     if map_data['td_b'] in hdn_coords:
         folium.Marker(hdn_coords[map_data['td_b']], popup=f"TĐ B: {map_data['td_b']}", icon=folium.Icon(color="black")).add_to(m)
 
-    # Marker Điểm Đứt Cáp
     folium.Marker(
         [map_data['fault_lat'], map_data['fault_lng']],
         popup=f"Vị trí đứt cáp: {map_data['target_dist']}m từ {map_data['td_a']}",
