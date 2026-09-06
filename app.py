@@ -215,7 +215,42 @@ def interpolate_on_polyline_scaled(coords, target_offset, decl_length):
         accumulated += seg_len
     return coords[-1][0], coords[-1][1]
 
-# 4. ĐỒ THỊ MẠNG CÁP
+# 4. TẠO TỪ ĐIỂN PHÂN CẤP TẬP ĐIỂM TỪ SHEET UPLINK (CỘT D HOẶC NỘI DUNG)
+node_level_map = {}
+if 'TĐ' in df_uplink.columns:
+    # Kiểm tra nếu cột D (chỉ số cột 3) tồn tại
+    has_col_d = df_uplink.shape[1] >= 4
+    for idx, row in df_uplink.iterrows():
+        node_name = normalize_node(row['TĐ'])
+        if not node_name:
+            continue
+        
+        level = None
+        if has_col_d and pd.notnull(row.iloc[3]):
+            val_d = str(row.iloc[3]).strip().lower()
+            if "1" in val_d:
+                level = 1
+            elif "2" in val_d:
+                level = 2
+        
+        # Mặc định quy ước nếu không có cột D: đuôi HO/MO là cấp 2, khác là cấp 1
+        if level is None:
+            if node_name.endswith('/HO') or node_name.endswith('/MO'):
+                level = 2
+            else:
+                level = 1
+        
+        node_level_map[node_name] = level
+
+def get_node_level(node_name):
+    if node_name in node_level_map:
+        return node_level_map[node_name]
+    # Mặc định nếu không nằm trong uplink
+    if node_name.endswith('/HO') or node_name.endswith('/MO'):
+        return 2
+    return 1
+
+# 5. ĐỒ THỊ MẠNG CÁP
 G = nx.Graph()
 for _, row in df_cable.iterrows():
     u = normalize_node(row['Điểm KN1'])
@@ -240,7 +275,7 @@ for _, row in df_cable.iterrows():
     if u and v: 
         G.add_edge(u, v, cable=cable_name, length=length, capacity=capacity_str)
 
-# 5. Tọa độ HĐN
+# 6. Tọa độ HĐN
 df_hdn['Lat_clean'] = pd.to_numeric(df_hdn['Lat'].astype(str).str.replace(',', '.'), errors='coerce')
 df_hdn['Lng_clean'] = pd.to_numeric(df_hdn['Lng'].astype(str).str.replace(',', '.'), errors='coerce')
 
@@ -257,7 +292,7 @@ if 'search_performed' not in st.session_state:
 map_data = None
 all_nodes = sorted(list(G.nodes()))
 
-# 6. MENU BÊN TRÁI - THUẬT TOÁN LỌC CHÍNH XÁC TĐ ĐẾN
+# 7. MENU BÊN TRÁI - THUẬT TOÁN LỌC THEO PHÂN CẤP CẤP 1 & CẤP 2
 with st.sidebar:
     current_dir = os.path.dirname(os.path.abspath(__file__)) if '__file__' in globals() else os.getcwd()
     logo_path = os.path.join(current_dir, "FPT_Telecom_logo.png")
@@ -271,23 +306,41 @@ with st.sidebar:
     
     selected_td_a = st.selectbox("Nhập / Chọn TĐ Đo:", options=all_nodes, index=0 if all_nodes else None)
     
-    # === THUẬT TOÁN LỌC TẬP ĐIỂM ĐẾN LIÊN KẾT ===
+    # === THUẬT TOÁN LỌC TĐ ĐẾN THEO CẤP VÀ LOẠI BỎ /TO, /FO ===
     related_nodes = []
     if selected_td_a and G.has_node(selected_td_a):
-        # 1. Thuật toán lấy thành phần thông suốt (Connected Component) trong Đồ thị
+        # Lấy tất cả các TĐ liên thông
         connected_component = nx.node_connected_component(G, selected_td_a)
         
-        # 2. Loại bỏ chính TĐ Đo khỏi danh sách đích đến
-        related_nodes = sorted([node for node in connected_component if node != selected_td_a])
+        # BƯỚC 1: Loại bỏ TĐ A và tất cả các TĐ có đuôi /TO hoặc /FO
+        valid_candidates = [
+            node for node in connected_component 
+            if node != selected_td_a and not (node.endswith('/TO') or node.endswith('/FO'))
+        ]
+        
+        # BƯỚC 2: Kiểm tra cấp của TĐ Đo (TĐ A)
+        level_a = get_node_level(selected_td_a)
+        
+        if level_a == 2:
+            # Nếu TĐ A là Cấp 2: Chỉ lấy các TĐ B là Cấp 1 hoặc Cấp 2
+            filtered_list = []
+            for node in valid_candidates:
+                lvl = get_node_level(node)
+                if lvl in [1, 2]:
+                    filtered_list.append(node)
+            related_nodes = sorted(filtered_list)
+        else:
+            # Nếu TĐ A là Cấp 1: Được phép lấy tất cả các TĐ liên quan (đã loại bỏ /TO, /FO)
+            related_nodes = sorted(valid_candidates)
 
     if related_nodes:
         selected_td_b = st.selectbox(
-            f"Chọn TĐ Đến ({len(related_nodes)} TĐ có liên kết):", 
+            f"Chọn TĐ Đến ({len(related_nodes)} TĐ phù hợp):", 
             options=related_nodes, 
             index=0
         )
     else:
-        selected_td_b = st.selectbox("Chọn TĐ Đến:", options=["Không có tập điểm liên quan"], disabled=True)
+        selected_td_b = st.selectbox("Chọn TĐ Đến:", options=["Không có tập điểm liên quan hợp lệ"], disabled=True)
 
     target_dist_input = st.number_input("Khoảng cách đo được (mét):", min_value=0.0, value=100.0, step=1.0)
     st.markdown("<br>", unsafe_allow_html=True)
@@ -363,7 +416,7 @@ with st.sidebar:
                         'td_a': td_a, 'td_b': td_b, 'target_dist': target_dist
                     }
 
-# 7. BẢN ĐỒ
+# 8. BẢN ĐỒ
 if map_data:
     m = folium.Map(location=[map_data['fault_lat'], map_data['fault_lng']], zoom_start=17, tiles=None, zoom_control=False)
     folium.TileLayer(tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", attr="Google", name="Đường phố", overlay=False).add_to(m)
