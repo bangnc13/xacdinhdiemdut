@@ -188,10 +188,6 @@ def load_data():
 
 @st.cache_data
 def load_json_cable_shapes(json_file_path="TQGP001.json"):
-    """
-    Hàm đọc file TQGP001.json và trích xuất danh sách tọa độ thực tế của tuyến cáp.
-    Hỗ trợ cả GeoJSON (LineString/MultiLineString) và JSON tự định nghĩa.
-    """
     cable_shapes = {}
     if not os.path.exists(json_file_path):
         return cable_shapes
@@ -200,7 +196,6 @@ def load_json_cable_shapes(json_file_path="TQGP001.json"):
         with open(json_file_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
-        # Trường hợp 1: Chuẩn GeoJSON
         if isinstance(data, dict) and data.get("type") == "FeatureCollection":
             for feature in data.get("features", []):
                 props = feature.get("properties", {})
@@ -208,7 +203,6 @@ def load_json_cable_shapes(json_file_path="TQGP001.json"):
                 geom = feature.get("geometry", {})
                 
                 if geom.get("type") == "LineString":
-                    # GeoJSON dạng [lng, lat], đổi thành [lat, lng] cho Folium
                     coords = [[p[1], p[0]] for p in geom.get("coordinates", [])]
                     if cable_name:
                         cable_shapes[str(cable_name).strip()] = coords
@@ -219,17 +213,14 @@ def load_json_cable_shapes(json_file_path="TQGP001.json"):
                     if cable_name:
                         cable_shapes[str(cable_name).strip()] = coords
 
-        # Trường hợp 2: Dạng danh sách các object JSON
         elif isinstance(data, list):
             for item in data:
                 cable_name = item.get("cable_name") or item.get("name") or item.get("code")
                 coords = item.get("coordinates") or item.get("points") or item.get("path")
                 if cable_name and coords:
-                    # Tự động phát hiện nếu tọa độ đang dạng [lng, lat]
                     formatted_coords = []
                     for pt in coords:
                         if isinstance(pt, (list, tuple)) and len(pt) >= 2:
-                            # Nếu lng > lat (ở VN, Lng ~105-109, Lat ~8-23)
                             if pt[0] > pt[1]:
                                 formatted_coords.append([pt[1], pt[0]])
                             else:
@@ -260,16 +251,14 @@ def normalize_node(node_str):
         return f"{prefix}.{int(num):04d}/{suffix}"
     return s
 
-# Tính khoảng cách giữa 2 điểm Lat/Lng (mét)
 def haversine(lat1, lon1, lat2, lon2):
-    R = 6371000  # Bán kính Trái Đất (mét)
+    R = 6371000
     phi1, phi2 = math.radians(lat1), math.radians(lat2)
     dphi = math.radians(lat2 - lat1)
     dlambda = math.radians(lon2 - lon1)
     a = math.sin(dphi/2)**2 + math.cos(phi1)*math.cos(phi2)*math.sin(dlambda/2)**2
     return 2 * R * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
-# Nội suy vị trí đứt trên đường PolyLine thực tế từ JSON
 def interpolate_on_polyline(coords, target_offset):
     if not coords or len(coords) < 2:
         return None
@@ -419,12 +408,10 @@ with st.sidebar:
                 offset = target_dist - target_segment['start_dist']
                 fault_lat, fault_lng = None, None
 
-                # Ưu tiên 1: Lấy đường đi uốn lượn thực tế từ TQGP001.json
                 if cable_name in json_cable_shapes:
                     raw_coords = json_cable_shapes[cable_name]
                     fault_lat, fault_lng = interpolate_on_polyline(raw_coords, offset)
 
-                # Ưu tiên 2: Dự phòng tuyến thẳng nếu không có dữ liệu JSON
                 if fault_lat is None or fault_lng is None:
                     u_coord = hdn_coords.get(target_segment['u'])
                     v_coord = hdn_coords.get(target_segment['v'])
@@ -484,7 +471,7 @@ if map_data:
     
     folium.LayerControl().add_to(m)
 
-    # Hiển thị tất cả đoạn cáp trong chuỗi TQGP001 từ JSON (nếu có)
+    # Hiển thị các đoạn cáp
     has_json_path = False
     for seg in map_data['cable_segments']:
         c_name = seg['cable']
@@ -495,23 +482,49 @@ if map_data:
                 color="#FF5F1F",
                 weight=6,
                 opacity=0.9,
-                tooltip=f"Đoạn cáp thực tế (JSON): {c_name}"
+                tooltip=f"Đoạn cáp: {c_name}"
             ).add_to(m)
 
-    # Nếu không tìm thấy tọa độ JSON -> Dùng tọa độ HĐN vẽ tuyến cáp mặc định
     if not has_json_path:
         path_coords = [hdn_coords[n] for n in map_data['node_path'] if n in hdn_coords]
         if len(path_coords) > 1:
             folium.PolyLine(path_coords, color="#1e40af", weight=6, opacity=0.85, tooltip="Tuyến cáp").add_to(m)
 
-    if map_data['td_a'] in hdn_coords:
-        folium.Marker(hdn_coords[map_data['td_a']], popup=f"TĐ A: {map_data['td_a']}", icon=folium.Icon(color="green")).add_to(m)
-    if map_data['td_b'] in hdn_coords:
-        folium.Marker(hdn_coords[map_data['td_b']], popup=f"TĐ B: {map_data['td_b']}", icon=folium.Icon(color="black")).add_to(m)
+    # --- HIỂN THỊ TẤT CẢ CÁC TẬP ĐIỂM (TĐ) LIÊN QUAN TRÊN TIẾN TRÌNH TUYẾN CÁP ---
+    for idx, node in enumerate(map_data['node_path']):
+        if node in hdn_coords:
+            coord = hdn_coords[node]
+            
+            if node == map_data['td_a']:
+                # TĐ Đo (Điểm đầu - Màu Xanh lá)
+                folium.Marker(
+                    coord,
+                    popup=f"<b>TĐ Đo (Gốc):</b> {node}",
+                    tooltip=f"TĐ Đo: {node}",
+                    icon=folium.Icon(color="green", icon="play", prefix="fa")
+                ).add_to(m)
+            elif node == map_data['td_b']:
+                # TĐ Đến (Điểm cuối - Màu Đen)
+                folium.Marker(
+                    coord,
+                    popup=f"<b>TĐ Đến:</b> {node}",
+                    tooltip=f"TĐ Đến: {node}",
+                    icon=folium.Icon(color="black", icon="flag-checkered", prefix="fa")
+                ).add_to(m)
+            else:
+                # Tất cả TĐ Trung gian nằm trên tuyến (Màu Xanh Dương)
+                folium.Marker(
+                    coord,
+                    popup=f"<b>TĐ Trung gian #{idx}:</b> {node}",
+                    tooltip=f"TĐ Trung gian: {node}",
+                    icon=folium.Icon(color="blue", icon="circle", prefix="fa")
+                ).add_to(m)
 
+    # Marker Vị trí đứt cáp (Màu Đỏ)
     folium.Marker(
         [map_data['fault_lat'], map_data['fault_lng']],
         popup=f"Vị trí đứt cáp: {map_data['target_dist']}m từ {map_data['td_a']}",
+        tooltip="Vị trí sự cố đứt cáp",
         icon=folium.Icon(color="red", icon="wrench", prefix="fa")
     ).add_to(m)
 
@@ -546,7 +559,6 @@ else:
         iconLoading="fa fa-spinner fa-spin"
     ).add_to(default_map)
 
-    # Hiển thị trước tất cả đoạn cáp từ TQGP001.json
     for c_name, coords in json_cable_shapes.items():
         folium.PolyLine(
             coords,
