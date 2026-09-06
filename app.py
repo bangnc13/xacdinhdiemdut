@@ -14,8 +14,11 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS: Tùy biến giao diện, ẩn nút Zoom & làm đẹp nút định vị
+# 2. Inject CSS: Tùy biến giao diện, ẩn Zoom, Fix Icon & Di chuyển nút định vị
 st.markdown("""
+    <!-- Load FontAwesome 6 để hiển thị icon định vị chính xác -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
     /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
     header[data-testid="stHeader"] {
@@ -122,25 +125,39 @@ st.markdown("""
         display: none !important;
     }
 
-    /* 9. TÙY BIẾN ICON VÀ NÚT ĐỊNH VỊ NỔI ĐẸP MẮT */
+    /* 9. FIX LỖI HIỂN THỊ & DI CHUYỂN NÚT ĐỊNH VỊ VỀ VỊ TRÍ KHOANH ĐỎ */
+    .leaflet-control-locate {
+        position: fixed !important;
+        top: 80px !important;       /* Đặt phía dưới nút toggle sidebar */
+        left: 20px !important;      /* Căn lề trái sát viền */
+        z-index: 99999 !important;
+        border: none !important;
+    }
+
     .leaflet-control-locate a {
-        background-color: #1E293B !important;
-        color: #3B82F6 !important;
-        border-radius: 50% !important;
-        border: 2px solid rgba(59, 130, 246, 0.6) !important;
+        background-color: #2563EB !important;
+        color: #FFFFFF !important;
+        border-radius: 8px !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
-        width: 40px !important;
-        height: 40px !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        width: 38px !important;
+        height: 38px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        transition: all 0.3s ease !important;
+        transition: all 0.2s ease !important;
     }
 
     .leaflet-control-locate a:hover {
-        background-color: #2563EB !important;
+        background-color: #1D4ED8 !important;
+        transform: scale(1.05);
+    }
+
+    /* Tùy chỉnh icon định vị bên trong */
+    .leaflet-control-locate a span.fa,
+    .leaflet-control-locate a span.fas {
+        font-size: 18px !important;
         color: #FFFFFF !important;
-        transform: scale(1.1);
     }
     </style>
 """, unsafe_allow_html=True)
@@ -348,12 +365,12 @@ if map_data:
         control=True
     ).add_to(m)
 
-    # ĐỊNH VỊ VỚI ICON TÙY BIẾN ĐẸP HƠN
+    # ĐỊNH VỊ VỚI ICON LOCATION TÍCH HỢP CHUẨN
     LocateControl(
         auto_start=False, 
         flyTo=True, 
-        icon="fa-crosshairs", 
-        iconLoading="fa-spinner fa-spin"
+        icon="fa fa-location-arrow", 
+        iconLoading="fa fa-spinner fa-spin"
     ).add_to(m)
     
     folium.LayerControl().add_to(m)
@@ -389,12 +406,12 @@ else:
         control=False
     ).add_to(default_map)
 
-    # ĐỊNH VỊ VỚI ICON TÙY BIẾN ĐẸP HƠN
+    # ĐỊNH VỊ VỚI ICON LOCATION TÍCH HỢP CHUẨN
     LocateControl(
         auto_start=False, 
         flyTo=True, 
-        icon="fa-crosshairs", 
-        iconLoading="fa-spinner fa-spin"
+        icon="fa fa-location-arrow", 
+        iconLoading="fa fa-spinner fa-spin"
     ).add_to(default_map)
 
     st_folium(default_map, width="100%", height=1000, key="default_map")
