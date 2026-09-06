@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS: Tùy biến vị trí nút Zoom (+ / -) và giao diện
+# 2. Inject CSS: Tùy biến giao diện và ẩn nút Zoom
 st.markdown("""
     <style>
     /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
@@ -117,33 +117,9 @@ st.markdown("""
         border: none !important;
     }
 
-    /* 8. DI CHUYỂN NÚT ZOOM (+ / -) XUỐNG GÓC DƯỚI BÊN TRÁI */
+    /* 8. ẨN HOÀN TOÀN NÚT ZOOM (+ / -) */
     .leaflet-control-zoom {
-        position: fixed !important;
-        bottom: 25px !important;
-        left: 25px !important;
-        right: auto !important;
-        top: auto !important;
-        z-index: 9999 !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-        border-radius: 8px !important;
-        overflow: hidden !important;
-    }
-
-    .leaflet-control-zoom a {
-        background-color: #1E293B !important;
-        color: #60A5FA !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-        width: 36px !important;
-        height: 36px !important;
-        line-height: 36px !important;
-        font-size: 18px !important;
-        font-weight: bold !important;
-    }
-
-    .leaflet-control-zoom a:hover {
-        background-color: #2563EB !important;
-        color: #FFFFFF !important;
+        display: none !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -332,7 +308,7 @@ if map_data:
         location=[map_data['fault_lat'], map_data['fault_lng']], 
         zoom_start=17,
         tiles=None,
-        zoom_control=True
+        zoom_control=False
     )
 
     folium.TileLayer(
@@ -375,7 +351,7 @@ else:
         location=[21.0285, 105.8542],
         zoom_start=12,
         tiles=None,
-        zoom_control=True
+        zoom_control=False
     )
     folium.TileLayer(
         tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
