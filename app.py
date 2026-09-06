@@ -9,6 +9,7 @@ import folium
 from folium import DivIcon
 from folium.plugins import LocateControl
 from streamlit_folium import st_folium
+import streamlit.components.v1 as components
 from PIL import Image
 
 # 1. Cấu hình trang
@@ -423,8 +424,49 @@ with st.sidebar:
 
                 if fault_lat and fault_lng:
                     st.success(f"⚠️ **Vị trí đứt nằm trong đoạn cáp:**\n\n**{cable_name}**\n\n({target_segment['u']} ➔ {target_segment['v']})")
+                    
+                    # 1. Link cố định định vị đến điểm đứt
                     gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
-                    st.link_button("🚗 Chỉ đường Google Maps", gmaps_url, type="primary", use_container_width=True)
+                    st.link_button("📍 Mở vị trí trên Google Maps", gmaps_url, type="primary", use_container_width=True)
+
+                    # 2. Nút HTML/JS lấy GPS vị trí hiện tại và mở Google Maps chỉ đường
+                    nav_html = f"""
+                        <script>
+                        function navigateFromCurrentLocation() {{
+                            if (navigator.geolocation) {{
+                                navigator.geolocation.getCurrentPosition(function(position) {{
+                                    var userLat = position.coords.latitude;
+                                    var userLng = position.coords.longitude;
+                                    var url = "https://www.google.com/maps/dir/?api=1&origin=" + userLat + "," + userLng + "&destination={fault_lat},{fault_lng}&travelmode=driving";
+                                    window.open(url, '_blank');
+                                }}, function(error) {{
+                                    alert("Không thể lấy vị trí hiện tại của bạn. Vui lòng bật định vị GPS!");
+                                    var fallbackUrl = "{gmaps_url}";
+                                    window.open(fallbackUrl, '_blank');
+                                }}, {{ enableHighAccuracy: true, timeout: 10000 }});
+                            } else {{
+                                alert("Trình duyệt không hỗ trợ Geolocation!");
+                            }}
+                        }}
+                        </script>
+                        <button onclick="navigateFromCurrentLocation()" style="
+                            width: 100%;
+                            background-color: #059669;
+                            color: white;
+                            border: None;
+                            padding: 10px 16px;
+                            font-size: 14px;
+                            font-weight: bold;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            margin-top: 8px;
+                            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+                            transition: all 0.2s;
+                        " onmouseover="this.style.backgroundColor='#047857'" onmouseout="this.style.backgroundColor='#059669'">
+                            🧭 Chỉ đường từ vị trí hiện tại (GPS)
+                        </button>
+                    """
+                    components.html(nav_html, height=60)
 
                     map_data = {
                         'fault_lat': fault_lat,
@@ -491,7 +533,7 @@ if map_data:
         if len(path_coords) > 1:
             folium.PolyLine(path_coords, color="#1e40af", weight=6, opacity=0.85, tooltip="Tuyến cáp").add_to(m)
 
-    # Hiển thị Marker và Nhãn tên TĐ (Inline CSS trực tiếp chữ màu đỏ)
+    # Hiển thị Marker và Nhãn tên TĐ (Màu Đỏ)
     for node in map_data['node_path']:
         if node in hdn_coords:
             coord = hdn_coords[node]
@@ -511,7 +553,7 @@ if map_data:
                 icon=folium.Icon(color=icon_color, icon=icon_name, prefix="fa")
             ).add_to(m)
 
-            # 2. Nhãn Tên TĐ trực tiếp trên Map - Chữ màu ĐỎ (#DC2626)
+            # 2. Nhãn Tên TĐ (Chữ màu ĐỎ)
             label_html = f'''
                 <div style="
                     font-size: 12px;
