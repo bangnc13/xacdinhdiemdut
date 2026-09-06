@@ -6,6 +6,7 @@ import networkx as nx
 import pandas as pd
 import streamlit as st
 import folium
+from folium import DivIcon
 from folium.plugins import LocateControl
 from streamlit_folium import st_folium
 from PIL import Image
@@ -133,6 +134,19 @@ st.markdown("""
 
     iframe {
         border: none !important;
+    }
+    
+    /* CSS nhãn TĐ hiển thị trên bản đồ */
+    .node-label {
+        font-size: 12px;
+        font-weight: bold;
+        color: #0F172A;
+        background-color: rgba(255, 255, 255, 0.9);
+        border: 1.5px solid #2563EB;
+        padding: 2px 6px;
+        border-radius: 4px;
+        white-space: nowrap;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     }
     </style>
 """, unsafe_allow_html=True)
@@ -490,35 +504,36 @@ if map_data:
         if len(path_coords) > 1:
             folium.PolyLine(path_coords, color="#1e40af", weight=6, opacity=0.85, tooltip="Tuyến cáp").add_to(m)
 
-    # Hiển thị tất cả các Tập điểm (TĐ) trên tuyến
+    # Hiển thị Marker và Nhãn tên TĐ hiển thị cố định trực tiếp trên màn hình map
     for node in map_data['node_path']:
         if node in hdn_coords:
             coord = hdn_coords[node]
             
+            # Chọn màu Marker tương ứng
             if node == map_data['td_a']:
-                # TĐ Đo (Màu Xanh lá)
-                folium.Marker(
-                    coord,
-                    popup=f"<b>{node}</b>",
-                    tooltip=node,
-                    icon=folium.Icon(color="green", icon="play", prefix="fa")
-                ).add_to(m)
+                icon_color, icon_name = "green", "play"
             elif node == map_data['td_b']:
-                # TĐ Đến (Màu Đen)
-                folium.Marker(
-                    coord,
-                    popup=f"<b>{node}</b>",
-                    tooltip=node,
-                    icon=folium.Icon(color="black", icon="flag-checkered", prefix="fa")
-                ).add_to(m)
+                icon_color, icon_name = "black", "flag-checkered"
             else:
-                # TĐ Trung gian: Hiển thị trực tiếp tên node, không kèm tiền tố
-                folium.Marker(
-                    coord,
-                    popup=f"<b>{node}</b>",
-                    tooltip=node,
-                    icon=folium.Icon(color="blue", icon="circle", prefix="fa")
-                ).add_to(m)
+                icon_color, icon_name = "blue", "circle"
+
+            # 1. Vẽ Marker thông thường
+            folium.Marker(
+                coord,
+                popup=f"<b>{node}</b>",
+                tooltip=node,
+                icon=folium.Icon(color=icon_color, icon=icon_name, prefix="fa")
+            ).add_to(m)
+
+            # 2. Vẽ Nhãn Tên hiển thị cố định ngay cạnh Marker trên bản đồ
+            folium.Marker(
+                coord,
+                icon=DivIcon(
+                    icon_size=(150, 36),
+                    icon_anchor=(-15, 12),
+                    html=f'<div class="node-label">{node}</div>'
+                )
+            ).add_to(m)
 
     # Marker Vị trí đứt cáp (Màu Đỏ)
     folium.Marker(
