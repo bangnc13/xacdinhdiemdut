@@ -164,9 +164,9 @@ with st.sidebar:
     st.title("📍 Cấu Hình Sự Cố")
     st.markdown("---")
     
-    td_a_input = st.text_input("Nhập TĐ A:", value="TQGP001.0011/HO")
-    td_b_input = st.text_input("Nhập TĐ B:", value="TQGP001.0013/HO")
-    target_dist_input = st.number_input("Khoảng cách từ TĐ A (mét):", min_value=0.0, value=100.0, step=1.0)
+    td_a_input = st.text_input("Nhập TĐ Đo:", value="TQGP001.0011/HO")
+    td_b_input = st.text_input("Nhập TĐ Đến:", value="TQGP001.0013/HO")
+    target_dist_input = st.number_input("Khoảng cách từ đo được (mét):", min_value=0.0, value=100.0, step=1.0)
     
     st.markdown("<br>", unsafe_allow_html=True)
     if st.button("🔍 Tìm vị trí sự cố", type="primary", use_container_width=True):
