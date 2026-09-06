@@ -195,6 +195,11 @@ def calculate_polyline_length(coords):
         total += haversine(coords[i][0], coords[i][1], coords[i+1][0], coords[i+1][1])
     return total
 
+def clean_key(text):
+    if pd.isna(text):
+        return ""
+    return str(text).strip().lower()
+
 def normalize_node(node_str):
     if pd.isna(node_str):
         return ""
@@ -233,13 +238,13 @@ def load_all_json_cables(directory="."):
                     if geom.get("type") == "LineString":
                         coords = [[p[1], p[0]] for p in geom.get("coordinates", [])]
                         if cable_name and coords:
-                            cable_shapes[str(cable_name).strip()] = coords
+                            cable_shapes[clean_key(cable_name)] = coords
                     elif geom.get("type") == "MultiLineString":
                         coords = []
                         for line in geom.get("coordinates", []):
                             coords.extend([[p[1], p[0]] for p in line])
                         if cable_name and coords:
-                            cable_shapes[str(cable_name).strip()] = coords
+                            cable_shapes[clean_key(cable_name)] = coords
 
             elif isinstance(data, list):
                 for item in data:
@@ -254,22 +259,22 @@ def load_all_json_cables(directory="."):
                                 else:
                                     formatted_coords.append([pt[0], pt[1]])
                         if formatted_coords:
-                            cable_shapes[str(cable_name).strip()] = formatted_coords
+                            cable_shapes[clean_key(cable_name)] = formatted_coords
         except Exception as e:
             st.error(f"Lỗi khi đọc file JSON ({os.path.basename(json_file)}): {e}")
 
     return cable_shapes
 
-# Tự động gán tọa độ các tập điểm u, v từ 2 đầu của sợi cáp trong JSON
+# Tự động gán tọa độ các tập điểm u, v từ 2 đầu cáp trong JSON
 def build_node_coords_from_json(df_cable, json_cable_shapes):
     node_coords = {}
     for _, row in df_cable.iterrows():
         u = normalize_node(row['Điểm KN1'])
         v = normalize_node(row['Điểm KN2'])
-        cable_name = str(row['Tên đoạn cáp']).strip()
+        c_key = clean_key(row['Tên đoạn cáp'])
 
-        if cable_name in json_cable_shapes:
-            coords = json_cable_shapes[cable_name]
+        if c_key in json_cable_shapes:
+            coords = json_cable_shapes[c_key]
             if coords:
                 start_pt, end_pt = coords[0], coords[-1]
                 if u and u not in node_coords:
@@ -278,16 +283,17 @@ def build_node_coords_from_json(df_cable, json_cable_shapes):
                     node_coords[v] = (end_pt[0], end_pt[1])
     return node_coords
 
-# Định hướng hướng tọa độ đi từ u sang v
+# Căn chỉnh hướng tọa độ cáp từ u đến v
 def get_oriented_cable_coords(cable_name, u_node, v_node, json_cable_shapes, node_coords):
-    if cable_name not in json_cable_shapes:
+    c_key = clean_key(cable_name)
+    if c_key not in json_cable_shapes:
         u_pt = node_coords.get(u_node)
         v_pt = node_coords.get(v_node)
         if u_pt and v_pt:
             return [u_pt, v_pt]
         return []
     
-    coords = list(json_cable_shapes[cable_name])
+    coords = list(json_cable_shapes[c_key])
     if len(coords) < 2:
         return coords
 
@@ -300,10 +306,10 @@ def get_oriented_cable_coords(cable_name, u_node, v_node, json_cable_shapes, nod
             
     return coords
 
-# Nội suy vị trí chính xác trên đường cáp JSON
+# Nội suy tọa độ chính xác từng mốc uốn lượn trên sợi cáp
 def interpolate_on_polyline(coords, target_offset):
     if not coords:
-        return None
+        return None, None
     if len(coords) == 1:
         return coords[0][0], coords[0][1]
 
@@ -323,22 +329,21 @@ def interpolate_on_polyline(coords, target_offset):
 try:
     df_cable = load_excel_cable()
     json_cable_shapes = load_all_json_cables(".")
-    # CHỈ LẤY TỌA ĐỘ TỪ CÁC FILE JSON
     json_node_coords = build_node_coords_from_json(df_cable, json_cable_shapes)
 except Exception as e:
     st.error(f"Lỗi khi tải dữ liệu: {e}")
     st.stop()
 
-# 5. Xây dựng đồ thị mạng cáp dựa hoàn toàn vào khoảng cách thực từ JSON
+# 5. Xây dựng đồ thị mạng cáp dựa vào chiều dài polyline JSON
 G = nx.Graph()
 for _, row in df_cable.iterrows():
     u = normalize_node(row['Điểm KN1'])
     v = normalize_node(row['Điểm KN2'])
     cable_name = str(row['Tên đoạn cáp']).strip()
+    c_key = clean_key(cable_name)
     
-    # Tính chiều dài thực tế từ chuỗi tọa độ chi tiết của file JSON
-    if cable_name in json_cable_shapes:
-        length = calculate_polyline_length(json_cable_shapes[cable_name])
+    if c_key in json_cable_shapes:
+        length = calculate_polyline_length(json_cable_shapes[c_key])
     else:
         try:
             length = float(row['Chiều dài thực (m)'])
@@ -458,7 +463,7 @@ with st.sidebar:
                 
                 fault_lat, fault_lng = interpolate_on_polyline(target_segment['coords'], offset)
 
-                if fault_lat and fault_lng:
+                if fault_lat is not None and fault_lng is not None:
                     st.success(f"⚠️ **Vị trí đứt nằm trong đoạn cáp:**\n\n**{cable_name}**\n\n({target_segment['u']} ➔ {target_segment['v']})")
                     
                     gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
@@ -474,9 +479,9 @@ with st.sidebar:
                         'target_dist': target_dist
                     }
                 else:
-                    st.warning("Thiếu dữ liệu tọa độ trong file JSON cho đoạn cáp này.")
+                    st.error(f"❌ Không tìm thấy dữ liệu tọa độ JSON cho đoạn cáp: **{cable_name}**")
 
-# 7. HIỂN THỊ BẢN ĐỒ DỰA TRÊN TOÀN BỘ DỮ LIỆU TỌA ĐỘ JSON
+# 7. HIỂN THỊ BẢN ĐỒ
 if map_data:
     m = folium.Map(
         location=[map_data['fault_lat'], map_data['fault_lng']], 
@@ -604,13 +609,13 @@ else:
         iconLoading="fa fa-spinner fa-spin"
     ).add_to(default_map)
 
-    for c_name, coords in json_cable_shapes.items():
+    for c_key, coords in json_cable_shapes.items():
         folium.PolyLine(
             coords,
             color="#2563EB",
             weight=4,
             opacity=0.7,
-            tooltip=f"Tuyến cáp: {c_name}"
+            tooltip=f"Tuyến cáp: {c_key}"
         ).add_to(default_map)
 
     apply_map_custom_css(default_map)
