@@ -7,9 +7,9 @@ import pandas as pd
 import streamlit as st
 import folium
 from folium import DivIcon
-from folium.plugins import LocateControl
+from folium.plugins import LocateControl, AntPath
 from streamlit_folium import st_folium
-import requests
+import streamlit.components.v1 as components
 from PIL import Image
 
 # 1. Cấu hình trang
@@ -139,19 +139,60 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-def apply_map_custom_css(folium_map):
-    font_awesome = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">'
-    folium_map.get_root().html.add_child(folium.Element(font_awesome))
+def apply_map_custom_css(folium_map, fault_lat=None, fault_lng=None):
+    font_awesome_link = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">'
+    folium_map.get_root().html.add_child(folium.Element(font_awesome_link))
 
-    custom_css = """
+    nav_script = ""
+    if fault_lat and fault_lng:
+        nav_script = f"""
+        <div style="position: absolute; top: 15px; left: 60px; z-index: 1000;">
+            <button onclick="navigateToFault()" style="
+                background-color: #059669;
+                color: white;
+                border: none;
+                padding: 10px 18px;
+                font-size: 14px;
+                font-weight: bold;
+                border-radius: 8px;
+                cursor: pointer;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            " onmouseover="this.style.backgroundColor='#047857'" onmouseout="this.style.backgroundColor='#059669'">
+                <i class="fa-solid fa-diamond-turn-right"></i> Chỉ đường từ GPS tới vị trí đứt
+            </button>
+        </div>
+        <script>
+        function navigateToFault() {{
+            if (navigator.geolocation) {{
+                navigator.geolocation.getCurrentPosition(function(position) {{
+                    var userLat = position.coords.latitude;
+                    var userLng = position.coords.longitude;
+                    var url = "https://www.google.com/maps/dir/?api=1&origin=" + userLat + "," + userLng + "&destination={fault_lat},{fault_lng}&travelmode=driving";
+                    window.open(url, '_blank');
+                }}, function(error) {{
+                    alert("Không thể lấy vị trí hiện tại của bạn. Mở định vị mặc định.");
+                    var fallbackUrl = "https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}";
+                    window.open(fallbackUrl, '_blank');
+                }}, {{ enableHighAccuracy: true, timeout: 10000 }});
+            }} else {{
+                alert("Trình duyệt không hỗ trợ Geolocation!");
+            }}
+        }}
+        </script>
+        """
+
+    custom_css = f"""
     <style>
-    .leaflet-control-zoom { display: none !important; }
-    .leaflet-control-locate {
+    .leaflet-control-zoom {{ display: none !important; }}
+    .leaflet-control-locate {{
         margin-top: 70px !important;
         margin-left: 10px !important;
         border: none !important;
-    }
-    .leaflet-control-locate a {
+    }}
+    .leaflet-control-locate a {{
         background-color: #2563EB !important;
         color: #FFFFFF !important;
         border-radius: 8px !important;
@@ -162,40 +203,23 @@ def apply_map_custom_css(folium_map):
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-    }
+    }}
     .leaflet-control-locate a span.fa,
-    .leaflet-control-locate a span.fas {
+    .leaflet-control-locate a span.fas {{
         font-size: 16px !important;
         color: #FFFFFF !important;
-    }
-    .leaflet-control-layers {
+    }}
+    .leaflet-control-layers {{
         margin-top: 70px !important;
         margin-right: 10px !important;
         border-radius: 8px !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    }
+    }}
     </style>
+    {nav_script}
     """
     folium_map.get_root().html.add_child(folium.Element(custom_css))
-
-# Hàm gọi API OSRM để lấy đường đi giao thông đường bộ
-@st.cache_data(show_spinner=False)
-def get_osrm_route(start_lat, start_lng, end_lat, end_lng):
-    try:
-        url = f"http://router.project-osrm.org/route/v1/driving/{start_lng},{start_lat};{end_lng},{end_lat}?overview=full&geometries=geojson"
-        res = requests.get(url, timeout=5)
-        if res.status_code == 200:
-            data = res.json()
-            if data.get("routes"):
-                coords = data["routes"][0]["geometry"]["coordinates"]
-                # Đổi thứ tự từ [lng, lat] thành [lat, lng] cho Folium
-                route_lat_lng = [[pt[1], pt[0]] for pt in coords]
-                distance_m = data["routes"][0]["distance"]
-                return route_lat_lng, distance_m
-    except Exception:
-        pass
-    return None, None
 
 # 3. Tải dữ liệu Excel & JSON
 @st.cache_data
@@ -259,6 +283,7 @@ except Exception as e:
     st.error(f"Lỗi khi tải dữ liệu: {e}")
     st.stop()
 
+# Chuẩn hóa tên tập điểm
 def normalize_node(node_str):
     if pd.isna(node_str):
         return ""
@@ -442,43 +467,12 @@ with st.sidebar:
                 if fault_lat and fault_lng:
                     st.success(f"⚠️ **Vị trí đứt nằm trong đoạn cáp:**\n\n**{cable_name}**\n\n({target_segment['u']} ➔ {target_segment['v']})")
                     
-                    st.markdown("---")
-                    st.subheader("🧭 Chỉ Đường Di Chuyển")
-                    
-                    # Cho phép chọn điểm bắt đầu để chỉ đường
-                    start_option = st.radio(
-                        "Điểm xuất phát:",
-                        options=[f"TĐ Đo ({td_a})", "Tọa độ tùy ý (Lat, Lng)"],
-                        index=0
-                    )
-                    
-                    start_lat, start_lng = None, None
-                    if start_option.startswith("TĐ Đo"):
-                        if td_a in hdn_coords:
-                            start_lat, start_lng = hdn_coords[td_a]
-                        else:
-                            st.warning(f"Không tìm thấy tọa độ của {td_a}!")
-                    else:
-                        custom_coords_str = st.text_input("Nhập tọa độ (Lat, Lng):", value=f"{fault_lat:.6f}, {fault_lng:.6f}")
-                        try:
-                            parts = custom_coords_str.split(',')
-                            start_lat, start_lng = float(parts[0].strip()), float(parts[1].strip())
-                        except Exception:
-                            st.error("Định dạng tọa độ không hợp lệ!")
-
-                    draw_route = st.checkbox("Vẽ lộ trình đường đi tới điểm đứt", value=True)
-
                     gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
-                    if start_lat and start_lng:
-                        gmaps_url = f"https://www.google.com/maps/dir/?api=1&origin={start_lat},{start_lng}&destination={fault_lat},{fault_lng}&travelmode=driving"
-                    
-                    st.link_button("🚀 Mở chỉ đường bằng App Google Maps", gmaps_url, type="primary", use_container_width=True)
+                    st.link_button("📍 Mở trên Google Maps", gmaps_url, type="primary", use_container_width=True)
 
                     map_data = {
                         'fault_lat': fault_lat,
                         'fault_lng': fault_lng,
-                        'start_lat': start_lat if draw_route else None,
-                        'start_lng': start_lng if draw_route else None,
                         'node_path': node_path,
                         'cable_segments': cable_segments,
                         'td_a': td_a,
@@ -522,49 +516,32 @@ if map_data:
     
     folium.LayerControl().add_to(m)
 
-    # 1. Vẽ lộ trình giao thông thực tế nối từ Điểm xuất phát -> Vị trí đứt (Đường màu Xanh Lam Đậm)
-    if map_data['start_lat'] and map_data['start_lng']:
-        route_coords, route_dist = get_osrm_route(
-            map_data['start_lat'], map_data['start_lng'],
-            map_data['fault_lat'], map_data['fault_lng']
-        )
-        if route_coords:
-            folium.PolyLine(
-                route_coords,
-                color="#0284C7",
-                weight=7,
-                opacity=0.9,
-                tooltip=f"Lộ trình di chuyển đường bộ (~{route_dist/1000:.2f} km)"
-            ).add_to(m)
-            
-            # Marker Điểm Xuất Phát
-            folium.Marker(
-                [map_data['start_lat'], map_data['start_lng']],
-                popup="Điểm xuất phát",
-                tooltip="Điểm xuất phát",
-                icon=folium.Icon(color="blue", icon="car", prefix="fa")
-            ).add_to(m)
-
-    # 2. Hiển thị các đoạn cáp viễn thông (Đường màu Cam)
-    has_json_path = False
+    # Hiển thị lộ trình bằng AntPath (Hiệu ứng dòng chảy di chuyển đến điểm đứt)
+    full_route_coords = []
     for seg in map_data['cable_segments']:
         c_name = seg['cable']
         if c_name in json_cable_shapes:
-            has_json_path = True
-            folium.PolyLine(
-                json_cable_shapes[c_name],
-                color="#FF5F1F",
-                weight=5,
-                opacity=0.85,
-                tooltip=f"Đoạn cáp: {c_name}"
-            ).add_to(m)
+            full_route_coords.extend(json_cable_shapes[c_name])
+        else:
+            u_coord = hdn_coords.get(seg['u'])
+            v_coord = hdn_coords.get(seg['v'])
+            if u_coord:
+                full_route_coords.append(u_coord)
+            if v_coord:
+                full_route_coords.append(v_coord)
 
-    if not has_json_path:
-        path_coords = [hdn_coords[n] for n in map_data['node_path'] if n in hdn_coords]
-        if len(path_coords) > 1:
-            folium.PolyLine(path_coords, color="#FF5F1F", weight=5, opacity=0.85, tooltip="Tuyến cáp").add_to(m)
+    if full_route_coords:
+        AntPath(
+            locations=full_route_coords,
+            color="#FF5F1F",
+            pulse_color="#FFFFFF",
+            weight=6,
+            opacity=0.9,
+            delay=1000,
+            tooltip="Lộ trình cáp mạng"
+        ).add_to(m)
 
-    # 3. Hiển thị Marker và Nhãn tên TĐ
+    # Hiển thị Marker và Nhãn tên TĐ
     for node in map_data['node_path']:
         if node in hdn_coords:
             coord = hdn_coords[node]
@@ -607,7 +584,7 @@ if map_data:
                 )
             ).add_to(m)
 
-    # 4. Marker Vị trí đứt cáp (Màu Đỏ)
+    # Marker Vị trí đứt cáp (Màu Đỏ)
     folium.Marker(
         [map_data['fault_lat'], map_data['fault_lng']],
         popup=f"Vị trí đứt cáp: {map_data['target_dist']}m từ {map_data['td_a']}",
@@ -615,7 +592,7 @@ if map_data:
         icon=folium.Icon(color="red", icon="wrench", prefix="fa")
     ).add_to(m)
 
-    apply_map_custom_css(m)
+    apply_map_custom_css(m, fault_lat=map_data['fault_lat'], fault_lng=map_data['fault_lng'])
     st_folium(m, width="100%", height=1000, key="fault_map")
 else:
     init_lat, init_lng = 21.0285, 105.8542
