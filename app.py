@@ -90,12 +90,6 @@ st.markdown("""
         color: #1D4ED8;
         line-height: 1.6;
     }
-    .result-item {
-        margin-bottom: 6px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
     .result-divider {
         border: 0;
         height: 1px;
@@ -301,14 +295,29 @@ if 'search_performed' not in st.session_state:
 
 map_data = None
 
-# 5. GIAO DIỆN BÊN TRÁI & TỐI ƯU THUẬT TOÁN LỌC TĐ
+# 5. GIAO DIỆN BÊN TRÁI
 with st.sidebar:
     current_dir = os.path.dirname(os.path.abspath(__file__)) if '__file__' in globals() else os.getcwd()
     logo_path = os.path.join(current_dir, "FPT_Telecom_logo.png")
+    
+    # CSS thu nhỏ logo và đẩy lên sát mép trên
+    st.markdown(
+        """
+        <style>
+            [data-testid="stSidebar"] [data-testid="stImage"] {
+                margin-top: -30px !important;
+                margin-bottom: -10px !important;
+                text-align: center;
+            }
+        </style>
+        """, 
+        unsafe_allow_html=True
+    )
+
     if os.path.exists(logo_path):
-        st.image(Image.open(logo_path), use_container_width=True)
+        st.image(Image.open(logo_path), width=120)
     else:
-        st.image("https://upload.wikimedia.org/wikipedia/commons/1/11/FPT_Telecom_logo.svg", width=220)
+        st.image("https://upload.wikimedia.org/wikipedia/commons/1/11/FPT_Telecom_logo.svg", width=120)
 
     st.title("📍XÁC ĐỊNH ĐIỂM ĐỨT")
     st.markdown("---")
