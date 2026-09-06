@@ -117,13 +117,13 @@ st.markdown("""
         border: none !important;
     }
 
-    /* 8. DI CHUYỂN NÚT ZOOM (+ / -) XUỐNG DƯỚI GÓC DƯỚI BÊN PHẢI */
+    /* 8. DI CHUYỂN NÚT ZOOM (+ / -) XUỐNG GÓC DƯỚI BÊN TRÁI */
     .leaflet-control-zoom {
         position: fixed !important;
         bottom: 25px !important;
-        right: 25px !important;
+        left: 25px !important;
+        right: auto !important;
         top: auto !important;
-        left: auto !important;
         z-index: 9999 !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
         border-radius: 8px !important;
@@ -326,7 +326,7 @@ with st.sidebar:
                 else:
                     st.warning("Thiếu dữ liệu tọa độ Lat/Lng cho đoạn cáp chứa vị trí đứt.")
 
-# 7. BẢN ĐỒ FULL TRÀN VIỀN BÊN PHẢI (Cấu hình zoomControl='bottomright')
+# 7. BẢN ĐỒ FULL TRÀN VIỀN BÊN PHẢI
 if map_data:
     m = folium.Map(
         location=[map_data['fault_lat'], map_data['fault_lng']], 
