@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS: Tùy biến giao diện & Vị trí các nút điều khiển bản đồ
+# 2. Inject CSS: Tùy biến vị trí nút Zoom (+ / -) và giao diện
 st.markdown("""
     <style>
     /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
@@ -117,76 +117,17 @@ st.markdown("""
         border: none !important;
     }
 
-    /* 8. CẤU HÌNH VỊ TRÍ CÁC NÚT Ở GÓC DƯỚI BÊN PHẢI */
-    
-    /* Move & Custom Nút Định vị (Locate) sang góc dưới bên phải */
-    .leaflet-control-locate {
-        position: fixed !important;
-        bottom: 165px !important;
-        right: 20px !important;
-        top: auto !important;
-        left: auto !important;
-        z-index: 9999 !important;
-        margin: 0 !important;
-    }
-
-    /* Thiết lập khung nút bấm Locate */
-    .leaflet-control-locate a {
-        background-color: #1E293B !important;
-        border-radius: 8px !important;
-        width: 36px !important;
-        height: 36px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-        text-decoration: none !important;
-        border: none !important;
-    }
-
-    .leaflet-control-locate a:hover {
-        background-color: #2563EB !important;
-    }
-
-    /* Ẩn hoàn toàn icon FontAwesome/Glyphicon gốc */
-    .leaflet-control-locate a span, 
-    .leaflet-control-locate a i,
-    .leaflet-control-locate a .fa,
-    .leaflet-control-locate a .glyphicon {
-        display: none !important;
-    }
-
-    /* Thay thế biểu tượng bằng emoji 🎯 */
-    .leaflet-control-locate a::after {
-        content: "🎯" !important;
-        font-size: 18px !important;
-        display: block !important;
-        line-height: 1 !important;
-    }
-
-    /* Nút Chuyển Layer Map - Ở giữa (Dưới nút Định vị) */
-    .leaflet-control-layers {
-        position: fixed !important;
-        bottom: 105px !important;
-        right: 20px !important;
-        top: auto !important;
-        left: auto !important;
-        z-index: 9999 !important;
-        margin: 0 !important;
-    }
-
-    /* Nút Zoom (+ / -) - Ở dưới cùng */
+    /* 8. DI CHUYỂN NÚT ZOOM (+ / -) XUỐNG DƯỚI GÓC DƯỚI BÊN PHẢI */
     .leaflet-control-zoom {
         position: fixed !important;
-        bottom: 20px !important;
-        right: 20px !important;
+        bottom: 25px !important;
+        right: 25px !important;
         top: auto !important;
         left: auto !important;
         z-index: 9999 !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
         border-radius: 8px !important;
         overflow: hidden !important;
-        margin: 0 !important;
     }
 
     .leaflet-control-zoom a {
@@ -385,7 +326,7 @@ with st.sidebar:
                 else:
                     st.warning("Thiếu dữ liệu tọa độ Lat/Lng cho đoạn cáp chứa vị trí đứt.")
 
-# 7. BẢN ĐỒ FULL TRÀN VIỀN BÊN PHẢI
+# 7. BẢN ĐỒ FULL TRÀN VIỀN BÊN PHẢI (Cấu hình zoomControl='bottomright')
 if map_data:
     m = folium.Map(
         location=[map_data['fault_lat'], map_data['fault_lng']], 
@@ -443,6 +384,5 @@ else:
         overlay=False,
         control=False
     ).add_to(default_map)
-
     LocateControl(auto_start=False, flyTo=True).add_to(default_map)
     st_folium(default_map, width="100%", height=1000, key="default_map")
