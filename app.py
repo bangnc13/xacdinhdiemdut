@@ -119,7 +119,6 @@ def load_all_json_cable_shapes(search_pattern="*.json"):
             st.warning(f"Lỗi khi đọc file JSON {json_file_path}: {e}")
     return cable_shapes
 
-# API OSRM - Bám sát tuyến đường bộ / xe máy
 @st.cache_data
 def get_osrm_route(lat1, lon1, lat2, lon2):
     try:
@@ -166,7 +165,6 @@ def calculate_polyline_length(coords):
         total += haversine(coords[i][0], coords[i][1], coords[i+1][0], coords[i+1][1])
     return total
 
-# THUẬT TOÁN ĐIỀU CHỈNH HƯỚNG VÀ CO GIÃN THEO CHIỀU ĐÀI KHAI BÁO EXCEL
 def process_segment_geometry(raw_coords, u_coord, v_coord, target_length):
     if not raw_coords:
         if u_coord and v_coord:
@@ -174,18 +172,14 @@ def process_segment_geometry(raw_coords, u_coord, v_coord, target_length):
         else:
             return []
 
-    # 1. Định hướng đường cáp đi đúng từ U -> V
     if u_coord:
         d_start = haversine(u_coord[0], u_coord[1], raw_coords[0][0], raw_coords[0][1])
         d_end = haversine(u_coord[0], u_coord[1], raw_coords[-1][0], raw_coords[-1][1])
         if d_end < d_start:
             raw_coords = list(reversed(raw_coords))
 
-    # 2. Xử lý trường hợp hình chữ nhật / vòng lặp:
-    # Nếu tuyến tạo thành vòng lặp closed-loop hoặc hình chữ nhật
     first_p, last_p = raw_coords[0], raw_coords[-1]
     if haversine(first_p[0], first_p[1], last_p[0], last_p[1]) < 20.0 and len(raw_coords) > 4:
-        # Tách tuyến thành 2 hướng (hướng trên / hướng dưới)
         mid_idx = len(raw_coords) // 2
         path_top = raw_coords[:mid_idx+1]
         path_bottom = raw_coords[mid_idx:] + [raw_coords[0]]
@@ -193,7 +187,6 @@ def process_segment_geometry(raw_coords, u_coord, v_coord, target_length):
         len_top = calculate_polyline_length(path_top)
         len_bottom = calculate_polyline_length(path_bottom)
         
-        # Chọn đường có độ dài sát nhất với chiều dài khai báo Excel
         if abs(len_top - target_length) < abs(len_bottom - target_length):
             raw_coords = path_top
         else:
@@ -264,7 +257,7 @@ if 'search_performed' not in st.session_state:
 map_data = None
 all_nodes = sorted(list(G.nodes()))
 
-# 6. MENU BÊN TRÁI
+# 6. MENU BÊN TRÁI - THUẬT TOÁN LỌC CHÍNH XÁC TĐ ĐẾN
 with st.sidebar:
     current_dir = os.path.dirname(os.path.abspath(__file__)) if '__file__' in globals() else os.getcwd()
     logo_path = os.path.join(current_dir, "FPT_Telecom_logo.png")
@@ -278,13 +271,21 @@ with st.sidebar:
     
     selected_td_a = st.selectbox("Nhập / Chọn TĐ Đo:", options=all_nodes, index=0 if all_nodes else None)
     
+    # === THUẬT TOÁN LỌC TẬP ĐIỂM ĐẾN LIÊN KẾT ===
     related_nodes = []
     if selected_td_a and G.has_node(selected_td_a):
-        related_nodes = sorted(list(nx.node_connected_component(G, selected_td_a)))
-        related_nodes = [node for node in related_nodes if node != selected_td_a]
+        # 1. Thuật toán lấy thành phần thông suốt (Connected Component) trong Đồ thị
+        connected_component = nx.node_connected_component(G, selected_td_a)
+        
+        # 2. Loại bỏ chính TĐ Đo khỏi danh sách đích đến
+        related_nodes = sorted([node for node in connected_component if node != selected_td_a])
 
     if related_nodes:
-        selected_td_b = st.selectbox("Chọn TĐ Đến (Đã lọc theo TĐ Đo):", options=related_nodes, index=0)
+        selected_td_b = st.selectbox(
+            f"Chọn TĐ Đến ({len(related_nodes)} TĐ có liên kết):", 
+            options=related_nodes, 
+            index=0
+        )
     else:
         selected_td_b = st.selectbox("Chọn TĐ Đến:", options=["Không có tập điểm liên quan"], disabled=True)
 
