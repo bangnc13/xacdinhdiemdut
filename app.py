@@ -14,17 +14,17 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS: Ẩn thanh Header Streamlit + Tạo Sidebar trong suốt Blur + Full Screen Map
+# 2. Inject CSS: Tinh chỉnh màu chữ Menu sang MÀU CAM + Tùy biến Sidebar Blur
 st.markdown("""
     <style>
-    /* 1. ẨN HOÀN TOÀN THANH HEADER TRÊN CÙNG (Biểu tượng GitHub, Fork, Deploy, Menu 3 chấm...) */
+    /* 1. ẨN HOÀN TOÀN THANH HEADER TRÊN CÙNG */
     header[data-testid="stHeader"] {
         display: none !important;
     }
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* 2. LOẠI BỎ PADDING CỦA MÀN HÌNH CHÍNH ĐỂ MAP TRÀN SÁT MÉP TRÊN VÀ CÁC CẠNH */
+    /* 2. BẢN ĐỒ TRÀN SÁT CÁC CẠNH MÀN HÌNH */
     .block-container {
         padding-top: 0rem !important;
         padding-bottom: 0rem !important;
@@ -35,35 +35,66 @@ st.markdown("""
 
     /* 3. MENU BÊN TRÁI (SIDEBAR) TRONG SUỐT VỚI HIỆU ỨNG BLUR KÍNH MỜ */
     [data-testid="stSidebar"] {
-        background: rgba(15, 23, 42, 0.45) !important; /* Nền trong suốt 45% */
-        backdrop-filter: blur(16px) saturate(180%) !important; /* Hiệu ứng mờ đục blur */
+        background: rgba(15, 23, 42, 0.55) !important;
+        backdrop-filter: blur(16px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-right: 1px solid rgba(255, 140, 0, 0.3) !important;
     }
 
-    /* Đổi màu chữ và nhãn trong Sidebar cho dễ đọc trên nền trong suốt */
-    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, 
-    [data-testid="stSidebar"] label, [data-testid="stSidebar"] .stMarkdown {
-        color: #ffffff !important;
-        text-shadow: 0 1px 3px rgba(0,0,0,0.6);
-    }
-
-    /* Ô nhập dữ liệu trong Sidebar */
-    [data-testid="stSidebar"] input {
-        background-color: rgba(255, 255, 255, 0.12) !important;
-        color: #ffffff !important;
-        border: 1px solid rgba(255, 255, 255, 0.25) !important;
-        border-radius: 8px !important;
-    }
-
-    /* Style nút bấm */
-    .stButton > button, .stLinkButton > a {
-        border-radius: 8px !important;
+    /* 4. ĐỔI MÀU CHỮ TRÊN MENU THÀNH MÀU CAM (#FF8C00 & #FFA500) */
+    [data-testid="stSidebar"] h1, 
+    [data-testid="stSidebar"] h2, 
+    [data-testid="stSidebar"] h3, 
+    [data-testid="stSidebar"] label, 
+    [data-testid="stSidebar"] .stMarkdown,
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] span {
+        color: #FF8C00 !important; /* Màu cam chính */
         font-weight: 600 !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    }
+
+    /* Đổi màu tiêu đề chính thành cam sáng hơn */
+    [data-testid="stSidebar"] h1 {
+        color: #FF7A00 !important;
+    }
+
+    /* 5. Ô NHẬP DỮ LIỆU BÊN SIDEBAR: VIỀN VÀ CHỮ KHI NHẬP MÀU CAM */
+    [data-testid="stSidebar"] input {
+        background-color: rgba(0, 0, 0, 0.3) !important;
+        color: #FF9F29 !important;
+        border: 1px solid rgba(255, 140, 0, 0.5) !important;
+        border-radius: 8px !important;
     }
     
-    /* Bản đồ tràn viền tuyệt đối */
+    [data-testid="stSidebar"] input:focus {
+        border-color: #FF7A00 !important;
+        box-shadow: 0 0 8px rgba(255, 122, 0, 0.6) !important;
+    }
+
+    /* 6. STYLE NÚT BẤM VÀ ĐƯỜNG KẺ GẠCH MÀU CAM */
+    [data-testid="stSidebar"] hr {
+        border-color: rgba(255, 140, 0, 0.4) !important;
+    }
+
+    .stButton > button {
+        background-color: #FF7A00 !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-weight: bold !important;
+        box-shadow: 0 4px 12px rgba(255, 122, 0, 0.3) !important;
+    }
+    
+    .stButton > button:hover {
+        background-color: #E06B00 !important;
+    }
+
+    .stLinkButton > a {
+        border-radius: 8px !important;
+        font-weight: bold !important;
+    }
+
     iframe {
         border: none !important;
     }
@@ -128,7 +159,7 @@ for _, row in df_hdn.iterrows():
 if 'search_performed' not in st.session_state:
     st.session_state.search_performed = False
 
-# 6. MENU DẠNG DỌC BÊN TRÁI (SIDEBAR) TRONG SUỐT BLUR
+# 6. MENU DẠNG DỌC BÊN TRÁI (SIDEBAR) VỚI CHỮ MÀU CAM
 with st.sidebar:
     st.title("📍 Cấu Hình Sự Cố")
     st.markdown("---")
@@ -144,7 +175,7 @@ with st.sidebar:
         st.session_state.td_b = normalize_node(td_b_input)
         st.session_state.target_dist = target_dist_input
 
-    # KHU VỰC HIỂN THỊ KẾT QUẢ NGAY TRONG SIDEBAR
+    # KHU VỰC HIỂN THỊ KẾT QUẢ
     map_data = None
     
     if st.session_state.search_performed:
@@ -205,7 +236,7 @@ with st.sidebar:
 
                     st.success(f"⚠️ **Đoạn cáp đứt:**\n\n**{target_segment['cable']}**\n\n({target_segment['u']} ➔ {target_segment['v']})")
 
-                    # Nút mở Google Maps dẫn đường trong Sidebar
+                    # Nút mở Google Maps chỉ đường
                     gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
                     st.link_button("🚗 Chỉ đường Google Maps", gmaps_url, type="primary", use_container_width=True)
 
@@ -220,7 +251,7 @@ with st.sidebar:
                 else:
                     st.warning("Thiếu dữ liệu tọa độ Lat/Lng cho đoạn cáp chứa vị trí đứt.")
 
-# 7. HIỂN THỊ BẢN ĐỒ FULL TRÀN CẠNH TRÊN VÀ TOÀN MÀN HÌNH
+# 7. BẢN ĐỒ FULL TRÀN VIỀN BÊN PHẢI
 if map_data:
     m = folium.Map(
         location=[map_data['fault_lat'], map_data['fault_lng']], 
@@ -269,10 +300,8 @@ if map_data:
         icon=folium.Icon(color="red", icon="wrench", prefix="fa")
     ).add_to(m)
 
-    # Render bản đồ tràn cạnh trên màn hình (Chiều cao 1000px)
     st_folium(m, width="100%", height=1000, key="fault_map")
 else:
-    # Màn hình mặc định tràn viền sát cạnh trên
     default_map = folium.Map(
         location=[21.0285, 105.8542],
         zoom_start=12,
