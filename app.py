@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS: Tinh chỉnh giao diện Sidebar & Màu sắc
+# 2. Inject CSS & JavaScript: Nút bấm Ẩn/Hiện Sidebar trên màn hình Map
 st.markdown("""
     <style>
     /* 1. ẨN HOÀN TOÀN THANH HEADER TRÊN CÙNG */
@@ -39,6 +39,7 @@ st.markdown("""
         backdrop-filter: blur(16px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
         border-right: 1px solid rgba(59, 130, 246, 0.4) !important;
+        z-index: 999998 !important;
     }
 
     /* 4. ĐỔI MÀU CHỮ TRÊN MENU THÀNH MÀU XANH DƯƠNG */
@@ -66,7 +67,33 @@ st.markdown("""
         border-radius: 8px !important;
     }
 
-    /* 6. STYLE NÚT BẤM VÀ ĐƯỜNG KẺ GẠCH MÀU XANH DƯƠNG */
+    /* 6. NÚT NỔI ẨN/HIỆN MENU TRÊN MÀN HÌNH BẢN ĐỒ */
+    .toggle-menu-btn {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 999999;
+        background-color: #2563EB;
+        color: white;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        transition: all 0.2s ease-in-out;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .toggle-menu-btn:hover {
+        background-color: #1D4ED8;
+        transform: scale(1.05);
+    }
+
+    /* STYLE NÚT BẤM VÀ ĐƯỜNG KẺ GẠCH MÀU XANH DƯƠNG */
     [data-testid="stSidebar"] hr {
         border-color: rgba(59, 130, 246, 0.4) !important;
     }
@@ -99,6 +126,26 @@ st.markdown("""
         border: none !important;
     }
     </style>
+
+    <!-- HTML & JavaScript tạo nút Toggle Menu trên bản đồ -->
+    <button class="toggle-menu-btn" onclick="toggleSidebar()">
+        ☰ Ẩn / Hiện Menu
+    </button>
+
+    <script>
+    function toggleSidebar() {
+        const sidebar = window.parent.document.querySelector('[data-testid="stSidebar"]');
+        if (sidebar) {
+            if (sidebar.style.display === "none" || sidebar.style.visibility === "hidden") {
+                sidebar.style.display = "block";
+                sidebar.style.visibility = "visible";
+            } else {
+                sidebar.style.display = "none";
+                sidebar.style.visibility = "hidden";
+            }
+        }
+    }
+    </script>
 """, unsafe_allow_html=True)
 
 # 3. Tải dữ liệu Excel
@@ -161,7 +208,7 @@ if 'search_performed' not in st.session_state:
 
 map_data = None
 
-# Danh sách tất cả tập điểm có trong mạng cáp
+# Danh sách tất cả tập điểm
 all_nodes = sorted(list(G.nodes()))
 
 # 6. MENU DẠNG DỌC BÊN TRÁI (SIDEBAR)
@@ -169,22 +216,20 @@ with st.sidebar:
     st.title("📍 TOOL XÁC ĐỊNH SỰ CỐ")
     st.markdown("---")
     
-    # 1. Ô Chọn/Nhập TĐ Đo
+    # Ô Chọn TĐ Đo
     selected_td_a = st.selectbox(
         "Nhập / Chọn TĐ Đo:",
         options=all_nodes,
         index=0 if all_nodes else None
     )
     
-    # 2. Tự động tìm các tập điểm liên quan đến TĐ Đo được chọn
+    # Lọc danh sách tập điểm liên quan
     related_nodes = []
     if selected_td_a and G.has_node(selected_td_a):
-        # Lấy tất cả các đỉnh kết nối thuộc cùng một nhánh liên thông với TĐ Đo
         related_nodes = sorted(list(nx.node_connected_component(G, selected_td_a)))
-        # Loại bỏ chính TĐ Đo khỏi danh sách chọn TĐ Đến
         related_nodes = [node for node in related_nodes if node != selected_td_a]
 
-    # 3. Ô Chọn TĐ Đến (Chỉ hiển thị các tập điểm có liên kết)
+    # Ô Chọn TĐ Đến
     if related_nodes:
         selected_td_b = st.selectbox(
             "Chọn TĐ Đến (Đã lọc theo TĐ Đo):",
