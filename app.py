@@ -211,23 +211,46 @@ def interpolate_on_polyline_scaled(coords, target_offset, decl_length):
         accumulated += seg_len
     return coords[-1][0], coords[-1][1]
 
-# 4. Đồ thị mạng cáp (Đã thêm lấy Dung lượng từ Cột F)
+# 4. ĐỒ THỊ MẠNG CÁP - SỬA LỖI ĐỌC DUNG LƯỢNG CỘT F
 G = nx.Graph()
 for _, row in df_cable.iterrows():
     u = normalize_node(row['Điểm KN1'])
     v = normalize_node(row['Điểm KN2'])
     cable_name = str(row['Tên đoạn cáp']).strip()
     
-    try: length = float(row['Chiều dài thực (m)'])
-    except: length = 0.0
+    try: 
+        length = float(row['Chiều dài thực (m)'])
+    except: 
+        length = 0.0
     
-    # Lấy thông tin dung lượng từ Cột F (Cột thứ 6, index 5)
-    capacity = row.iloc[5] if len(row) > 5 else row.get('Dung lượng', 'N/A')
-    if pd.isna(capacity): 
-        capacity = 'Không xác định'
+    # Kỹ thuật đa tầng bẫy dữ liệu Dung Lượng Cột F:
+    capacity_val = None
+    
+    # 1. Tìm theo tên cột có sẵn
+    possible_cols = ['Dung lượng', 'DUNG_LUONG', 'Dung luong', 'Dung Lượng', 'Cap']
+    for col in possible_cols:
+        if col in df_cable.columns:
+            capacity_val = row[col]
+            break
+            
+    # 2. Nếu không thấy theo tên, ép lấy theo vị trí Cột F (Index 5)
+    if capacity_val is None and len(row) > 5:
+        capacity_val = row.iloc[5]
+
+    # 3. Làm sạch giá trị hiển thị
+    if pd.isna(capacity_val) or str(capacity_val).strip() == "":
+        capacity_str = "Chưa cập nhật"
+    else:
+        # Nếu dạng số thực (VD: 24.0) thì chuyển thành số nguyên (24)
+        if isinstance(capacity_val, float) and capacity_val.is_integer():
+            capacity_str = f"{int(capacity_val)} FO"
+        else:
+            capacity_str = f"{str(capacity_val).strip()}"
+            if not any(unit in capacity_str.lower() for unit in ['fo', 'f', 'sợi', 'soi']):
+                capacity_str += " FO"
 
     if u and v: 
-        G.add_edge(u, v, cable=cable_name, length=length, capacity=capacity)
+        G.add_edge(u, v, cable=cable_name, length=length, capacity=capacity_str)
 
 # 5. Tọa độ HĐN
 df_hdn['Lat_clean'] = pd.to_numeric(df_hdn['Lat'].astype(str).str.replace(',', '.'), errors='coerce')
@@ -304,7 +327,7 @@ with st.sidebar:
                     'v': v, 
                     'cable': edge_data['cable'], 
                     'length': seg_len, 
-                    'capacity': edge_data.get('capacity', 'N/A'),
+                    'capacity': edge_data.get('capacity', 'Chưa cập nhật'),
                     'start_dist': start_d, 
                     'end_dist': accumulated_dist
                 }
