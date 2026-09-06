@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS: Tùy biến giao diện, ẩn Zoom, Fix Icon & Di chuyển nút định vị xuống dưới nút menu
+# 2. Inject CSS: Tùy biến giao diện, ẩn Zoom, Fix Icon & Đặt nút định vị góc dưới bên trái
 st.markdown("""
     <!-- Load FontAwesome 6 để hiển thị icon định vị chính xác -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -125,11 +125,13 @@ st.markdown("""
         display: none !important;
     }
 
-    /* 9. DI CHUYỂN NÚT ĐỊNH VỊ XUỐNG THẤP HƠN NÚT TOGGLE MENU (TOP: 130PX) */
+    /* 9. CHUYỂN NÚT ĐỊNH VỊ XUỐNG GÓC DƯỚI BÊN TRÁI (KHÔNG BAO GIỜ BỊ CHỒNG) */
     .leaflet-control-locate {
         position: fixed !important;
-        top: 130px !important;      /* Tăng khoảng cách xuống 130px để hoàn toàn không chạm nút Menu */
+        bottom: 30px !important;     /* Đặt ở góc dưới */
         left: 20px !important;       /* Căn lề trái sát viền */
+        top: auto !important;        /* Hủy bỏ vị trí top cũ */
+        right: auto !important;
         z-index: 99999 !important;
         border: none !important;
     }
@@ -140,8 +142,8 @@ st.markdown("""
         border-radius: 8px !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        width: 38px !important;
-        height: 38px !important;
+        width: 40px !important;
+        height: 40px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -150,7 +152,7 @@ st.markdown("""
 
     .leaflet-control-locate a:hover {
         background-color: #1D4ED8 !important;
-        transform: scale(1.05);
+        transform: scale(1.08);
     }
 
     /* Styling icon bên trong */
