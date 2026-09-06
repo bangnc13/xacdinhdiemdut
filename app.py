@@ -64,6 +64,44 @@ st.markdown("""
         color: #1D4ED8 !important;
         font-weight: 700 !important;
     }
+    
+    /* CSS cho Ô kết quả phân tích động */
+    .result-card {
+        background: #EFF6FF;
+        border-left: 5px solid #2563EB;
+        border-radius: 12px;
+        padding: 16px 20px;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+        height: fit-content;
+        margin-bottom: 16px;
+        font-family: system-ui, -apple-system, sans-serif;
+    }
+    .result-header {
+        font-size: 15px;
+        font-weight: 700;
+        color: #1E40AF;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .result-body {
+        font-size: 14px;
+        color: #1D4ED8;
+        line-height: 1.6;
+    }
+    .result-item {
+        margin-bottom: 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .result-divider {
+        border: 0;
+        height: 1px;
+        background: #BFDBFE;
+        margin: 12px 0;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -366,24 +404,26 @@ with st.sidebar:
                 if fault_lat and fault_lng:
                     st.markdown(
                         f"""
-                        <div style="
-                            background-color: #D1FAE5; 
-                            border: 1px solid #10B981; 
-                            border-radius: 8px; 
-                            padding: 16px; 
-                            color: #1D4ED8; 
-                            font-weight: 600;
-                            margin-bottom: 16px;
-                        ">
-                        ⚠️ <b>Vị trí đứt nằm trong đoạn cáp:</b><br><br>
-                        <b>{cable_name}</b><br><br>
-                        📍 <b>Lộ trình đoạn:</b> {target_segment['u']} ➔ {target_segment['v']}<br><br>
-                        📏 <b>Chiều dài đoạn cáp lỗi:</b> {target_segment['length']:.1f} m<br><br>
-                        🔌 <b>Dung lượng đoạn cáp:</b> {target_segment['capacity']}<br><br>
-                        <hr style="border-top: 1px solid #1D4ED8;">
-                        🎯 <b>Chi tiết vị trí điểm đứt:</b><br>
-                        - Cách <b>{target_segment['u']}</b> (Đầu đoạn): <b>{offset_from_u:.1f} m</b><br>
-                        - Cách <b>{target_segment['v']}</b> (Cuối đoạn): <b>{offset_from_v:.1f} m</b>
+                        <div class="result-card">
+                            <div class="result-header">
+                                ⚠️ VỊ TRÍ ĐỨT TRÊN ĐOẠN CÁP
+                            </div>
+                            <div class="result-body">
+                                <div style="font-size: 16px; font-weight: 800; color: #1E3A8A; margin-bottom: 8px;">
+                                    {cable_name}
+                                </div>
+                                <div><b>📍 Lộ trình:</b> {target_segment['u']} ➔ {target_segment['v']}</div>
+                                <div><b>📏 Độ dài đoạn cáp lỗi:</b> {target_segment['length']:.1f} m</div>
+                                <div><b>🔌 Dung lượng:</b> {target_segment['capacity']}</div>
+                                <hr class="result-divider">
+                                <div style="font-weight: 700; color: #1E40AF; margin-bottom: 4px;">
+                                    🎯 Vị trí điểm đứt chi tiết:
+                                </div>
+                                <div style="padding-left: 8px;">
+                                    • Cách <b>{target_segment['u']}</b> (Đầu): <b>{offset_from_u:.1f} m</b><br>
+                                    • Cách <b>{target_segment['v']}</b> (Cuối): <b>{offset_from_v:.1f} m</b>
+                                </div>
+                            </div>
                         </div>
                         """,
                         unsafe_allow_html=True
