@@ -21,14 +21,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS Streamlit
+# 2. Inject CSS Custom Streamlit
 st.markdown("""
     <style>
-    header[data-testid="stHeader"] {
-        background-color: transparent !important;
-        z-index: 999999 !important;
-        pointer-events: none;
-    }
+    header[data-testid="stHeader"] { background-color: transparent !important; z-index: 999999 !important; pointer-events: none; }
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
@@ -50,16 +46,9 @@ st.markdown("""
         justify-content: center !important;
         border: 2px solid #FF5F1F !important;
         box-shadow: 0 0 10px rgba(255, 95, 31, 0.5), 0 4px 12px rgba(0, 0, 0, 0.2) !important;
-        transition: all 0.2s ease-in-out !important;
     }
 
-    .block-container {
-        padding-top: 0rem !important;
-        padding-bottom: 0rem !important;
-        padding-left: 0rem !important;
-        padding-right: 0rem !important;
-        max-width: 100% !important;
-    }
+    .block-container { padding: 0rem !important; max-width: 100% !important; }
 
     [data-testid="stSidebar"] {
         background: rgba(255, 255, 255, 0.15) !important;
@@ -67,7 +56,6 @@ st.markdown("""
         -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
         border-right: 1px solid rgba(255, 255, 255, 0.3) !important;
         z-index: 999998 !important;
-        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05) !important;
     }
 
     [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, 
@@ -75,22 +63,6 @@ st.markdown("""
     [data-testid="stSidebar"] p, [data-testid="stSidebar"] span {
         color: #1D4ED8 !important;
         font-weight: 700 !important;
-    }
-
-    [data-testid="stSidebar"] input, [data-testid="stSidebar"] div[data-baseweb="select"] {
-        background-color: rgba(255, 255, 255, 0.5) !important;
-        color: #1D4ED8 !important;
-        border: 1px solid rgba(37, 99, 235, 0.4) !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-    }
-
-    [data-testid="stSidebar"] .stButton > button, [data-testid="stSidebar"] .stLinkButton > a {
-        background-color: #FFEDD5 !important;
-        color: #C2410C !important;
-        border: 1.5px solid #FDBA74 !important;
-        border-radius: 8px !important;
-        font-weight: bold !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -113,7 +85,7 @@ def apply_map_custom_css(folium_map):
     """
     folium_map.get_root().html.add_child(folium.Element(custom_css))
 
-# 3. Tải dữ liệu Excel & JSON - Tự cập nhật khi file thay đổi
+# 3. Tải dữ liệu Excel & JSON
 @st.cache_data(ttl=5)
 def load_data():
     file_path = "Data.xlsx"
@@ -123,7 +95,7 @@ def load_data():
     return df_uplink, df_cable, df_hdn
 
 @st.cache_data
-def load_all_json_cable_shapes(search_pattern="TQGP*.json"):
+def load_all_json_cable_shapes(search_pattern="*.json"):
     cable_shapes = {}
     json_files = glob.glob(search_pattern)
     for json_file_path in json_files:
@@ -144,10 +116,10 @@ def load_all_json_cable_shapes(search_pattern="TQGP*.json"):
                             coords.extend([[p[1], p[0]] for p in line])
                         if cable_name: cable_shapes[str(cable_name).strip()] = coords
         except Exception as e:
-            st.warning(f"Lỗi khi đọc file {json_file_path}: {e}")
+            st.warning(f"Lỗi khi đọc file JSON {json_file_path}: {e}")
     return cable_shapes
 
-# API OSRM lấy tuyến giao thông thực tế
+# API OSRM - Bám sát tuyến đường bộ / xe máy
 @st.cache_data
 def get_osrm_route(lat1, lon1, lat2, lon2):
     try:
@@ -164,7 +136,7 @@ def get_osrm_route(lat1, lon1, lat2, lon2):
 
 try:
     df_uplink, df_cable, df_hdn = load_data()
-    json_cable_shapes = load_all_json_cable_shapes("TQGP*.json")
+    json_cable_shapes = load_all_json_cable_shapes("*.json")
 except Exception as e:
     st.error(f"Lỗi khi tải dữ liệu: {e}")
     st.stop()
@@ -187,14 +159,53 @@ def haversine(lat1, lon1, lat2, lon2):
     a = math.sin(dphi/2)**2 + math.cos(phi1)*math.cos(phi2)*math.sin(dlambda/2)**2
     return 2 * R * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
+def calculate_polyline_length(coords):
+    if not coords or len(coords) < 2: return 0.0
+    total = 0.0
+    for i in range(len(coords) - 1):
+        total += haversine(coords[i][0], coords[i][1], coords[i+1][0], coords[i+1][1])
+    return total
+
+# THUẬT TOÁN ĐIỀU CHỈNH HƯỚNG VÀ CO GIÃN THEO CHIỀU ĐÀI KHAI BÁO EXCEL
+def process_segment_geometry(raw_coords, u_coord, v_coord, target_length):
+    if not raw_coords:
+        if u_coord and v_coord:
+            raw_coords = get_osrm_route(u_coord[0], u_coord[1], v_coord[0], v_coord[1])
+        else:
+            return []
+
+    # 1. Định hướng đường cáp đi đúng từ U -> V
+    if u_coord:
+        d_start = haversine(u_coord[0], u_coord[1], raw_coords[0][0], raw_coords[0][1])
+        d_end = haversine(u_coord[0], u_coord[1], raw_coords[-1][0], raw_coords[-1][1])
+        if d_end < d_start:
+            raw_coords = list(reversed(raw_coords))
+
+    # 2. Xử lý trường hợp hình chữ nhật / vòng lặp:
+    # Nếu tuyến tạo thành vòng lặp closed-loop hoặc hình chữ nhật
+    first_p, last_p = raw_coords[0], raw_coords[-1]
+    if haversine(first_p[0], first_p[1], last_p[0], last_p[1]) < 20.0 and len(raw_coords) > 4:
+        # Tách tuyến thành 2 hướng (hướng trên / hướng dưới)
+        mid_idx = len(raw_coords) // 2
+        path_top = raw_coords[:mid_idx+1]
+        path_bottom = raw_coords[mid_idx:] + [raw_coords[0]]
+        
+        len_top = calculate_polyline_length(path_top)
+        len_bottom = calculate_polyline_length(path_bottom)
+        
+        # Chọn đường có độ dài sát nhất với chiều dài khai báo Excel
+        if abs(len_top - target_length) < abs(len_bottom - target_length):
+            raw_coords = path_top
+        else:
+            raw_coords = path_bottom
+
+    return raw_coords
+
 def interpolate_on_polyline_scaled(coords, target_offset, decl_length):
     if not coords or len(coords) < 2:
         return None
     
-    geo_length = 0.0
-    for i in range(len(coords) - 1):
-        geo_length += haversine(coords[i][0], coords[i][1], coords[i+1][0], coords[i+1][1])
-    
+    geo_length = calculate_polyline_length(coords)
     scale_factor = geo_length / decl_length if (decl_length > 0 and geo_length > 0) else 1.0
     adjusted_target = target_offset * scale_factor
 
@@ -211,7 +222,7 @@ def interpolate_on_polyline_scaled(coords, target_offset, decl_length):
         accumulated += seg_len
     return coords[-1][0], coords[-1][1]
 
-# 4. ĐỒ THỊ MẠNG CÁP - SỬA ĐỔI ĐỂ ĐỌC CHUẨN DUNG LƯỢNG CỘT F
+# 4. ĐỒ THỊ MẠNG CÁP
 G = nx.Graph()
 for _, row in df_cable.iterrows():
     u = normalize_node(row['Điểm KN1'])
@@ -223,9 +234,7 @@ for _, row in df_cable.iterrows():
     except: 
         length = 0.0
     
-    # Ép kiểu đọc chính xác cột Dung lượng (cột F)
     cap_val = row.get('Dung lượng') if 'Dung lượng' in df_cable.columns else row.iloc[5]
-    
     if pd.isna(cap_val) or str(cap_val).strip() in ["", "nan", "None"]:
         capacity_str = "Chưa xác định"
     else:
@@ -331,20 +340,10 @@ with st.sidebar:
                 u_coord = hdn_coords.get(target_segment['u'])
                 v_coord = hdn_coords.get(target_segment['v'])
 
-                if cable_name in json_cable_shapes:
-                    raw_coords = json_cable_shapes[cable_name]
-                elif u_coord and v_coord:
-                    raw_coords = get_osrm_route(u_coord[0], u_coord[1], v_coord[0], v_coord[1])
-                else:
-                    raw_coords = []
+                raw_coords = json_cable_shapes.get(cable_name, [])
+                processed_coords = process_segment_geometry(raw_coords, u_coord, v_coord, target_segment['length'])
 
-                if u_coord and len(raw_coords) > 1:
-                    d_start = haversine(u_coord[0], u_coord[1], raw_coords[0][0], raw_coords[0][1])
-                    d_end = haversine(u_coord[0], u_coord[1], raw_coords[-1][0], raw_coords[-1][1])
-                    if d_end < d_start:
-                        raw_coords = list(reversed(raw_coords))
-
-                fault_lat, fault_lng = interpolate_on_polyline_scaled(raw_coords, offset, target_segment['length'])
+                fault_lat, fault_lng = interpolate_on_polyline_scaled(processed_coords, offset, target_segment['length'])
 
                 if fault_lat and fault_lng:
                     st.success(
@@ -375,17 +374,8 @@ if map_data:
     for seg in map_data['cable_segments']:
         c_name = seg['cable']
         u_coord, v_coord = hdn_coords.get(seg['u']), hdn_coords.get(seg['v'])
-        
-        if c_name in json_cable_shapes:
-            seg_coords = json_cable_shapes[c_name]
-        elif u_coord and v_coord:
-            seg_coords = get_osrm_route(u_coord[0], u_coord[1], v_coord[0], v_coord[1])
-        else:
-            seg_coords = []
-
-        if u_coord and len(seg_coords) > 1:
-            if haversine(u_coord[0], u_coord[1], seg_coords[-1][0], seg_coords[-1][1]) < haversine(u_coord[0], u_coord[1], seg_coords[0][0], seg_coords[0][1]):
-                seg_coords = list(reversed(seg_coords))
+        raw_coords = json_cable_shapes.get(c_name, [])
+        seg_coords = process_segment_geometry(raw_coords, u_coord, v_coord, seg['length'])
         full_route_coords.extend(seg_coords)
 
     if full_route_coords:
