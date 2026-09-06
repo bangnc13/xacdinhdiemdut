@@ -153,7 +153,7 @@ def apply_map_custom_css(folium_map):
         display: none !important;
     }
 
-    /* Dời nút định vị xuống dưới để không bị nút sidebar đè lên */
+    /* Dời nút định vị xuống dưới (máp lề trái) */
     .leaflet-control-locate {
         margin-top: 70px !important;
         margin-left: 10px !important;
@@ -177,6 +177,15 @@ def apply_map_custom_css(folium_map):
     .leaflet-control-locate a span.fas {
         font-size: 16px !important;
         color: #FFFFFF !important;
+    }
+
+    /* DỜI NÚT CHUYỂN LAYER (BÊN PHẢI) XUỐNG NGANG HÀNG NÚT ĐỊNH VỊ */
+    .leaflet-control-layers {
+        margin-top: 70px !important;
+        margin-right: 10px !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
     }
     </style>
     """
