@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS: Tùy biến giao diện và vị trí nút Zoom (+ / -)
+# 2. Inject CSS: Tùy biến giao diện & Vị trí các nút điều khiển bản đồ
 st.markdown("""
     <style>
     /* 1. HIỆN LẠI HEADER TRONG SUỐT VỚI NÚT TOGGLE SIDEBAR */
@@ -117,11 +117,33 @@ st.markdown("""
         border: none !important;
     }
 
-    /* 8. DI CHUYỂN NÚT ZOOM (+ / -) XUỐNG GÓC DƯỚI BÊN PHẢI */
+    /* 8. ĐẶT NÚT ĐỊNH VỊ, CHUYỂN LAYER VÀ ZOOM Ở GÓC DƯỚI BÊN PHẢI */
+    
+    /* Nút Định vị (Locate) - Trên cùng */
+    .leaflet-top.leaflet-left .leaflet-control-locate {
+        position: fixed !important;
+        bottom: 165px !important;
+        right: 20px !important;
+        top: auto !important;
+        left: auto !important;
+        z-index: 9999 !important;
+    }
+
+    /* Nút Chuyển Layer Map - Ở giữa (Dưới nút Định vị) */
+    .leaflet-top.leaflet-right .leaflet-control-layers {
+        position: fixed !important;
+        bottom: 105px !important;
+        right: 20px !important;
+        top: auto !important;
+        left: auto !important;
+        z-index: 9999 !important;
+    }
+
+    /* Nút Zoom (+ / -) - Ở dưới cùng (Dưới nút Layer) */
     .leaflet-top.leaflet-left .leaflet-control-zoom {
         position: fixed !important;
-        bottom: 30px !important;
-        right: 25px !important;
+        bottom: 20px !important;
+        right: 20px !important;
         top: auto !important;
         left: auto !important;
         z-index: 9999 !important;
