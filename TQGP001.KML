@@ -1,0 +1,2668 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>TQGP001 Network Objects</name>
+    <description>Danh sách hạ tầng trạm/tập điểm từ file JSON</description>
+
+    <!-- Point Styles -->
+    <Style id="style_type1">
+      <IconStyle>
+        <scale>1.1</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/pushpin/red-pushpin.png</href>
+        </Icon>
+      </IconStyle>
+    </Style>
+    <Style id="style_type2">
+      <IconStyle>
+        <scale>1.1</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png</href>
+        </Icon>
+      </IconStyle>
+    </Style>
+    <Style id="style_type3">
+      <IconStyle>
+        <scale>1.0</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+        </Icon>
+      </IconStyle>
+    </Style>
+    <Style id="style_type4">
+      <IconStyle>
+        <scale>1.0</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href>
+        </Icon>
+      </IconStyle>
+    </Style>
+    <Style id="style_type5">
+      <IconStyle>
+        <scale>1.2</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/pushpin/purple-pushpin.png</href>
+        </Icon>
+      </IconStyle>
+    </Style>
+
+    <!-- Placemarks -->
+    <Placemark>
+      <name>TQGP001.0001/FO</name>
+      <styleUrl>#style_type1</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>408542</value></Data>
+        <Data name="Total Port"><value>96</value></Data>
+        <Data name="Port Free"><value>80</value></Data>
+        <Data name="Port Used"><value>16</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2110277,21.7992374,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0039/TO</name>
+      <styleUrl>#style_type2</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>475802</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21178297698498,21.799049777061274,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0011/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>409672</value></Data>
+        <Data name="Total Port"><value>0</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21094813942909,21.799179900902434,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0012/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>408742</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21045863628387,21.79863948149632,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0013/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>408822</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>6</value></Data>
+        <Data name="Port Used"><value>10</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21051295101643,21.798539242188795,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0014/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>408882</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>5</value></Data>
+        <Data name="Port Used"><value>3</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21175883710384,21.799036079807916,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0015/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>408902</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2119318395853,21.79911950851234,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0016/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>408942</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>7</value></Data>
+        <Data name="Port Used"><value>1</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21241128444672,21.79828023843593,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0017/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>409042</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>12</value></Data>
+        <Data name="Port Used"><value>4</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21230801939964,21.798214864818547,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0018/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>409172</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>6</value></Data>
+        <Data name="Port Used"><value>2</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21362096071243,21.796323375237204,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0019/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>409242</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>10</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21322399377823,21.795923656336292,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0020/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>409382</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>6</value></Data>
+        <Data name="Port Used"><value>2</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21140545606613,21.800279411511184,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0021/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>409402</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>10</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21099776029587,21.800558334717767,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0022/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>409422</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>4</value></Data>
+        <Data name="Port Used"><value>4</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21066449582577,21.801545145720404,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0023/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>409502</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>1</value></Data>
+        <Data name="Port Used"><value>7</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21050289273262,21.801424985501253,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0024/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>409522</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>9</value></Data>
+        <Data name="Port Used"><value>7</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2089773863554,21.80087710343165,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0025/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2662182</value></Data>
+        <Data name="Total Port"><value>12</value></Data>
+        <Data name="Port Free"><value>12</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20981758832932,21.797683158288958,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0026/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>470302</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>7</value></Data>
+        <Data name="Port Used"><value>9</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2097961306572,21.79766136699565,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0027/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>470322</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>7</value></Data>
+        <Data name="Port Used"><value>1</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20857036113739,21.796963421248343,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0028/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>470332</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20815461874008,21.79594233481441,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0029/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>470342</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20789980888367,21.794682154695558,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0030/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>470352</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20713604986668,21.793554582951234,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0031/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>471912</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>6</value></Data>
+        <Data name="Port Used"><value>10</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20851537585258,21.797248577013534,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0032/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>471942</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>8</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20814254879951,21.798666876077476,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0033/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>471972</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>7</value></Data>
+        <Data name="Port Used"><value>1</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20949840545654,21.79978506860102,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0034/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>472002</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>8</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20720511674881,21.800315522135495,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0035/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>472022</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>1</value></Data>
+        <Data name="Port Used"><value>15</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20688191056252,21.800933136921333,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0036/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>472032</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>1</value></Data>
+        <Data name="Port Used"><value>7</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20640917122364,21.802528836988348,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0037/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>472052</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20574733614922,21.80332138839311,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0038/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>477022</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>13</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20595252513885,21.80395891281322,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0040/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>475812</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>8</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20992085337639,21.803464582601766,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0041/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>475822</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>7</value></Data>
+        <Data name="Port Used"><value>1</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2099235355854,21.803422246937604,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0042/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>475872</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>1</value></Data>
+        <Data name="Port Used"><value>7</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2097062766552,21.803350649829998,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0043/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>475882</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20849794149399,21.803575402369333,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0044/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>475912</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>13</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20771473646164,21.803094767700763,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0045/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>475932</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>1</value></Data>
+        <Data name="Port Used"><value>7</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20892575383186,21.80450304762238,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0046/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>475952</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>7</value></Data>
+        <Data name="Port Used"><value>9</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20976662635803,21.805905087970462,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0047/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>475962</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>4</value></Data>
+        <Data name="Port Used"><value>4</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20988196134567,21.804354873817395,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0048/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>475972</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>5</value></Data>
+        <Data name="Port Used"><value>3</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20969957113266,21.804372306037706,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0049/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>475992</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>5</value></Data>
+        <Data name="Port Used"><value>3</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21069467067719,21.806606102997193,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0050/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>476002</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>9</value></Data>
+        <Data name="Port Used"><value>7</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2105364203453,21.80663847661002,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0051/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>476232</value></Data>
+        <Data name="Total Port"><value>12</value></Data>
+        <Data name="Port Free"><value>12</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2141647785902,21.795865753038512,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0052/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>476262</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>16</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21420031785965,21.795828396059814,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0053/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>476392</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>8</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21245956420898,21.794490387184112,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0054/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>476402</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>16</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2097887545824,21.794722002457934,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0055/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>476412</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>8</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21275460720062,21.793775615107734,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0056/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>476422</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>5</value></Data>
+        <Data name="Port Used"><value>3</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21503783762455,21.79506382108936,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0057/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>476432</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>5</value></Data>
+        <Data name="Port Used"><value>3</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21487958729267,21.794929335167733,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0058/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>476442</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>13</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21421909332275,21.793568903354796,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0059/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>476452</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>4</value></Data>
+        <Data name="Port Used"><value>4</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21620392799377,21.793997269547653,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0060/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>476462</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21600008010864,21.793857801625453,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0061/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>476682</value></Data>
+        <Data name="Total Port"><value>32</value></Data>
+        <Data name="Port Free"><value>32</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21801173686981,21.792526623287163,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0062/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>476482</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21848648786545,21.792698469268245,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0063/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>476492</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21846637129784,21.791583957246978,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0064/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>476502</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>5</value></Data>
+        <Data name="Port Used"><value>3</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21725803613663,21.79126765840163,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0065/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>476512</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>4</value></Data>
+        <Data name="Port Used"><value>4</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21556556224823,21.79074713358524,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0066/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>476522</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>5</value></Data>
+        <Data name="Port Used"><value>3</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21452218294144,21.789125773836044,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0069/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>937942</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>10</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20468384027481,21.791556561311594,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0106/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2619432</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>4</value></Data>
+        <Data name="Port Used"><value>4</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2115087211132,21.785670049573103,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0107/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2619502</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>7</value></Data>
+        <Data name="Port Used"><value>9</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21130219101906,21.793367172320426,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0108/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2619512</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21190702915192,21.79310566870509,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0109/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2619522</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>16</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21285116672516,21.792684771407732,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0111/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2796852</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>7</value></Data>
+        <Data name="Port Used"><value>9</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.22709906101227,21.79706552949152,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0115/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4327912</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>7</value></Data>
+        <Data name="Port Used"><value>1</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21325618028641,21.796931045448737,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0116/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4313302</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.209491699934,21.796804032625776,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0117/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4313312</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>8</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20813047885895,21.79469709760774,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0118/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4313322</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20723059773445,21.79340079417924,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0119/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4266602</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20658820867538,21.803214303934816,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0120/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4266612</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20490378141403,21.803010096141247,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0121/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4327572</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>5</value></Data>
+        <Data name="Port Used"><value>3</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20908534526825,21.803455866436646,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0122/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4327582</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2089512348175,21.80414817732915,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0123/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4327592</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>5</value></Data>
+        <Data name="Port Used"><value>3</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20994901657104,21.805209050117224,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0124/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4316922</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>4</value></Data>
+        <Data name="Port Used"><value>4</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21448463201523,21.79527115330455,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0125/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4316932</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>7</value></Data>
+        <Data name="Port Used"><value>1</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21676182746887,21.79349418818999,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0126/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4316942</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21555081009865,21.79431107187629,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0127/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4252512</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21975517272949,21.793150497930178,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0128/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4317382</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21868765354156,21.790884113983374,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0129/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4262482</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>1</value></Data>
+        <Data name="Port Used"><value>7</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21452754735947,21.790122003197123,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0130/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4262492</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21386504173279,21.789007471139495,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0131/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4266622</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>1</value></Data>
+        <Data name="Port Used"><value>7</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20291090011597,21.799879703647836,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0132/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4266632</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>5</value></Data>
+        <Data name="Port Used"><value>3</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20229935646057,21.802761061852646,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0133/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4252522</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2246367931366,21.796109195777863,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0134/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4266642</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20087242126465,21.801324125550373,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0135/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4266652</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>4</value></Data>
+        <Data name="Port Used"><value>12</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.1994588971138,21.79891093666018,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0136/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4252492</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>8</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.22136852145195,21.792966199915117,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0137/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4262502</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>13</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21227046847343,21.78692096911144,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0138/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4252542</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.22866547107697,21.79389266861874,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0139/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4252552</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.23030698299408,21.793608751426767,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0140/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4252532</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.22474341094494,21.797052454659553,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0141/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>4252502</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.22284507751465,21.794316052860104,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0142/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>5167622</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>4</value></Data>
+        <Data name="Port Used"><value>4</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20133376121521,21.796853841589368,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0143/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>5167632</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.19921481609344,21.796512649841752,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0144/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>5572242</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>8</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20394623279572,21.788737242508326,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0145/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>5572252</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>14</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.23268342018127,21.79011702206755,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0146/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>5572262</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.23138523101807,21.794699588092957,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0147/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>5939542</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>7</value></Data>
+        <Data name="Port Used"><value>1</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21723657846451,21.790014908873,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0148/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6169692</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>5</value></Data>
+        <Data name="Port Used"><value>3</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20579159259796,21.78708099138079,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0149/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6169702</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>4</value></Data>
+        <Data name="Port Used"><value>4</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2064460515976,21.78519309081689,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0153/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6590122</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>1</value></Data>
+        <Data name="Port Used"><value>7</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20188361406326,21.799127602339286,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0154/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6590132</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>1</value></Data>
+        <Data name="Port Used"><value>7</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20037353038788,21.796789089933306,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0155/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6590142</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.19775032997131,21.794898826769796,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0156/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6590152</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.19841283559799,21.79813143558725,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0157/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6590172</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.22022724151611,21.79070230360834,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0158/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6590182</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>4</value></Data>
+        <Data name="Port Used"><value>4</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21265804767609,21.789870455936956,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0159/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6590192</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>4</value></Data>
+        <Data name="Port Used"><value>4</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21308451890945,21.788039875945113,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0160/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6590202</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.22340297698975,21.794291147939354,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0161/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6590212</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>1</value></Data>
+        <Data name="Port Used"><value>7</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.22348344326019,21.793539017293543,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0162/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6590222</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>1</value></Data>
+        <Data name="Port Used"><value>7</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2265277504921,21.79676044976841,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0163/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6590232</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.22687643766403,21.798589673153522,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0164/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>8592652</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20528061745654,21.803355109541933,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0165/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6590262</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.23046791553497,21.79418903771904,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0166/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6590272</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.23017019033432,21.795090593734603,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0168/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>8592682</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>4</value></Data>
+        <Data name="Port Used"><value>4</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.23281223389245,21.79310008565187,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0171/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>11835092</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.22494492021201,21.79789712050091,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0173/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>12877532</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>4</value></Data>
+        <Data name="Port Used"><value>4</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20744324169573,21.79176405542331,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0174/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>12877542</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>5</value></Data>
+        <Data name="Port Used"><value>3</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.22802214203875,21.800162134034004,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0180/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15384442</value></Data>
+        <Data name="Total Port"><value>24</value></Data>
+        <Data name="Port Free"><value>24</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21818696048891,21.792173776374643,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0184/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859272</value></Data>
+        <Data name="Total Port"><value>12</value></Data>
+        <Data name="Port Free"><value>12</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.23220096358615,21.800641297356808,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0185/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859292</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.23294661769229,21.800058546805445,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0186/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859252</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>1</value></Data>
+        <Data name="Port Used"><value>7</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.22994790801364,21.798350127680767,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0187/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859302</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>6</value></Data>
+        <Data name="Port Used"><value>2</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.23356889018375,21.801971155121365,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0188/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859312</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>7</value></Data>
+        <Data name="Port Used"><value>1</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.23650322684604,21.801542812769867,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0189/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859322</value></Data>
+        <Data name="Total Port"><value>24</value></Data>
+        <Data name="Port Free"><value>24</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.23764584788638,21.801712157573565,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0190/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859332</value></Data>
+        <Data name="Total Port"><value>24</value></Data>
+        <Data name="Port Free"><value>24</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.23817692527133,21.801194161073017,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0191/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859352</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>8</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.23801599273044,21.800277701137077,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0192/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859362</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>8</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.23949657210666,21.800935162120275,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0193/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859342</value></Data>
+        <Data name="Total Port"><value>24</value></Data>
+        <Data name="Port Free"><value>24</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.23867045173007,21.80237459267638,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0194/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859372</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>8</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.23793016204196,21.803744279601137,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0195/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859382</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.24048898944217,21.80293741107077,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0196/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859392</value></Data>
+        <Data name="Total Port"><value>12</value></Data>
+        <Data name="Port Free"><value>12</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.24186764487582,21.803674550401404,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0197/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859412</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>4</value></Data>
+        <Data name="Port Used"><value>4</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.24389539489108,21.80390864115189,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0198/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859422</value></Data>
+        <Data name="Total Port"><value>12</value></Data>
+        <Data name="Port Free"><value>12</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.24561737307864,21.80351018858201,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0199/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859432</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.24678145179111,21.802947372438354,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0200/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859452</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>6</value></Data>
+        <Data name="Port Used"><value>2</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.24600361117679,21.800327508892973,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0201/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859462</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>8</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2485087943967,21.79830530008249,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0202/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859472</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>7</value></Data>
+        <Data name="Port Used"><value>1</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2416477037366,21.80301212131083,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0203/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859482</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>4</value></Data>
+        <Data name="Port Used"><value>4</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.24372373351413,21.802140499418652,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0204/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859492</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.241899831384,21.799406062605716,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0205/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>15859502</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.24423871764499,21.797727520893623,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0206/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>16004652</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>8</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21615468152822,21.79398137376461,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0219/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>28276412</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.228124,21.794336,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0150/MO</name>
+      <styleUrl>#style_type4</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6191762</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>6</value></Data>
+        <Data name="Port Used"><value>2</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21138936281204,21.80026571437544,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0151/MO</name>
+      <styleUrl>#style_type4</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6191772</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>6</value></Data>
+        <Data name="Port Used"><value>2</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21094411611557,21.801021545271585,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0152/MO</name>
+      <styleUrl>#style_type4</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>6366002</value></Data>
+        <Data name="Total Port"><value>12</value></Data>
+        <Data name="Port Free"><value>10</value></Data>
+        <Data name="Port Used"><value>2</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21505057811737,21.79448789669527,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0167/MO</name>
+      <styleUrl>#style_type4</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>7660992</value></Data>
+        <Data name="Total Port"><value>24</value></Data>
+        <Data name="Port Free"><value>19</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.22725999355316,21.795197684265613,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0168/MO</name>
+      <styleUrl>#style_type4</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>7695202</value></Data>
+        <Data name="Total Port"><value>24</value></Data>
+        <Data name="Port Free"><value>21</value></Data>
+        <Data name="Port Used"><value>3</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.22489964962006,21.796522611656105,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0169/MO</name>
+      <styleUrl>#style_type4</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>10041262</value></Data>
+        <Data name="Total Port"><value>24</value></Data>
+        <Data name="Port Free"><value>24</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21387620656276,21.795575132970445,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0170/MO</name>
+      <styleUrl>#style_type4</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>10041272</value></Data>
+        <Data name="Total Port"><value>24</value></Data>
+        <Data name="Port Free"><value>23</value></Data>
+        <Data name="Port Used"><value>1</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2138654777267,21.795570152030407,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0172/MO</name>
+      <styleUrl>#style_type4</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>11979602</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21061290676698,21.794545791270657,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0175/MO</name>
+      <styleUrl>#style_type4</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>12968552</value></Data>
+        <Data name="Total Port"><value>12</value></Data>
+        <Data name="Port Free"><value>12</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20818460271437,21.79900688149033,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001</name>
+      <styleUrl>#style_type5</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>14292</value></Data>
+        <Data name="Total Port"><value>2512</value></Data>
+        <Data name="Port Free"><value>1390</value></Data>
+        <Data name="Port Used"><value>1106</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21097227931023,21.799197956354266,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0070/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>1446232</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21070808172226,21.79874719197842,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0072/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>1410442</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21006435155869,21.800066483162055,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0073/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>1446242</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20803928375244,21.799957528475023,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0074/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>1446252</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>9</value></Data>
+        <Data name="Port Used"><value>7</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20933881402016,21.805385861484545,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0075/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>1359892</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>13</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20299673080444,21.80236260609022,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0076/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>1590202</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>15</value></Data>
+        <Data name="Port Used"><value>1</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20641922950745,21.792831712024775,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0077/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>1648422</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>10</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.22087901830673,21.79363116596236,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0078/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2072982</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>16</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.22436589002609,21.795825282977816,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0080/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2658512</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21043986082077,21.798627029412238,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0081/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2658522</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>5</value></Data>
+        <Data name="Port Used"><value>3</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21193116903305,21.798781435178284,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0082/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2658542</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>5</value></Data>
+        <Data name="Port Used"><value>3</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21291419863701,21.797450302583236,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0083/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2658592</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21237373352051,21.795416846033024,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0084/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2658612</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>7</value></Data>
+        <Data name="Port Used"><value>1</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21050088107586,21.801401327000647,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0085/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2658062</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>11</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20337224006653,21.802843243215758,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0086/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2658102</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>8</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20119428634644,21.801812237245457,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0087/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2658142</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20006507635117,21.79940154698171,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0088/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2658642</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20799368619919,21.795979691763424,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0089/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2658662</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20710319280624,21.79356205446632,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0090/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2658852</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20660161972046,21.792752015437646,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0091/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2658872</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>7</value></Data>
+        <Data name="Port Used"><value>1</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20830482244492,21.797750399973125,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0092/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2658932</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>2</value></Data>
+        <Data name="Port Used"><value>6</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20947694778442,21.799747712644276,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0093/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2658962</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21020516753197,21.80249957538359,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0094/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2658972</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>7</value></Data>
+        <Data name="Port Used"><value>1</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2098873257637,21.804324990006222,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0095/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2659052</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21069198846817,21.806566258540585,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0096/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2659082</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>7</value></Data>
+        <Data name="Port Used"><value>1</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.20889088511467,21.804537912024813,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0097/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2659092</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>8</value></Data>
+        <Data name="Port Used"><value>0</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21505527198315,21.795047010356065,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0098/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2659102</value></Data>
+        <Data name="Total Port"><value>16</value></Data>
+        <Data name="Port Free"><value>1</value></Data>
+        <Data name="Port Used"><value>15</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21732106804848,21.792605074738862,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0099/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2659112</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21532148122787,21.793277513991782,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0101/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2619362</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>1</value></Data>
+        <Data name="Port Used"><value>7</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21790713071823,21.793167931513956,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0102/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2619392</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2265813946724,21.79571072151323,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0103/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2619402</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.2256640791893,21.799750203041697,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0104/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2619412</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>4</value></Data>
+        <Data name="Port Used"><value>4</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21607786417007,21.79147935455647,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0105/HO</name>
+      <styleUrl>#style_type3</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>2619422</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>3</value></Data>
+        <Data name="Port Used"><value>5</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21325752139091,21.78759281238148,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0176/MO</name>
+      <styleUrl>#style_type4</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>14339042</value></Data>
+        <Data name="Total Port"><value>24</value></Data>
+        <Data name="Port Free"><value>12</value></Data>
+        <Data name="Port Used"><value>12</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21443903739078,21.79552615382058,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0177/MO</name>
+      <styleUrl>#style_type4</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>14340102</value></Data>
+        <Data name="Total Port"><value>8</value></Data>
+        <Data name="Port Free"><value>0</value></Data>
+        <Data name="Port Used"><value>8</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.21396696860413,21.795981909256746,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>TQGP001.0178/MO</name>
+      <styleUrl>#style_type4</styleUrl>
+      <ExtendedData>
+        <Data name="ID"><value>14858872</value></Data>
+        <Data name="Total Port"><value>24</value></Data>
+        <Data name="Port Free"><value>21</value></Data>
+        <Data name="Port Used"><value>3</value></Data>
+      </ExtendedData>
+      <Point>
+        <coordinates>105.23070509035902,21.79354477677025,0</coordinates>
+      </Point>
+    </Placemark>
+  </Document>
+</kml>
