@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Inject CSS: Tùy biến giao diện, ẩn Zoom, Fix Icon & Di chuyển nút định vị
+# 2. Inject CSS: Tùy biến giao diện, ẩn Zoom, Fix Icon & Di chuyển nút định vị xuống dưới nút menu
 st.markdown("""
     <!-- Load FontAwesome 6 để hiển thị icon định vị chính xác -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -125,11 +125,11 @@ st.markdown("""
         display: none !important;
     }
 
-    /* 9. FIX LỖI HIỂN THỊ & DI CHUYỂN NÚT ĐỊNH VỊ VỀ VỊ TRÍ KHOANH ĐỎ */
+    /* 9. DI CHUYỂN NÚT ĐỊNH VỊ XUỐNG THẤP HƠN NÚT TOGGLE MENU (TOP: 130PX) */
     .leaflet-control-locate {
         position: fixed !important;
-        top: 80px !important;       /* Đặt phía dưới nút toggle sidebar */
-        left: 20px !important;      /* Căn lề trái sát viền */
+        top: 130px !important;      /* Tăng khoảng cách xuống 130px để hoàn toàn không chạm nút Menu */
+        left: 20px !important;       /* Căn lề trái sát viền */
         z-index: 99999 !important;
         border: none !important;
     }
@@ -153,7 +153,7 @@ st.markdown("""
         transform: scale(1.05);
     }
 
-    /* Tùy chỉnh icon định vị bên trong */
+    /* Styling icon bên trong */
     .leaflet-control-locate a span.fa,
     .leaflet-control-locate a span.fas {
         font-size: 18px !important;
