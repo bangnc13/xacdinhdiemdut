@@ -167,7 +167,7 @@ def apply_map_custom_css(folium_map, fault_lat=None, fault_lng=None):
                 text-decoration: none;
                 font-family: sans-serif;
             " onmouseover="this.style.backgroundColor='#047857'" onmouseout="this.style.backgroundColor='#059669'">
-                <i class="fa-solid fa-diamond-turn-right"></i> Chỉ đường Google Maps
+                <i class="fa-solid fa-diamond-turn-right"></i>
             </a>
         </div>
         """
@@ -456,7 +456,7 @@ with st.sidebar:
                     st.success(f"⚠️ **Vị trí đứt nằm trong đoạn cáp:**\n\n**{cable_name}**\n\n({target_segment['u']} ➔ {target_segment['v']})")
                     
                     gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}&travelmode=driving"
-                    st.link_button("📍 Mở chỉ đường Google Maps", gmaps_url, type="primary", use_container_width=True)
+                    st.link_button("📍", gmaps_url, type="primary", use_container_width=True)
 
                     map_data = {
                         'fault_lat': fault_lat,
