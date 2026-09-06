@@ -3,11 +3,12 @@ import networkx as nx
 import pandas as pd
 import streamlit as st
 import folium
+from folium.plugins import LocateControl
 from streamlit_folium import st_folium
 
-st.set_page_config(page_title="Xác định điểm đứt cáp", layout="wide")
+st.set_page_config(page_title="Xác định điểm đứt cáp & Dẫn đường", layout="wide")
 
-# 1. Hàm tải dữ liệu
+# 1. Hàm tải dữ liệu từ file Excel
 @st.cache_data
 def load_data():
     file_path = "Data.xlsx"
@@ -22,7 +23,7 @@ except Exception as e:
     st.error(f"Lỗi khi đọc file Data.xlsx: {e}")
     st.stop()
 
-# Chuẩn hóa tên tập điểm
+# Chuẩn hóa tên tập điểm (xử lý định dạng tên TĐ và loại bỏ số cổng)
 def normalize_node(node_str):
     if pd.isna(node_str):
         return ""
@@ -34,7 +35,7 @@ def normalize_node(node_str):
         return f"{prefix}.{int(num):04d}/{suffix}"
     return s
 
-# 2. Xây dựng đồ thị từ sheet Đoạn cáp
+# 2. Xây dựng đồ thị kết nối từ sheet Đoạn cáp
 G = nx.Graph()
 for _, row in df_cable.iterrows():
     u = normalize_node(row['Điểm KN1'])
@@ -49,7 +50,7 @@ for _, row in df_cable.iterrows():
     if u and v:
         G.add_edge(u, v, cable=cable_name, length=length)
 
-# 3. Lấy tọa độ an toàn từ sheet HĐN
+# 3. Làm sạch và trích xuất tọa độ từ sheet HĐN
 df_hdn['Lat_clean'] = pd.to_numeric(df_hdn['Lat'].astype(str).str.replace(',', '.'), errors='coerce')
 df_hdn['Lng_clean'] = pd.to_numeric(df_hdn['Lng'].astype(str).str.replace(',', '.'), errors='coerce')
 
@@ -61,9 +62,9 @@ for _, row in df_hdn.iterrows():
     if pd.notnull(lat) and pd.notnull(lng):
         hdn_coords[name] = (float(lat), float(lng))
 
-st.title("📍 Xác Định Vị Trí Sự Cố Cáp Trên Bản Đồ")
+st.title("📍 Xác Định Vị Trí Sự Cố Cáp & Dẫn Đường GPS")
 
-# 4. Khởi tạo Session State lưu trữ kết quả
+# 4. Khởi tạo Session State
 if 'search_performed' not in st.session_state:
     st.session_state.search_performed = False
 
@@ -74,16 +75,15 @@ with col1:
 with col2:
     td_b_input = st.text_input("Nhập TĐ B:", value="TQGP001.0013/HO")
 with col3:
-    target_dist = st.number_input("Khoảng cách từ TĐ A (mét):", min_value=0.0, value=100.0, step=1.0)
+    target_dist = st.number_input("Khoảng cách đo từ TĐ A (mét):", min_value=0.0, value=100.0, step=1.0)
 
-# Xử lý khi nhấn nút Tìm kiếm
-if st.button("Tìm vị trí sự cố"):
+if st.button("Tìm vị trí sự cố", type="primary"):
     st.session_state.search_performed = True
     st.session_state.td_a = normalize_node(td_a_input)
     st.session_state.td_b = normalize_node(td_b_input)
     st.session_state.target_dist = target_dist
 
-# 6. Hiển thị kết quả tính toán nếu đã thực hiện tìm kiếm
+# 6. Xử lý và hiển thị kết quả
 if st.session_state.search_performed:
     td_a = st.session_state.td_a
     td_b = st.session_state.td_b
@@ -139,24 +139,35 @@ if st.session_state.search_performed:
                 fault_lat = u_coord[0] + ratio * (v_coord[0] - u_coord[0])
                 fault_lng = u_coord[1] + ratio * (v_coord[1] - u_coord[1])
 
+                # Tạo link mở Google Maps dẫn đường
+                gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
+                st.link_button("🚗 Mở Google Maps để chỉ đường tới điểm đứt", gmaps_url, type="primary")
+
+                # Khởi tạo bản đồ Folium
                 m = folium.Map(location=[fault_lat, fault_lng], zoom_start=17)
 
+                # Nút định vị GPS trực tiếp trên thiết bị (điện thoại/máy tính)
+                LocateControl(auto_start=False, flyTo=True).add_to(m)
+
+                # Vẽ tuyến cáp
                 path_coords = [hdn_coords[n] for n in node_path if n in hdn_coords]
                 if len(path_coords) > 1:
                     folium.PolyLine(path_coords, color="blue", weight=4, opacity=0.8, tooltip="Tuyến cáp").add_to(m)
 
+                # Marker TĐ A và TĐ B
                 if td_a in hdn_coords:
                     folium.Marker(hdn_coords[td_a], popup=f"TĐ A: {td_a}", icon=folium.Icon(color="green")).add_to(m)
                 if td_b in hdn_coords:
                     folium.Marker(hdn_coords[td_b], popup=f"TĐ B: {td_b}", icon=folium.Icon(color="black")).add_to(m)
 
+                # Marker điểm đứt cáp
                 folium.Marker(
                     [fault_lat, fault_lng],
                     popup=f"Vị trí đứt cáp: {target_dist}m từ {td_a}",
                     icon=folium.Icon(color="red", icon="wrench", prefix="fa")
                 ).add_to(m)
 
-                # Render bản đồ với key cố định tránh reset trạng thái
+                # Render bản đồ lên màn hình Streamlit
                 st_folium(m, width=1000, height=550, key="fault_map")
             else:
                 st.warning("Thiếu dữ liệu tọa độ Lat/Lng hợp lệ trong sheet HĐN cho đoạn cáp chứa vị trí đứt.")
