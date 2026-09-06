@@ -23,7 +23,7 @@ except Exception as e:
     st.error(f"Lỗi khi đọc file Data.xlsx: {e}")
     st.stop()
 
-# Chuẩn hóa tên tập điểm (xử lý định dạng tên TĐ và loại bỏ số cổng)
+# Chuẩn hóa tên tập điểm
 def normalize_node(node_str):
     if pd.isna(node_str):
         return ""
@@ -139,20 +139,46 @@ if st.session_state.search_performed:
                 fault_lat = u_coord[0] + ratio * (v_coord[0] - u_coord[0])
                 fault_lng = u_coord[1] + ratio * (v_coord[1] - u_coord[1])
 
-                # Tạo link mở Google Maps dẫn đường
+                # Tạo link mở Google Maps dẫn đường trực tiếp
                 gmaps_url = f"https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}"
                 st.link_button("🚗 Mở Google Maps để chỉ đường tới điểm đứt", gmaps_url, type="primary")
 
-                # Khởi tạo bản đồ Folium
-                m = folium.Map(location=[fault_lat, fault_lng], zoom_start=17)
+                # KHỞI TẠO BẢN ĐỒ VỚI TILE ĐƯỜNG PHỐ (STREET MAP) MẶC ĐỊNH
+                m = folium.Map(
+                    location=[fault_lat, fault_lng], 
+                    zoom_start=17,
+                    tiles="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                    attr="OpenStreetMap"
+                )
 
-                # Nút định vị GPS trực tiếp trên thiết bị (điện thoại/máy tính)
+                # Thêm Layer Google Maps Đường Phố
+                folium.TileLayer(
+                    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+                    attr="Google",
+                    name="Google Maps Đường phố",
+                    overlay=False,
+                    control=True
+                ).add_to(m)
+
+                # Thêm Layer Google Maps Ảnh Vệ Tinh (Hỗ trợ soi vị trí thực địa)
+                folium.TileLayer(
+                    tiles="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+                    attr="Google",
+                    name="Google Maps Vệ tinh",
+                    overlay=False,
+                    control=True
+                ).add_to(m)
+
+                # Nút định vị GPS vị trí hiện tại của điện thoại/máy tính
                 LocateControl(auto_start=False, flyTo=True).add_to(m)
+
+                # Bổ sung Bảng chọn chuyển đổi Layer bản đồ góc trên bên phải
+                folium.LayerControl().add_to(m)
 
                 # Vẽ tuyến cáp
                 path_coords = [hdn_coords[n] for n in node_path if n in hdn_coords]
                 if len(path_coords) > 1:
-                    folium.PolyLine(path_coords, color="blue", weight=4, opacity=0.8, tooltip="Tuyến cáp").add_to(m)
+                    folium.PolyLine(path_coords, color="blue", weight=5, opacity=0.8, tooltip="Tuyến cáp").add_to(m)
 
                 # Marker TĐ A và TĐ B
                 if td_a in hdn_coords:
@@ -160,14 +186,14 @@ if st.session_state.search_performed:
                 if td_b in hdn_coords:
                     folium.Marker(hdn_coords[td_b], popup=f"TĐ B: {td_b}", icon=folium.Icon(color="black")).add_to(m)
 
-                # Marker điểm đứt cáp
+                # Marker vị trí điểm đứt cáp
                 folium.Marker(
                     [fault_lat, fault_lng],
                     popup=f"Vị trí đứt cáp: {target_dist}m từ {td_a}",
                     icon=folium.Icon(color="red", icon="wrench", prefix="fa")
                 ).add_to(m)
 
-                # Render bản đồ lên màn hình Streamlit
+                # Render bản đồ lên Streamlit
                 st_folium(m, width=1000, height=550, key="fault_map")
             else:
                 st.warning("Thiếu dữ liệu tọa độ Lat/Lng hợp lệ trong sheet HĐN cho đoạn cáp chứa vị trí đứt.")
