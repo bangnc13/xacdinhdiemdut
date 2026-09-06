@@ -257,23 +257,14 @@ with st.sidebar:
                 else:
                     st.warning("Thiếu dữ liệu tọa độ Lat/Lng cho đoạn cáp chứa vị trí đứt.")
 
-# 7. BẢN ĐỒ FULL TRÀN VIỀN BÊN PHẢI
+# 7. BẢN ĐỒ FULL TRÀN VIỀN BÊN PHẢI (CHỈ SỬ DỤNG GOOGLE MAPS)
 if map_data:
     m = folium.Map(
         location=[map_data['fault_lat'], map_data['fault_lng']], 
         zoom_start=17,
-        tiles="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        attr="OpenStreetMap"
-    )
-
-    # Layer Google Maps Đường phố
-    folium.TileLayer(
         tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-        attr="Google",
-        name="Google Maps Đường phố",
-        overlay=False,
-        control=True
-    ).add_to(m)
+        attr="Google"
+    )
 
     # Layer Google Maps Vệ tinh
     folium.TileLayer(
