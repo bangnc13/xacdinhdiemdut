@@ -129,23 +129,36 @@ st.markdown("""
         z-index: 9999 !important;
     }
 
-    /* Định dạng icon 🎯 trên nút Locate */
+    /* Tùy biến giao diện nút Locate */
     .leaflet-control-locate a {
         background-color: #1E293B !important;
-        color: #FFFFFF !important;
         border-radius: 8px !important;
         width: 36px !important;
         height: 36px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        font-size: 18px !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
         text-decoration: none !important;
+        border: none !important;
     }
 
     .leaflet-control-locate a:hover {
         background-color: #2563EB !important;
+    }
+
+    /* Ẩn các icon FontAwesome/Glyphicon mặc định gây ô vuông trắng */
+    .leaflet-control-locate a span, 
+    .leaflet-control-locate a i {
+        display: none !important;
+    }
+
+    /* Ép hiển thị icon 🎯 bằng CSS */
+    .leaflet-control-locate a::before {
+        content: "🎯" !important;
+        font-size: 18px !important;
+        display: block !important;
+        line-height: 1 !important;
     }
 
     /* Nút Chuyển Layer Map - Ở giữa (Dưới nút Định vị) */
@@ -392,8 +405,8 @@ if map_data:
         control=True
     ).add_to(m)
 
-    # Thay đổi icon của nút Locate thành 🎯 tại đây
-    LocateControl(auto_start=False, flyTo=True, icon="🎯").add_to(m)
+    # Khởi tạo LocateControl không truyền icon tùy biến (CSS sẽ đảm nhiệm việc này)
+    LocateControl(auto_start=False, flyTo=True).add_to(m)
     folium.LayerControl().add_to(m)
 
     path_coords = [hdn_coords[n] for n in map_data['node_path'] if n in hdn_coords]
@@ -427,6 +440,6 @@ else:
         control=False
     ).add_to(default_map)
 
-    # Thay đổi icon của nút Locate thành 🎯 tại đây
-    LocateControl(auto_start=False, flyTo=True, icon="🎯").add_to(default_map)
+    # Khởi tạo LocateControl mặc định
+    LocateControl(auto_start=False, flyTo=True).add_to(default_map)
     st_folium(default_map, width="100%", height=1000, key="default_map")
