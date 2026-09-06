@@ -22,7 +22,7 @@ except Exception as e:
     st.error(f"Lỗi khi đọc file Data.xlsx: {e}")
     st.stop()
 
-# Chuẩn hóa tên tập điểm (loại bỏ cổng, ví dụ TQGP001.011/HO/17 -> TQGP001.0011/HO)
+# Chuẩn hóa tên tập điểm
 def normalize_node(node_str):
     if pd.isna(node_str):
         return ""
@@ -41,7 +41,6 @@ for _, row in df_cable.iterrows():
     v = normalize_node(row['Điểm KN2'])
     cable_name = str(row['Tên đoạn cáp']).strip()
     
-    # Ép kiểu an toàn cho chiều dài
     try:
         length = float(row['Chiều dài thực (m)'])
     except (ValueError, TypeError):
@@ -50,7 +49,7 @@ for _, row in df_cable.iterrows():
     if u and v:
         G.add_edge(u, v, cable=cable_name, length=length)
 
-# 3. Lấy tọa độ an toàn từ sheet HĐN (Xử lý dọn dẹp lỗi dữ liệu)
+# 3. Lấy tọa độ an toàn từ sheet HĐN
 df_hdn['Lat_clean'] = pd.to_numeric(df_hdn['Lat'].astype(str).str.replace(',', '.'), errors='coerce')
 df_hdn['Lng_clean'] = pd.to_numeric(df_hdn['Lng'].astype(str).str.replace(',', '.'), errors='coerce')
 
@@ -64,7 +63,11 @@ for _, row in df_hdn.iterrows():
 
 st.title("📍 Xác Định Vị Trí Sự Cố Cáp Trên Bản Đồ")
 
-# 4. Giao diện nhập liệu
+# 4. Khởi tạo Session State lưu trữ kết quả
+if 'search_performed' not in st.session_state:
+    st.session_state.search_performed = False
+
+# 5. Giao diện nhập liệu
 col1, col2, col3 = st.columns(3)
 with col1:
     td_a_input = st.text_input("Nhập TĐ A:", value="TQGP001.0011/HO")
@@ -73,9 +76,18 @@ with col2:
 with col3:
     target_dist = st.number_input("Khoảng cách từ TĐ A (mét):", min_value=0.0, value=100.0, step=1.0)
 
+# Xử lý khi nhấn nút Tìm kiếm
 if st.button("Tìm vị trí sự cố"):
-    td_a = normalize_node(td_a_input)
-    td_b = normalize_node(td_b_input)
+    st.session_state.search_performed = True
+    st.session_state.td_a = normalize_node(td_a_input)
+    st.session_state.td_b = normalize_node(td_b_input)
+    st.session_state.target_dist = target_dist
+
+# 6. Hiển thị kết quả tính toán nếu đã thực hiện tìm kiếm
+if st.session_state.search_performed:
+    td_a = st.session_state.td_a
+    td_b = st.session_state.td_b
+    target_dist = st.session_state.target_dist
 
     if not td_a or not td_b:
         st.warning("Vui lòng nhập đầy đủ thông tin TĐ A và TĐ B!")
@@ -127,7 +139,7 @@ if st.button("Tìm vị trí sự cố"):
                 fault_lat = u_coord[0] + ratio * (v_coord[0] - u_coord[0])
                 fault_lng = u_coord[1] + ratio * (v_coord[1] - u_coord[1])
 
-                m = folium.Map(location=[fault_lat, fault_lng], zoom_start=16)
+                m = folium.Map(location=[fault_lat, fault_lng], zoom_start=17)
 
                 path_coords = [hdn_coords[n] for n in node_path if n in hdn_coords]
                 if len(path_coords) > 1:
@@ -144,6 +156,7 @@ if st.button("Tìm vị trí sự cố"):
                     icon=folium.Icon(color="red", icon="wrench", prefix="fa")
                 ).add_to(m)
 
-                st_folium(m, width=900, height=500)
+                # Render bản đồ với key cố định tránh reset trạng thái
+                st_folium(m, width=1000, height=550, key="fault_map")
             else:
                 st.warning("Thiếu dữ liệu tọa độ Lat/Lng hợp lệ trong sheet HĐN cho đoạn cáp chứa vị trí đứt.")
