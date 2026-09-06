@@ -139,60 +139,20 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-def apply_map_custom_css(folium_map, fault_lat=None, fault_lng=None):
+# Đã bỏ nút chỉ đường từ GPS tới vị trí đứt trong hàm này
+def apply_map_custom_css(folium_map):
     font_awesome_link = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">'
     folium_map.get_root().html.add_child(folium.Element(font_awesome_link))
 
-    nav_script = ""
-    if fault_lat and fault_lng:
-        nav_script = f"""
-        <div style="position: absolute; top: 15px; left: 60px; z-index: 1000;">
-            <button onclick="navigateToFault()" style="
-                background-color: #059669;
-                color: white;
-                border: none;
-                padding: 10px 18px;
-                font-size: 14px;
-                font-weight: bold;
-                border-radius: 8px;
-                cursor: pointer;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            " onmouseover="this.style.backgroundColor='#047857'" onmouseout="this.style.backgroundColor='#059669'">
-                <i class="fa-solid fa-diamond-turn-right"></i> Chỉ đường từ GPS tới vị trí đứt
-            </button>
-        </div>
-        <script>
-        function navigateToFault() {{
-            if (navigator.geolocation) {{
-                navigator.geolocation.getCurrentPosition(function(position) {{
-                    var userLat = position.coords.latitude;
-                    var userLng = position.coords.longitude;
-                    var url = "https://www.google.com/maps/dir/?api=1&origin=" + userLat + "," + userLng + "&destination={fault_lat},{fault_lng}&travelmode=driving";
-                    window.open(url, '_blank');
-                }}, function(error) {{
-                    alert("Không thể lấy vị trí hiện tại của bạn. Mở định vị mặc định.");
-                    var fallbackUrl = "https://www.google.com/maps/dir/?api=1&destination={fault_lat},{fault_lng}";
-                    window.open(fallbackUrl, '_blank');
-                }}, {{ enableHighAccuracy: true, timeout: 10000 }});
-            }} else {{
-                alert("Trình duyệt không hỗ trợ Geolocation!");
-            }}
-        }}
-        </script>
-        """
-
-    custom_css = f"""
+    custom_css = """
     <style>
-    .leaflet-control-zoom {{ display: none !important; }}
-    .leaflet-control-locate {{
+    .leaflet-control-zoom { display: none !important; }
+    .leaflet-control-locate {
         margin-top: 70px !important;
         margin-left: 10px !important;
         border: none !important;
-    }}
-    .leaflet-control-locate a {{
+    }
+    .leaflet-control-locate a {
         background-color: #2563EB !important;
         color: #FFFFFF !important;
         border-radius: 8px !important;
@@ -203,21 +163,20 @@ def apply_map_custom_css(folium_map, fault_lat=None, fault_lng=None):
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-    }}
+    }
     .leaflet-control-locate a span.fa,
-    .leaflet-control-locate a span.fas {{
+    .leaflet-control-locate a span.fas {
         font-size: 16px !important;
         color: #FFFFFF !important;
-    }}
-    .leaflet-control-layers {{
+    }
+    .leaflet-control-layers {
         margin-top: 70px !important;
         margin-right: 10px !important;
         border-radius: 8px !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    }}
+    }
     </style>
-    {nav_script}
     """
     folium_map.get_root().html.add_child(folium.Element(custom_css))
 
@@ -592,7 +551,7 @@ if map_data:
         icon=folium.Icon(color="red", icon="wrench", prefix="fa")
     ).add_to(m)
 
-    apply_map_custom_css(m, fault_lat=map_data['fault_lat'], fault_lng=map_data['fault_lng'])
+    apply_map_custom_css(m)
     st_folium(m, width="100%", height=1000, key="fault_map")
 else:
     init_lat, init_lng = 21.0285, 105.8542
